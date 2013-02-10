@@ -7,9 +7,7 @@ import actions.Action;
 
 public abstract class Agent {
 	//State information
-	int x;
-	int y;
-	int z;
+	int[] pos = new int[3]; //Position (x, y, z)
 	ArrayList<Action> actions;
 	Action currentAction;
 	
@@ -46,5 +44,23 @@ public abstract class Agent {
 			return;
 		else
 			currentAction.execute(world);
+	}
+	
+	/**
+	 * Setter for position
+	 */
+	public void setPos(int[] newPos)
+	{
+		pos[0] = newPos[0];
+		pos[1] = newPos[1];
+		pos[2] = newPos[2];
+	}
+	
+	/**
+	 * Getter for position
+	 */
+	public int[] getPos()
+	{
+		return pos;
 	}
 }
