@@ -176,7 +176,7 @@ public class GameMain {
 		{
 			for (int j = 0; j < ys; j ++)
 			{
-				t[i][j][0] = new Terrain(cliff);
+				t[i][j][0] = new Terrain(rock);
 				t[i][j][1] = new Terrain(grass);
 			}
 		}
@@ -191,16 +191,16 @@ public class GameMain {
 			}
 		}
 		
-		t[2][2][1] = new Terrain(cliff);
-		t[3][2][1] = new Terrain(cliff);
-		t[4][2][1] = new Terrain(cliff);
-		t[2][3][1] = new Terrain(cliff);
-		t[3][3][1] = new Terrain(cliff);
-		t[4][3][1] = new Terrain(cliff);
-		t[3][4][1] = new Terrain(cliff);
-		t[4][4][1] = new Terrain(cliff);
-		t[3][4][2] = new Terrain(cliff);
-		t[4][4][2] = new Terrain(cliff);
+		t[2][2][1] = new Terrain(rock);
+		t[3][2][1] = new Terrain(rock);
+		t[4][2][1] = new Terrain(rock);
+		t[2][3][1] = new Terrain(rock);
+		t[3][3][1] = new Terrain(rock);
+		t[4][3][1] = new Terrain(rock);
+		t[3][4][1] = new Terrain(rock);
+		t[4][4][1] = new Terrain(rock);
+		t[3][4][2] = new Terrain(rock);
+		t[4][4][2] = new Terrain(rock);
 		
 		t[2][2][2] = new Terrain(grass);
 		t[3][2][2] = new Terrain(grass);
@@ -212,22 +212,22 @@ public class GameMain {
 		t[3][4][3] = new Terrain(dirt);
 		t[4][4][3] = new Terrain(dirt);
 		
-		t[7][3][1] = new Terrain(cliff);
-		t[7][3][2] = new Terrain(cliff);
+		t[7][3][1] = new Terrain(rock);
+		t[7][3][2] = new Terrain(rock);
 		
 		t[7][3][3] = new Terrain(dirt);
 		
-		t[6][8][1] = new Terrain(cliff);
-		t[6][8][2] = new Terrain(cliff);
-		t[7][8][1] = new Terrain(cliff);
-		t[7][8][2] = new Terrain(cliff);
-		t[8][8][1] = new Terrain(cliff);
-		t[8][8][2] = new Terrain(cliff);
+		t[6][8][1] = new Terrain(rock);
+		t[6][8][2] = new Terrain(rock);
+		t[7][8][1] = new Terrain(rock);
+		t[7][8][2] = new Terrain(rock);
+		t[8][8][1] = new Terrain(rock);
+		t[8][8][2] = new Terrain(rock);
 		t[7][8][3] = new Terrain(grass);
 		t[8][8][3] = new Terrain(grass);
-		t[6][8][3] = new Terrain(cliff);
-		t[6][8][4] = new Terrain(cliff);
-		t[6][8][5] = new Terrain(grass);
+		t[6][8][3] = new Terrain(rock);
+		t[6][8][4] = new Terrain(rock);
+		//t[6][8][5] = new Terrain(grass);
 		
 		t[0][9][1] = new Terrain(dirt);
 		t[0][8][1] = new Terrain(dirt);

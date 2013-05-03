@@ -5,18 +5,25 @@ import static world.Terrain.terrainType.*;
 public class Terrain {
 	public enum terrainType
 	{
-		grass, dirt, water, air, cliff
+		grass, dirt, air, rock
 	}
 	
 	boolean blocking;
-	boolean vertical;
 	terrainType type;
+	terrainType top;
 	int texRow;
 	int texCol;
+	int texRowTop;
+	int texColTop;
 	
 	public Terrain(terrainType t)
 	{
 		setTerrainType(t);
+	}
+	
+	public Terrain(terrainType aType, terrainType aTop)
+	{
+		setTerrainType(aType, aTop);
 	}
 	
 	/**
@@ -35,27 +42,39 @@ public class Terrain {
 	public void setTerrainType(terrainType t)
 	{
 		type = t;
+		top = t;
+		updateAttributes();
+	}
+	
+	/**
+	 * Change the terrain type
+	 * @param t the new terrain type
+	 */
+	public void setTerrainType(terrainType aType, terrainType aTop)
+	{
+		type = aType;
+		top = aTop;
 		updateAttributes();
 	}
 	
 	public int getTexRow()
 	{
-		int height;
-		if (vertical)
-			height = 2;
-		else
-			height = 4;
-		return texRow * height;
+		return texRow * 2;
 	}
 	
 	public int getTexCol()
 	{
-		int width;
-		if (vertical)
-			width = 2;
-		else
-			width = 4;
-		return texCol * width;
+		return texCol * 2;
+	}
+	
+	public int getTexRowTop()
+	{
+		return texRowTop * 4;
+	}
+	
+	public int getTexColTop()
+	{
+		return texColTop * 4;
 	}
 	
 	/**
@@ -70,8 +89,6 @@ public class Terrain {
 			return ',';
 		case dirt:
 			return ':';
-		case water:
-			return '~';
 		default:
 			return ' ';
 		}
@@ -87,22 +104,12 @@ public class Terrain {
 	}
 	
 	/**
-	 * Getter for vertical option
-	 * @return true if the terrain is vertical
-	 */
-	public boolean isVertical()
-	{
-		return vertical;
-	}
-	
-	/**
 	 * Updates the internal attributes of the terrain type.
 	 * This must be called any time the terrain type is set.
 	 */
 	private void updateAttributes()
 	{
 		setBlocking();
-		setVertical();
 		setTexPos();
 	}
 	
@@ -112,22 +119,10 @@ public class Terrain {
 	private void setBlocking()
 	{
 		//add the names of any new non-blocking terrain types here
-		if (type == grass || type == dirt)
+		if (type == air)
 			blocking = false;
 		else
 			blocking = true;
-	}
-	
-	/**
-	 * Determines whether or not a terrain type is vertical and updates accordingly
-	 */
-	private void setVertical()
-	{
-		//add the names of any new vertical terrain types here
-		if (type == cliff)
-			vertical = true;
-		else
-			vertical = false;
 	}
 	
 	/**
@@ -135,21 +130,30 @@ public class Terrain {
 	 */
 	private void setTexPos()
 	{
+		//Vertical textures
 		switch (type)
 		{
-		//Horizontal textures
 		case grass: 
 			texRow = 0; texCol = 0; break;
 		case dirt: 
 			texRow = 0; texCol = 1; break;
-		
-		//Vertical textures
-		case cliff:
-			texRow = 0; texCol = 0; break;
+		case rock:
+			texRow = 0; texCol = 2; break;
 			
 		//Unset
 		default:
 			texRow = 0; texCol = 0; break;
+		}
+		
+		//Horizontal textures
+		switch (top)
+		{
+		case grass:
+			texRowTop = 0; texColTop = 0; break;
+		case dirt: 
+			texRowTop = 0; texColTop = 1; break;
+		case rock:
+			texRowTop = 0; texColTop = 2; break;
 		}
 	}
 }
