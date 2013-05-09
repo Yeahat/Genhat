@@ -26,7 +26,7 @@ public class World {
 	private Texture hTerrainTexture;
 	private Texture vTerrainTexture;
 	
-	int[] displayCenter = new int[3];
+	float[] displayCenter = new float[3];
 	
 	/**
 	 * Constructor, initializes display center to the center of the world
@@ -41,9 +41,9 @@ public class World {
 		thingGrid = new Thing[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
 		
-		displayCenter[0] = (int)xSize/2;
-		displayCenter[1] = (int)ySize/2;
-		displayCenter[2] = (int)zSize/2;
+		displayCenter[0] = (float)xSize/2;
+		displayCenter[1] = (float)ySize/2;
+		displayCenter[2] = (float)zSize/2;
 	}
 	
 	/**
@@ -86,9 +86,10 @@ public class World {
 					//Display vertical textures
 					if (t.getTerrainType() != air)
 					{
+						System.out.println(i - (displayCenter[0]*TEXTURE_SIZE));
 						//Determine position on screen
-						int x = PIXEL_SIZE*TEXTURE_SIZE * (i - displayCenter[0]) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*TEXTURE_SIZE * (j - displayCenter[1]) + 300) - PIXEL_SIZE*TEXTURE_SIZE * (displayCenter[2] - k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
 						GL11.glPushMatrix();
 							//Translate to screen position and bind appropriate texture
@@ -139,8 +140,8 @@ public class World {
 						{
 							t = terrainGrid[i][j][k-1];
 							//Determine position on screen
-							int x = PIXEL_SIZE*TEXTURE_SIZE * (i - displayCenter[0]) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*TEXTURE_SIZE * (j - displayCenter[1]) + 300) - PIXEL_SIZE*TEXTURE_SIZE * (displayCenter[2] - k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
 								//Translate to screen position and bind appropriate texture
@@ -239,6 +240,67 @@ public class World {
 		displayCenter[0] = center[0];
 		displayCenter[1] = center[1];
 		displayCenter[2] = center[2];
+	}
+	
+	/**
+	 * Incrementer for the display x
+	 * 
+	 * @param x the amount to increment the display x center, in pixels
+	 */
+	public void IncrementDisplayX(int x)
+	{
+		displayCenter[0] += (float)x/TEXTURE_SIZE;
+	}
+	
+	/**
+	 * Incrementer for the display y
+	 * 
+	 * @param y the amount to increment the display y center, in pixels
+	 */
+	public void IncrementDisplayY(int y)
+	{
+		displayCenter[1] += (float)y/TEXTURE_SIZE;
+	}
+	
+	
+	/**
+	 * Incrementer for the display z
+	 * 
+	 * @param z the amount to increment the display z center, in pixels
+	 */
+	public void IncrementDisplayZ(int z)
+	{
+		displayCenter[2] += (float)z/TEXTURE_SIZE;
+	}
+	
+	/**
+	 * Getter for the display x
+	 * 
+	 * @return x display pixel coordinate
+	 */
+	public float getDisplayX()
+	{
+		return displayCenter[0];
+	}
+	
+	/**
+	 * Getter for the display y
+	 * 
+	 * @return y display pixel coordinate
+	 */
+	public float getDisplayY()
+	{
+		return displayCenter[1];
+	}
+	
+	/**
+	 * Getter for the display z
+	 * 
+	 * @return z display pixel coordinate
+	 */
+	public float getDisplayZ()
+	{
+		return displayCenter[2];
 	}
 	
 	/**

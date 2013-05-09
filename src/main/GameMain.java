@@ -76,21 +76,21 @@ public class GameMain {
 			
 		}
 		
-		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 		{
-			
-		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
-		{
-			
+			world.IncrementDisplayY(1);
 		}
 		else if (Keyboard.isKeyDown(Keyboard.KEY_UP))
 		{
-			
+			world.IncrementDisplayY(-1);
 		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+		else if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 		{
-			
+			world.IncrementDisplayX(-1);
+		}
+		else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+		{
+			world.IncrementDisplayX(1);
 		}
 	}
 	
