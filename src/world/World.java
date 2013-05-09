@@ -19,7 +19,8 @@ public class World {
 	Agent[][][] agentGrid;
 	ArrayList<Agent> agents;
 	
-	int PIXEL_SIZE = 4;
+	int PIXEL_SIZE = 2;
+	int TEXTURE_SIZE = 16;
 	
 	//Textures
 	private Texture hTerrainTexture;
@@ -86,8 +87,8 @@ public class World {
 					if (t.getTerrainType() != air)
 					{
 						//Determine position on screen
-						int x = PIXEL_SIZE*6 * (i - displayCenter[0]) + 400;
-						int y = (PIXEL_SIZE*6 * (j - displayCenter[1]) + 300) - PIXEL_SIZE*6 * (displayCenter[2] - k);
+						int x = PIXEL_SIZE*TEXTURE_SIZE * (i - displayCenter[0]) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*TEXTURE_SIZE * (j - displayCenter[1]) + 300) - PIXEL_SIZE*TEXTURE_SIZE * (displayCenter[2] - k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
 						GL11.glPushMatrix();
 							//Translate to screen position and bind appropriate texture
@@ -116,17 +117,17 @@ public class World {
 				    			texX += 1;
 				    		}
 				    		
-				    		tConv = 6.0f/128.0f;	//width and height of texture sheet
+				    		tConv = ((float)TEXTURE_SIZE)/128.0f;	//width and height of texture sheet
 					    	
 					    	GL11.glBegin(GL11.GL_QUADS);
 								GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 								GL11.glVertex2f(0, 0);
 								GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-								GL11.glVertex2f(PIXEL_SIZE*6, 0);
+								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
 								GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-								GL11.glVertex2f(PIXEL_SIZE*6, PIXEL_SIZE*6);
+								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
 								GL11.glTexCoord2f(texX*tConv, texY * tConv);
-								GL11.glVertex2f(0, PIXEL_SIZE*6);
+								GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
 							GL11.glEnd();
 							
 						GL11.glPopMatrix();
@@ -138,8 +139,8 @@ public class World {
 						{
 							t = terrainGrid[i][j][k-1];
 							//Determine position on screen
-							int x = PIXEL_SIZE*6 * (i - displayCenter[0]) + 400;
-							int y = (PIXEL_SIZE*6 * (j - displayCenter[1]) + 300) - PIXEL_SIZE*6 * (displayCenter[2] - k);
+							int x = PIXEL_SIZE*TEXTURE_SIZE * (i - displayCenter[0]) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int y = (PIXEL_SIZE*TEXTURE_SIZE * (j - displayCenter[1]) + 300) - PIXEL_SIZE*TEXTURE_SIZE * (displayCenter[2] - k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
 								//Translate to screen position and bind appropriate texture
@@ -193,17 +194,17 @@ public class World {
 					    			texX += 1;
 					    		}
 					    		
-					    		tConv = 6.0f/256.0f;	//width and height of texture sheet
+					    		tConv = ((float)TEXTURE_SIZE)/256.0f;	//width and height of texture sheet
 					    		
 					    		GL11.glBegin(GL11.GL_QUADS);
 									GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 									GL11.glVertex2f(0, 0);
 									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-									GL11.glVertex2f(PIXEL_SIZE*6, 0);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
 									GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-									GL11.glVertex2f(PIXEL_SIZE*6, PIXEL_SIZE*6);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
 									GL11.glTexCoord2f(texX*tConv, texY * tConv);
-									GL11.glVertex2f(0, PIXEL_SIZE*6);
+									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
 								GL11.glEnd();
 								
 							GL11.glPopMatrix();

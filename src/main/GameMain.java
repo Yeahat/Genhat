@@ -108,7 +108,7 @@ public class GameMain {
 			System.exit(0);
 		}
 		
-		GL11.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+		GL11.glClearColor(0.3f, 0.7f, 1.0f, 1.0f);
 		
 		//Allow transparent colors in textures
 		GL11.glEnable(GL11.GL_BLEND);
@@ -130,6 +130,7 @@ public class GameMain {
 	 */
 	public void initWorld()
 	{
+		//genTestWorld0();
 		genTestWorld1();
 	}
 	
@@ -168,6 +169,27 @@ public class GameMain {
 	/*#################################################################################
 	 * Test Worlds
 	 *#################################################################################*/
+	private void genTestWorld0()
+	{
+		int xs = 10, ys = 10, zs = 10;
+		Terrain[][][] t = new Terrain[xs][ys][zs];
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				for (int k = 0; k < zs; k ++)
+				{
+					t[i][j][k] = new Terrain(air);
+				}
+			}
+		}
+		
+		t[xs/2][ys/2][zs/2] = new Terrain(grass);
+		
+		world = new World(xs, ys, zs);
+		world.setTerrain(t);
+	}
+	
 	private void genTestWorld1()
 	{
 		int xs = 10, ys = 10, zs = 10;
@@ -215,7 +237,7 @@ public class GameMain {
 		t[7][3][1] = new Terrain(rock);
 		t[7][3][2] = new Terrain(rock);
 		
-		t[7][3][3] = new Terrain(dirt);
+		t[7][3][3] = new Terrain(dirt, grass);
 		
 		t[6][8][1] = new Terrain(rock);
 		t[6][8][2] = new Terrain(rock);
