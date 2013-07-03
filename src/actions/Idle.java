@@ -1,0 +1,20 @@
+package actions;
+
+import java.util.ArrayList;
+
+import entities.Agent;
+
+import world.World;
+
+public class Idle implements Action {
+
+	/**
+	 * Do nothing, this is the default idle action
+	 */
+	@Override
+	public void execute(Agent agent, World world, ArrayList<String> args) 
+	{
+		return;
+	}
+	
+}

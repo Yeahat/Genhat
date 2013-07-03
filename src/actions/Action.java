@@ -1,5 +1,9 @@
 package actions;
 
+import java.util.ArrayList;
+
+import entities.Agent;
+
 import world.World;
 
 public interface Action {
@@ -9,5 +13,5 @@ public interface Action {
 	 * @param world the world which contains all information necessary for
 	 * an action to be executed
 	 */
-	public void execute(World world);
+	public void execute(Agent agent, World world, ArrayList<String> args);
 }
