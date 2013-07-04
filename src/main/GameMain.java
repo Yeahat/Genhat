@@ -1,10 +1,15 @@
 package main;
 
+import java.util.ArrayList;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+
+import entities.Agent;
+import entities.Hero;
 
 import world.Terrain;
 import world.World;
@@ -29,6 +34,7 @@ public class GameMain {
 		while(!Display.isCloseRequested())	//exits when window is closed
 		{
 			//update everything
+			world.updateAgents();
 			
 			//render everything
 			renderGL();
@@ -38,7 +44,7 @@ public class GameMain {
 			
 			//update the screen
 			Display.update();
-			Display.sync(30);
+			Display.sync(32);
 		}
 		
 		//Exit
@@ -78,19 +84,59 @@ public class GameMain {
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 		{
-			world.IncrementDisplayY(1);
+			Hero player = world.getPlayer();
+			if (player != null)
+			{
+				if (player.isIdle())
+				{
+					ArrayList<String> newArgs = new ArrayList<String>();
+					newArgs.add("down");
+					world.getPlayer().setArgs(newArgs);
+					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+				}
+			}
 		}
 		else if (Keyboard.isKeyDown(Keyboard.KEY_UP))
 		{
-			world.IncrementDisplayY(-1);
+			Hero player = world.getPlayer();
+			if (player != null)
+			{
+				if (player.isIdle())
+				{
+					ArrayList<String> newArgs = new ArrayList<String>();
+					newArgs.add("up");
+					world.getPlayer().setArgs(newArgs);
+					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+				}
+			}
 		}
 		else if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 		{
-			world.IncrementDisplayX(-1);
+			Hero player = world.getPlayer();
+			if (player != null)
+			{
+				if (player.isIdle())
+				{
+					ArrayList<String> newArgs = new ArrayList<String>();
+					newArgs.add("right");
+					world.getPlayer().setArgs(newArgs);
+					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+				}
+			}
 		}
 		else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 		{
-			world.IncrementDisplayX(1);
+			Hero player = world.getPlayer();
+			if (player != null)
+			{
+				if (player.isIdle())
+				{
+					ArrayList<String> newArgs = new ArrayList<String>();
+					newArgs.add("left");
+					world.getPlayer().setArgs(newArgs);
+					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+				}
+			}
 		}
 	}
 	
@@ -131,7 +177,8 @@ public class GameMain {
 	public void initWorld()
 	{
 		//genTestWorld0();
-		genTestWorld1();
+		//genTestWorld1();
+		genTestWorldAgentPos();
 	}
 	
 	/**
@@ -259,5 +306,34 @@ public class GameMain {
 		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
+	}
+	
+	private void genTestWorldAgentPos()
+	{
+		int xs = 10, ys = 10, zs = 10;
+		Terrain[][][] t = new Terrain[xs][ys][zs];
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				for (int k = 0; k < zs; k ++)
+				{
+					t[i][j][k] = new Terrain(air);
+				}
+			}
+		}
+		
+		t[xs/2][ys/2][zs/2] = new Terrain(grass);
+		
+		world = new World(xs, ys, zs);
+		world.setTerrain(t);
+		
+		ArrayList<Agent> agents = new ArrayList<Agent>();
+		Hero hero = new Hero();
+		int[] pos = {xs/2, ys/2, zs/2 + 1};
+		hero.setPos(pos);
+		agents.add(hero);
+		world.addAgents(agents);
+		world.setPlayer(hero);
 	}
 }

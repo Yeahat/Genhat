@@ -17,4 +17,13 @@ public class Idle implements Action {
 		return;
 	}
 	
+	/**
+	 * The action is always finished
+	 * @return true always
+	 */
+	@Override
+	public boolean isFinished()
+	{
+		return true;
+	}
 }

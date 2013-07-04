@@ -6,7 +6,7 @@ import entities.Agent;
 
 import world.World;
 
-public interface Action {
+public interface Action {	
 	/**
 	 * Execute one step of the action
 	 * 
@@ -14,4 +14,6 @@ public interface Action {
 	 * an action to be executed
 	 */
 	public void execute(Agent agent, World world, ArrayList<String> args);
+	
+	public boolean isFinished();
 }
