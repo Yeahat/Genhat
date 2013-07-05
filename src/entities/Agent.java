@@ -27,6 +27,8 @@ public abstract class Agent {
 	private direction dir;	//direction the agent is facing
 	private int speed;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
 	boolean stepping;	//true if the agent is currently taking a step
+	private direction footstep; //whether the next step is the left or right foot
+	private int height;	//Agent height in tiles
 	
 	//Actions: List all actions of this agent here
 	Idle idle;
@@ -216,5 +218,21 @@ public abstract class Agent {
 
 	public direction getDir() {
 		return dir;
+	}
+
+	public void setFootstep(direction footstep) {
+		this.footstep = footstep;
+	}
+
+	public direction getFootstep() {
+		return footstep;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 }

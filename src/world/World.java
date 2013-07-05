@@ -400,16 +400,58 @@ public class World {
 	 * @param x grid location
 	 * @param y grid location
 	 * @param z grid location
-	 * @return true if an agent cannot move to the grid space space
+	 * @return true if an agent cannot move to the grid space
 	 */
 	public boolean isBlocked(int x, int y, int z)
 	{
-		if (this.isOccupied(x,y,z))
+		if (this.isOccupied(x, y, z))
+		{
 			return true;
-		else if (this.hasThing(x,y,z))
+		}
+		else if (this.hasThing(x, y, z))
+		{
 			return this.thingGrid[x][y][z].isBlocking();
+		}
 		else
+		{
 			return terrainGrid[x][y][z].isBlocking();
+		}
+	}
+	
+	public boolean isCrossable(int x, int y, int z)
+	{
+		if (this.hasThing(x, y, z))
+		{
+			return this.thingGrid[x][y][z].isCrossable();
+		}
+		else
+		{
+			if (!this.isInBounds(x, y, z - 1))
+			{
+				return false;
+			}
+			else
+			{
+				return this.terrainGrid[x][y][z-1].isBlocking();
+			}
+		}
+	}
+	
+	/**
+	 * Check whether a specified location is within the bounds of the world grid
+	 * 
+	 * @param x grid location
+	 * @param y grid location
+	 * @param z grid location
+	 * @return true if the specified grid space is within bounds
+	 */
+	public boolean isInBounds(int x, int y, int z)
+	{
+		if (x >= 0 && x < terrainGrid.length && y >= 0 && y < terrainGrid[0].length && z >= 0 && z < terrainGrid[0][0].length)
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	public void setTerrain(Terrain[][][] t)

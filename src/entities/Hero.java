@@ -41,6 +41,8 @@ public class Hero extends Agent {
 		setDir(down);
 		setSpeed(2);
 		setStepping(false);
+		setFootstep(left);
+		setHeight(2);
 	}
 	
 	@Override
@@ -89,15 +91,13 @@ public class Hero extends Agent {
 				break;
 			}
 			
-			if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 12) 
-				|| (Math.abs(offset[1]) <= 16) && Math.abs(offset[1]) > 12)
+			if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7) 
+				|| (Math.abs(offset[1]) <= 16) && Math.abs(offset[1]) > 7)
 			{
-				texX = 0;
-			}
-			else if ((Math.abs(offset[0]) <= 8 && Math.abs(offset[0]) > 4) 
-				|| (Math.abs(offset[1]) <= 8 && Math.abs(offset[1]) > 4))
-			{
-				texX = 2;
+				if (getFootstep() == right)
+					texX = 2;
+				else
+					texX = 0;
 			}
 			else
 			{
