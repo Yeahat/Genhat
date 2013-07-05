@@ -296,13 +296,15 @@ public class GameMain {
 		t[8][8][3] = new Terrain(grass);
 		t[6][8][3] = new Terrain(rock);
 		t[6][8][4] = new Terrain(rock);
-		//t[6][8][5] = new Terrain(grass);
+		t[6][8][5] = new Terrain(grass);
 		
 		t[0][9][1] = new Terrain(dirt);
 		t[0][8][1] = new Terrain(dirt);
 		t[0][7][1] = new Terrain(dirt);
+		t[0][6][1] = new Terrain(dirt);
 		t[1][9][1] = new Terrain(dirt);
-		t[1][8][1] = new Terrain(dirt);
+		t[1][8][1] = new Terrain(air);
+		t[1][7][1] = new Terrain(air);
 		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
@@ -310,27 +312,11 @@ public class GameMain {
 	
 	private void genTestWorldAgentPos()
 	{
-		int xs = 10, ys = 10, zs = 10;
-		Terrain[][][] t = new Terrain[xs][ys][zs];
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				for (int k = 0; k < zs; k ++)
-				{
-					t[i][j][k] = new Terrain(air);
-				}
-			}
-		}
-		
-		t[xs/2][ys/2][zs/2] = new Terrain(grass);
-		
-		world = new World(xs, ys, zs);
-		world.setTerrain(t);
+		genTestWorld1();
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		Hero hero = new Hero();
-		int[] pos = {xs/2, ys/2, zs/2 + 1};
+		int[] pos = {1, 1, 2};
 		hero.setPos(pos);
 		agents.add(hero);
 		world.addAgents(agents);

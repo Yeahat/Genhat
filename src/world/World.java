@@ -93,7 +93,7 @@ public class World {
 	{
 		for (int k = 0; k < terrainGrid[0][0].length; k ++)
 		{
-			for (int j = 0; j < terrainGrid[0].length; j ++)
+			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
 			{
 				for (int i = 0; i < terrainGrid.length; i ++)
 				{
