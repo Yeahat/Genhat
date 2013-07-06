@@ -93,53 +93,132 @@ public class World {
 	{
 		for (int k = 0; k < terrainGrid[0][0].length; k ++)
 		{
+			
+			//***************************************************************************************************************
+			//********* TERRAIN RENDERING ***********************************************************************************
+			//***************************************************************************************************************
 			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
 			{
 				for (int i = 0; i < terrainGrid.length; i ++)
 				{
 					Terrain t = terrainGrid[i][j][k];					
-						//***************************************************************************************************************
-						//********* TERRAIN RENDERING ***********************************************************************************
-						//***************************************************************************************************************
 					
-						//Display vertical textures
-						if (t.getTerrainType() != air)
+					//Display vertical textures
+					if (t.getTerrainType() != air)
+					{
+						//Determine position on screen
+						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						
+						GL11.glPushMatrix();
+						
+							//Translate to screen position and bind appropriate texture
+							GL11.glColor3f(1.0f, 1.0f, 1.0f);
+							GL11.glEnable(GL11.GL_TEXTURE_2D);
+							GL11.glTranslatef(x, y, 0);
+							vTerrainTexture.bind();
+							GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+					    	
+					    	//Determine which part of the texture to use based on how many neighbors are air
+					    	int texX = t.getTexCol();
+					    	int texY = t.getTexRow();
+					    	float tConv;
+				    		if ((i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air) && 
+				    				(i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air))
+				    		{
+				    			texY += 1;
+				    		}
+				    		else if (i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air)
+				    		{
+				    			texX += 1;
+				    			texY += 1;
+				    		}
+				    		else if (i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air)
+				    		{
+				    			texX += 1;
+				    		}
+				    		
+				    		tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
+					    	
+					    	GL11.glBegin(GL11.GL_QUADS);
+								GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
+								GL11.glVertex2f(0, 0);
+								GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
+								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
+								GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
+								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
+								GL11.glTexCoord2f(texX*tConv, texY * tConv);
+								GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+							GL11.glEnd();
+							
+						GL11.glPopMatrix();
+					}
+					//Display horizontal textures
+					else if (k - 1 >= 0)
+					{
+						if (terrainGrid[i][j][k-1].getTerrainType() != air)
 						{
+							t = terrainGrid[i][j][k-1];
 							//Determine position on screen
 							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
-							
+								
 								//Translate to screen position and bind appropriate texture
 								GL11.glColor3f(1.0f, 1.0f, 1.0f);
 								GL11.glEnable(GL11.GL_TEXTURE_2D);
 								GL11.glTranslatef(x, y, 0);
-								vTerrainTexture.bind();
+								hTerrainTexture.bind();
 								GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 						    	
 						    	//Determine which part of the texture to use based on how many neighbors are air
-						    	int texX = t.getTexCol();
-						    	int texY = t.getTexRow();
+						    	int texX = t.getTexColTop();
+						    	int texY = t.getTexRowTop();
 						    	float tConv;
-					    		if ((i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air) && 
-					    				(i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air))
+							
+								boolean topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainType() == air,
+				    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainType() == air,
+				    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainType() == air,
+				    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainType() == air;
+				    		
+					    		if (topEmpty && bottomEmpty)
+					    		{
+					    			texY += 3;
+					    		}
+					    		else if (topEmpty)
+					    		{
+					    			//texY is unchanged, this case is required for the else case and organizational purposes
+					    		}
+					    		else if (bottomEmpty)
+					    		{
+					    			texY += 2;
+					    		}
+					    		else
 					    		{
 					    			texY += 1;
 					    		}
-					    		else if (i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air)
+					    		
+					    		if (leftEmpty && rightEmpty)
 					    		{
-					    			texX += 1;
-					    			texY += 1;
+					    			texX += 3;
 					    		}
-					    		else if (i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air)
+					    		else if (leftEmpty)
+					    		{
+					    			//texX is unchanged, this case is required for the else case and organizational purposes
+					    		}
+					    		else if (rightEmpty)
+					    		{
+					    			texX += 2;
+					    		}
+					    		else
 					    		{
 					    			texX += 1;
 					    		}
 					    		
-					    		tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
-						    	
-						    	GL11.glBegin(GL11.GL_QUADS);
+					    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
+					    		
+					    		GL11.glBegin(GL11.GL_QUADS);
 									GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 									GL11.glVertex2f(0, 0);
 									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
@@ -149,110 +228,42 @@ public class World {
 									GL11.glTexCoord2f(texX*tConv, texY * tConv);
 									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
 								GL11.glEnd();
-								
-							GL11.glPopMatrix();
-						}
-						//Display horizontal textures
-						else if (k - 1 >= 0)
-						{
-							if (terrainGrid[i][j][k-1].getTerrainType() != air)
-							{
-								t = terrainGrid[i][j][k-1];
-								//Determine position on screen
-								int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-								int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-								
-								GL11.glPushMatrix();
-									
-									//Translate to screen position and bind appropriate texture
-									GL11.glColor3f(1.0f, 1.0f, 1.0f);
-									GL11.glEnable(GL11.GL_TEXTURE_2D);
-									GL11.glTranslatef(x, y, 0);
-									hTerrainTexture.bind();
-									GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-							    	
-							    	//Determine which part of the texture to use based on how many neighbors are air
-							    	int texX = t.getTexColTop();
-							    	int texY = t.getTexRowTop();
-							    	float tConv;
-								
-									boolean topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainType() == air,
-					    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainType() == air,
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainType() == air,
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainType() == air;
-					    		
-						    		if (topEmpty && bottomEmpty)
-						    		{
-						    			texY += 3;
-						    		}
-						    		else if (topEmpty)
-						    		{
-						    			//texY is unchanged, this case is required for the else case and organizational purposes
-						    		}
-						    		else if (bottomEmpty)
-						    		{
-						    			texY += 2;
-						    		}
-						    		else
-						    		{
-						    			texY += 1;
-						    		}
-						    		
-						    		if (leftEmpty && rightEmpty)
-						    		{
-						    			texX += 3;
-						    		}
-						    		else if (leftEmpty)
-						    		{
-						    			//texX is unchanged, this case is required for the else case and organizational purposes
-						    		}
-						    		else if (rightEmpty)
-						    		{
-						    			texX += 2;
-						    		}
-						    		else
-						    		{
-						    			texX += 1;
-						    		}
-						    		
-						    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
-						    		
-						    		GL11.glBegin(GL11.GL_QUADS);
-										GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-										GL11.glVertex2f(0, 0);
-										GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-										GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-										GL11.glTexCoord2f(texX*tConv, texY * tConv);
-										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-									GL11.glEnd();
-								
-								GL11.glPopMatrix();
-							}
-						}
-					
-						//***************************************************************************************************************
-						//********* OBJECT RENDERING ************************************************************************************
-						//***************************************************************************************************************
-						
-						//***************************************************************************************************************
-						//********* AGENT RENDERING *************************************************************************************
-						//***************************************************************************************************************
-						
-						Agent agent = agentGrid[i][j][k];
-						if (agent != null)
-						{
-							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
-							GL11.glPushMatrix();
-								GL11.glTranslatef(x, y, 0);
-								agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
 							GL11.glPopMatrix();
 						}
+					}
+				}
+			}
+			
+			//***************************************************************************************************************
+			//********* OBJECT RENDERING ************************************************************************************
+			//***************************************************************************************************************
+			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
+			{
+				for (int i = 0; i < terrainGrid.length; i ++)
+				{					
+					
+				}
+			}
+			
+			//***************************************************************************************************************
+			//********* AGENT RENDERING *************************************************************************************
+			//***************************************************************************************************************
+			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
+			{
+				for (int i = 0; i < terrainGrid.length; i ++)
+				{
+					Agent agent = agentGrid[i][j][k];
+					if (agent != null)
+					{
+						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
-					GL11.glPopMatrix();
+						GL11.glPushMatrix();
+							GL11.glTranslatef(x, y, 0);
+							agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
+						GL11.glPopMatrix();
+					}
 				}
 			}
 		}
