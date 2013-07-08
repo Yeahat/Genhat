@@ -1,5 +1,9 @@
 package entities;
 
+import static entities.Agent.direction.down;
+import static entities.Agent.direction.left;
+import static entities.Agent.direction.right;
+
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
@@ -8,33 +12,48 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import actions.Step;
 import actions.Turn;
+import actions.Wander;
 
 import world.World;
 
-import static entities.Agent.direction.*;
-
-public class Hero extends Agent {
-	int row;
-	int column;
+public class Wanderer extends Agent {
+	int frequency;
+	int distance;
+	int[] homePosTemp;
 	
 	//Actions
-	Step step;
-	Turn turn;
+	Wander wander;
 	
 	/**
 	 * Constructor
 	 */
-	public Hero()
+	public Wanderer(int[] homePosition, int freq, int dst)
 	{
-		super();
+		super(false, false);
+		
+		frequency = freq;
+		distance = dst;
+		homePosTemp = new int[3];
+		if (homePosition.length < 3)
+		{
+			homePosTemp = getPos();
+		}
+		else
+		{
+			homePosTemp[0] = homePosition[0];
+			homePosTemp[1] = homePosition[1];
+			homePosTemp[2] = homePosition[2];
+		}
+		
+		setActions();		
+		initState();
 	}
 	
 	@Override
 	protected void setActions()
 	{
 		super.setActions();
-		step = new Step();
-		turn = new Turn();
+		wander = new Wander(frequency, distance);
 	}
 	
 	@Override
@@ -46,16 +65,14 @@ public class Hero extends Agent {
 		setStepping(false);
 		setFootstep(left);
 		setHeight(2);
+		setHomePos(homePosTemp);
 	}
 	
 	@Override
 	public void decideNextAction(World world) 
 	{
-		if (currentAction.isFinished())
-		{
-			currentAction = idle;
-			args.clear();
-		}
+		if (currentAction != wander)
+			currentAction = wander;
 	}
 
 	@Override
@@ -67,10 +84,10 @@ public class Hero extends Agent {
 	}
 
 	@Override
-	public void renderAgent(int pixelSize, int terrainTextureSize) 
+	public void renderAgent(int pixelSize, int terrainTextureSize)
 	{
 		GL11.glPushMatrix();
-			
+		
 			texture.bind();
 			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		
@@ -125,37 +142,5 @@ public class Hero extends Agent {
 			
 		GL11.glPopMatrix();
 	}
-	
-	/**
-	 * Getter for the hero's step action, this is required to allow the keyboard polling to set
-	 * the agent's action from outside of the scope of the class
-	 * @return the agent's step action
-	 */
-	public Step getStepAction()
-	{
-		return step;
-	}
-	
-	/**
-	 * Getter for the hero's turn action, this is required to allow the keyboard polling to set
-	 * the agent's action from outside of the scope of the class
-	 * @return the agent's turn action
-	 */
-	public Turn getTurnAction()
-	{
-		return turn;
-	}
-	
-	/**
-	 * Getter for whether or not the hero is idle, this is required to allow the keyboard polling to determine
-	 * whether it should change the agent's action from outside the scope of the class
-	 * @return true if the agent's current action is idle
-	 */
-	public boolean isIdle()
-	{
-		if (currentAction == idle)
-			return true;
-		else
-			return false;
-	}
+
 }

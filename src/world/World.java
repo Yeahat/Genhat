@@ -388,7 +388,7 @@ public class World {
 	 */
 	public boolean isOccupied(int x, int y, int z)
 	{
-		return agentGrid[x][y][x] != null;
+		return agentGrid[x][y][z] != null;
 	}
 	
 	/**

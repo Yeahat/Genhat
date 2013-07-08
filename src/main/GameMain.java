@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import entities.Agent;
 import entities.Hero;
+import entities.Wanderer;
 
 import world.Terrain;
 import world.World;
@@ -19,6 +20,8 @@ import static world.Terrain.terrainType.*;
 public class GameMain {
 	
 	World world;
+	
+	int arrowKeyInputCount = 0;
 	
 	/**
 	 * Main game loop, this is where everything happens
@@ -87,12 +90,16 @@ public class GameMain {
 			Hero player = world.getPlayer();
 			if (player != null)
 			{
+				arrowKeyInputCount ++;
 				if (player.isIdle())
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("down");
 					world.getPlayer().setArgs(newArgs);
-					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+					if (arrowKeyInputCount < 3)
+						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+					else
+						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
 				}
 			}
 		}
@@ -101,12 +108,16 @@ public class GameMain {
 			Hero player = world.getPlayer();
 			if (player != null)
 			{
+				arrowKeyInputCount ++;
 				if (player.isIdle())
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("up");
 					world.getPlayer().setArgs(newArgs);
-					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+					if (arrowKeyInputCount < 3)
+						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+					else
+						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
 				}
 			}
 		}
@@ -115,12 +126,16 @@ public class GameMain {
 			Hero player = world.getPlayer();
 			if (player != null)
 			{
+				arrowKeyInputCount ++;
 				if (player.isIdle())
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("right");
 					world.getPlayer().setArgs(newArgs);
-					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+					if (arrowKeyInputCount < 3)
+						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+					else
+						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
 				}
 			}
 		}
@@ -129,14 +144,22 @@ public class GameMain {
 			Hero player = world.getPlayer();
 			if (player != null)
 			{
+				arrowKeyInputCount ++;
 				if (player.isIdle())
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("left");
 					world.getPlayer().setArgs(newArgs);
-					world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+					if (arrowKeyInputCount < 3)
+						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+					else
+						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
 				}
 			}
+		}
+		else
+		{
+			arrowKeyInputCount = 0;
 		}
 	}
 	
@@ -178,7 +201,7 @@ public class GameMain {
 	{
 		//genTestWorld0();
 		//genTestWorld1();
-		genTestWorldAgentPos();
+		genTestWorldHeroTest();
 	}
 	
 	/**
@@ -310,15 +333,22 @@ public class GameMain {
 		world.setTerrain(t);
 	}
 	
-	private void genTestWorldAgentPos()
+	private void genTestWorldHeroTest()
 	{
 		genTestWorld1();
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
+		
 		Hero hero = new Hero();
 		int[] pos = {1, 1, 2};
 		hero.setPos(pos);
 		agents.add(hero);
+		
+		int[] wPos = {8, 6, 2};
+		Wanderer wanderer = new Wanderer(wPos, 32, 2);
+		wanderer.setPos(wPos);
+		agents.add(wanderer);
+		
 		world.addAgents(agents);
 		world.setPlayer(hero);
 	}

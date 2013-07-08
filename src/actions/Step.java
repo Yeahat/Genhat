@@ -10,7 +10,7 @@ import static entities.Agent.direction.*;
 
 public class Step implements Action {
 
-	boolean finishedStep = false;
+	boolean finishedStep = true;
 	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)

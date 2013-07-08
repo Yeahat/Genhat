@@ -29,6 +29,7 @@ public abstract class Agent {
 	boolean stepping;	//true if the agent is currently taking a step
 	private direction footstep; //whether the next step is the left or right foot
 	private int height;	//Agent height in tiles
+	private int[] homePos;
 	
 	//Actions: List all actions of this agent here
 	Idle idle;
@@ -48,6 +49,32 @@ public abstract class Agent {
 		setActions();		
 		loadTextures();
 		initState();
+	}
+	
+	/**
+	 * Constructor that may or may not initialize state
+	 * @param initState true if state should be initialized, false otherwise
+	 */
+	public Agent(boolean initState)
+	{
+		setActions();
+		loadTextures();
+		if (initState)
+			initState();
+	}
+	
+	/**
+	 * Constructor that may or may not initialize state and set actions
+	 * @param initState true if state should be initialized, false otherwise
+	 * @param setActions true if actions should be set, false otherwise
+	 */
+	public Agent(boolean initState, boolean setActions)
+	{
+		if (setActions)
+			setActions();
+		loadTextures();
+		if (initState)
+			initState();
 	}
 	
 	/**
@@ -234,5 +261,13 @@ public abstract class Agent {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public void setHomePos(int[] homePos) {
+		this.homePos = homePos;
+	}
+
+	public int[] getHomePos() {
+		return homePos;
 	}
 }
