@@ -12,10 +12,13 @@ import entities.Agent;
 import entities.Hero;
 import entities.Wanderer;
 
+import things.Stairs;
+import things.Thing;
 import world.Terrain;
 import world.World;
 
 import static world.Terrain.terrainType.*;
+import static entities.Agent.direction.*;
 
 public class GameMain {
 	
@@ -202,6 +205,7 @@ public class GameMain {
 		//genTestWorld0();
 		//genTestWorld1();
 		genTestWorldHeroTest();
+		//genTestWorldStairs();
 	}
 	
 	/**
@@ -348,6 +352,55 @@ public class GameMain {
 		Wanderer wanderer = new Wanderer(wPos, 32, 2);
 		wanderer.setPos(wPos);
 		agents.add(wanderer);
+		
+		world.addAgents(agents);
+		world.setPlayer(hero);
+	}
+	
+	private void genTestWorldStairs()
+	{
+		int xs = 6, ys = 6, zs = 6;
+		Terrain[][][] t = new Terrain[xs][ys][zs];
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				for (int k = 0; k < zs; k ++)
+				{
+					t[i][j][k] = new Terrain(air);
+				}
+			}
+		}
+		
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				t[i][j][0] = new Terrain(grass);
+			}
+		}
+		
+		t[3][3][1] = new Terrain(grass);
+		t[3][4][1] = new Terrain(grass);
+		t[4][3][1] = new Terrain(grass);
+		t[4][4][1] = new Terrain(grass);
+		
+		Stairs s1 = new Stairs(down);
+		Stairs s2 = new Stairs(left);
+		Stairs s3 = new Stairs(right);
+		
+		world = new World(xs, ys, zs);
+		world.setTerrain(t);
+		world.addThing(s1, 3, 2, 1);
+		world.addThing(s2, 2, 2, 1);
+		world.addThing(s3, 5, 3, 1);
+		
+ArrayList<Agent> agents = new ArrayList<Agent>();
+		
+		Hero hero = new Hero();
+		int[] pos = {1, 1, 1};
+		hero.setPos(pos);
+		agents.add(hero);
 		
 		world.addAgents(agents);
 		world.setPlayer(hero);

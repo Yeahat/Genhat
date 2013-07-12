@@ -9,7 +9,7 @@ public abstract class Thing {
 	boolean blocking;
 	boolean crossable;
 	boolean ramp;
-	int[] pos = new int[3]; //Position (x, y, z)
+	private int[] pos = new int[3]; //Position (x, y, z)
 	direction dir;	//direction the object is facing
 	
 	//Texture
@@ -59,5 +59,13 @@ public abstract class Thing {
 	public boolean isRamp()
 	{
 		return ramp;
+	}
+
+	public void setPos(int[] pos) {
+		this.pos = pos;
+	}
+
+	public int[] getPos() {
+		return pos;
 	}
 }

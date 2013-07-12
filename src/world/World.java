@@ -242,7 +242,16 @@ public class World {
 			{
 				for (int i = 0; i < terrainGrid.length; i ++)
 				{					
-					
+					if (this.hasThing(i, j, k))
+					{
+						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						
+						GL11.glPushMatrix();
+							GL11.glTranslatef(x, y, 0);
+							thingGrid[i][j][k].renderThing(PIXEL_SIZE, TEXTURE_SIZE);
+						GL11.glPopMatrix();
+					}
 				}
 			}
 			
@@ -281,6 +290,13 @@ public class World {
 			int[] pos = newAgents.get(i).getPos();
 			agentGrid[pos[0]][pos[1]][pos[2]] = newAgents.get(i);
 		}
+	}
+	
+	public void addThing(Thing t, int x, int y, int z)
+	{
+		thingGrid[x][y][z] = t;
+		int[] pos = {x, y, z};
+		t.setPos(pos);
 	}
 	
 	public void moveAgent(Agent agent, int xChange, int yChange, int zChange)

@@ -14,6 +14,8 @@ public class Stairs extends Thing {
 
 	public Stairs(direction d)
 	{
+		loadTextures();
+		
 		texRow = 1;
 		texCol = 0;
 		dir = d;
