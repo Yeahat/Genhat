@@ -204,8 +204,8 @@ public class GameMain {
 	{
 		//genTestWorld0();
 		//genTestWorld1();
-		genTestWorldHeroTest();
-		//genTestWorldStairs();
+		//genTestWorldHeroTest();
+		genTestWorldStairs();
 	}
 	
 	/**
@@ -395,7 +395,7 @@ public class GameMain {
 		world.addThing(s2, 2, 2, 1);
 		world.addThing(s3, 5, 3, 1);
 		
-ArrayList<Agent> agents = new ArrayList<Agent>();
+		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
 		int[] pos = {1, 1, 1};
