@@ -53,10 +53,10 @@ public class Stairs extends Thing {
 		case right:
 			texX += 1;
 			break;
-		case left:
+		case up:
 			texX += 2;
 			break;
-		case up:
+		case left:
 			texX += 3;				
 			break;
 		}

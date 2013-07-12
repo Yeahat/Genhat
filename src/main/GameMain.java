@@ -380,10 +380,10 @@ public class GameMain {
 			}
 		}
 		
+		t[2][2][1] = new Terrain(grass);
+		t[2][3][1] = new Terrain(grass);
+		t[3][2][1] = new Terrain(grass);
 		t[3][3][1] = new Terrain(grass);
-		t[3][4][1] = new Terrain(grass);
-		t[4][3][1] = new Terrain(grass);
-		t[4][4][1] = new Terrain(grass);
 		
 		Stairs s1 = new Stairs(down);
 		Stairs s2 = new Stairs(left);
@@ -391,9 +391,9 @@ public class GameMain {
 		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
-		world.addThing(s1, 3, 2, 1);
-		world.addThing(s2, 2, 2, 1);
-		world.addThing(s3, 5, 3, 1);
+		world.addThing(s1, 3, 1, 1);
+		world.addThing(s2, 4, 3, 1);
+		world.addThing(s3, 1, 2, 1);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
