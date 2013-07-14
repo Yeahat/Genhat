@@ -3,6 +3,7 @@ package entities;
 import java.util.ArrayList;
 
 import org.newdawn.slick.opengl.Texture;
+import static entities.Agent.direction.*;
 
 import world.World;
 import actions.Action;
@@ -24,11 +25,12 @@ public abstract class Agent {
 	float[] offset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
 	Action currentAction;
 	ArrayList<String> args;	//extra arguments for executing actions
-	private direction dir;	//direction the agent is facing
-	private int speed;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
-	boolean stepping;	//true if the agent is currently taking a step
-	private direction footstep; //whether the next step is the left or right foot
-	private int height;	//Agent height in tiles
+	private direction dir = down;	//direction the agent is facing
+	private int speed = 2;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
+	boolean stepping = false;	//true if the agent is currently taking a step
+	private boolean rampStepping = false;	//true if the agent is currently taking a step up or down a ramp
+	private direction footstep = left; //whether the next step is the left or right foot
+	private int height = 2;	//Agent height in tiles
 	private int[] homePos;
 	
 	//Actions: List all actions of this agent here
@@ -269,5 +271,13 @@ public abstract class Agent {
 
 	public int[] getHomePos() {
 		return homePos;
+	}
+
+	public void setRampStepping(boolean rampStepping) {
+		this.rampStepping = rampStepping;
+	}
+
+	public boolean isRampStepping() {
+		return rampStepping;
 	}
 }

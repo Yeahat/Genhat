@@ -292,6 +292,11 @@ public class World {
 		t.setPos(pos);
 	}
 	
+	public Thing getThingAt(int x, int y, int z)
+	{
+		return thingGrid[x][y][z];
+	}
+	
 	public void moveAgent(Agent agent, int xChange, int yChange, int zChange)
 	{
 		int[] pos = agent.getPos();
@@ -410,7 +415,10 @@ public class World {
 	 */
 	public boolean hasThing(int x, int y, int z)
 	{
-		return thingGrid[x][y][z] != null;
+		if (this.isInBounds(x, y, z))
+			return thingGrid[x][y][z] != null;
+		else
+			return false;
 	}
 	
 	/**

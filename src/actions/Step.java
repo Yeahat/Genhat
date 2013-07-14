@@ -26,31 +26,70 @@ public class Step implements Action {
 		String arg1 = args.get(0);
 		if (arg1.equals("up"))
 		{
-			if (!agent.isStepping())
+			if (!agent.isStepping() && !agent.isRampStepping())
 			{
 				agent.setDir(up);
 				
-				if(canStep(agent, world, up))
+				//Special case: Ramp up
+				int[] pos = agent.getPos();
+				System.out.println("-");
+				if (world.hasThing(pos[0], pos[1], pos[2]) && world.getThingAt(pos[0], pos[1], pos[2]).isRamp())
 				{
-					world.moveAgent(agent, 0, 1, 0);
-					agent.setOffsetY(-16);
-					finishedStep = false;
-					agent.setStepping(true);
+					if (canStepRamp(agent, world, up))
+					{
+						world.moveAgent(agent, 0, 1, 1);
+						agent.setOffsetY(-32);
+						finishedStep = false;
+						agent.setRampStepping(true);
+					}
+					else
+					{
+						finishedStep = true;
+						return;
+					}
 				}
+				//Normal case
 				else
 				{
-					finishedStep = true;
-					return;
+					if(canStep(agent, world, up))
+					{
+						world.moveAgent(agent, 0, 1, 0);
+						agent.setOffsetY(-16);
+						finishedStep = false;
+						agent.setStepping(true);
+					}
+					else
+					{
+						finishedStep = true;
+						return;
+					}
 				}
 			}
 			
-			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-			if (agent.getOffsetY() >= 0)
+			//Special case: Ramp up
+			if (agent.isRampStepping())
 			{
-				swapFootstep(agent);
-				agent.setOffsetY(0);
-				agent.setStepping(false);
-				finishedStep = true;
+				agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+				if (agent.getOffsetY() >= 0)
+				{
+					swapFootstep(agent);
+					agent.setOffsetY(0);
+					agent.setRampStepping(false);
+					finishedStep = true;
+				}
+					
+			}
+			//Normal case
+			else if (agent.isStepping())
+			{
+				agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+				if (agent.getOffsetY() >= 0)
+				{
+					swapFootstep(agent);
+					agent.setOffsetY(0);
+					agent.setStepping(false);
+					finishedStep = true;
+				}
 			}
 		}
 		else if (arg1.equals("down"))
@@ -201,6 +240,58 @@ public class Step implements Action {
 		}
 		//ground check
 		if (!world.isCrossable(x, y, pos[2]))
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Determine whether it is possible to step to the next location, where that location is at the top
+	 * of a ramp, incorporating bounds checking,
+	 * collision checking with things and objects, and ensuring that the next location either has
+	 * solid ground below it or a crossable thing on it
+	 * 
+	 * @param agent the agent taking the action
+	 * @param world the world
+	 * @param dir the direction of the step
+	 * @return true if the agent can step in the given direction, false otherwise
+	 */
+	private boolean canStepRamp(Agent agent, World world, direction dir)
+	{
+		int[] pos = agent.getPos();
+		int x = pos[0];
+		int y = pos[1];
+		int z = pos[2];
+		
+		switch (dir)
+		{
+		case up:
+			y += 1;
+			z += 1;
+		break;
+		case down:
+			y -= 1;
+			z -= 1;
+		break;
+		}
+		
+		for (int k = z; k < pos[2] + agent.getHeight(); k ++)
+		{
+			//grid bounds check
+			if (!world.isInBounds(x, y, k))
+			{
+				return false;
+			}
+			//collision check
+			if (world.isBlocked(x, y, k))
+			{
+				return false;
+			}
+		}
+		//ground check
+		if (!world.isCrossable(x, y, z))
 		{
 			return false;
 		}

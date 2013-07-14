@@ -12,15 +12,16 @@ import static entities.Agent.direction.*;
 
 public class Stairs extends Thing {
 
-	public Stairs(direction d)
+	public Stairs()
 	{
 		loadTextures();
 		
 		texRow = 1;
 		texCol = 0;
-		dir = d;
+		setDir(down);
 		blocking = false;
 		crossable = true;
+		tall = false;
 		ramp = true;
 	}
 	
@@ -45,18 +46,18 @@ public class Stairs extends Thing {
 		
 		int texX = texCol * 4;
 		int texY = texRow;
-		switch (dir)
+		switch (getDir())
 		{
 		case down:
 			texX += 0;
 			break;
-		case right:
+		case left:
 			texX += 1;
 			break;
 		case up:
 			texX += 2;
 			break;
-		case left:
+		case right:
 			texX += 3;				
 			break;
 		}

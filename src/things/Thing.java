@@ -10,7 +10,8 @@ public abstract class Thing {
 	boolean crossable;
 	boolean ramp;
 	private int[] pos = new int[3]; //Position (x, y, z)
-	direction dir;	//direction the object is facing
+	private direction dir;	//direction the thing is facing
+	boolean tall; //tall things render over heros and other things if they are in front of them
 	
 	//Texture
 	Texture texture;
@@ -67,5 +68,13 @@ public abstract class Thing {
 
 	public int[] getPos() {
 		return pos;
+	}
+
+	public void setDir(direction dir) {
+		this.dir = dir;
+	}
+
+	public direction getDir() {
+		return dir;
 	}
 }
