@@ -92,18 +92,76 @@ public class Hero extends Agent {
 				texY = 3;				
 				break;
 			}
-			
-			if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7) 
-				|| (Math.abs(offset[1]) <= 16) && Math.abs(offset[1]) > 7)
+					
+			//Set footstep animation for walking up ramps
+			if (this.isRampAscending())
 			{
-				if (getFootstep() == right)
-					texX = 2;
-				else
-					texX = 0;
+				if (this.getDir() == up)
+				{
+					if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+						|| (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7))
+					{
+						if (getFootstep() == right)
+							texX = 0;
+						else
+							texX = 2;
+					}
+					else if ((Math.abs(offset[0]) <= 32 && Math.abs(offset[0]) > 23)
+					|| (Math.abs(offset[1]) <= 32 && Math.abs(offset[1]) > 23))
+					{
+						if (getFootstep() == right)
+							texX = 2;
+						else
+							texX = 0;
+					}
+					else
+					{
+						texX = 1;
+					}
+				}
 			}
+			//Set footstep animation for walking down ramps
+			else if (this.isRampDescending())
+			{
+				if (this.getDir() == down)
+				{
+					if ((Math.abs(offset[0]) <= 7 && Math.abs(offset[0]) > 0)
+						|| (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0))
+					{
+						if (getFootstep() == right)
+							texX = 2;
+						else
+							texX = 0;
+					}
+					else if ((Math.abs(offset[0]) <= 23 && Math.abs(offset[0]) > 16)
+					|| (Math.abs(offset[1]) <= 23 && Math.abs(offset[1]) > 16))
+					{
+						if (getFootstep() == right)
+							texX = 0;
+						else
+							texX = 2;
+					}
+					else
+					{
+						texX = 1;
+					}
+				}
+			}
+			//Set footstep animation for regular stepping
 			else
 			{
-				texX = 1;
+				if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7) 
+					|| (Math.abs(offset[1]) <= 16) && Math.abs(offset[1]) > 7)
+				{
+					if (getFootstep() == right)
+						texX = 2;
+					else
+						texX = 0;
+				}
+				else
+				{
+					texX = 1;
+				}
 			}
 			
 			int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2 + (int)(offset[0]));

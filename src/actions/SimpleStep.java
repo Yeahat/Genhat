@@ -4,12 +4,11 @@ import java.util.ArrayList;
 
 import world.World;
 import entities.Agent;
-import entities.Placeholder;
 import entities.Agent.direction;
 
 import static entities.Agent.direction.*;
 
-public class Step implements Action {
+public class SimpleStep implements Action {
 
 	boolean finishedStep = true;
 	
@@ -19,153 +18,74 @@ public class Step implements Action {
 		//invalid arguments, do nothing
 		if (args.size() < 1)
 		{
-			System.out.println("Invalid arguments to action Step.");
-			System.out.println("Step must take 1 argument denoting direction, as either: {up, down, left, right}");
+			System.out.println("Invalid arguments to action SimpleStep.");
+			System.out.println("SimpleStep must take 1 argument denoting direction, as either: {up, down, left, right}");
 			return;
 		}
 			
 		String arg1 = args.get(0);
+		
 		if (arg1.equals("up"))
 		{
-			if (!agent.isStepping() && !agent.isRampAscending() && !agent.isRampDescending())
+			if (!agent.isStepping())
 			{
 				agent.setDir(up);
 				
-				//Special case: Ascending ramp down
-				int[] pos = agent.getPos();
-				if (world.hasThing(pos[0], pos[1], pos[2]) && world.getThingAt(pos[0], pos[1], pos[2]).isRamp()
-						&& world.getThingAt(pos[0], pos[1], pos[2]).getDir() == down)
+				if(canStep(agent, world, up))
 				{
-					if (canStepRamp(agent, world, up, true))
-					{
-						world.moveAgent(agent, 0, 1, 1);
-						agent.setOffsetY(-32);
-						finishedStep = false;
-						agent.setRampAscending(true);
-					}
-					else
-					{
-						finishedStep = true;
-						return;
-					}
+					world.moveAgent(agent, 0, 1, 0);
+					agent.setOffsetY(-16);
+					finishedStep = false;
+					agent.setStepping(true);
 				}
-				//Normal case
 				else
 				{
-					if(canStep(agent, world, up))
-					{
-						world.moveAgent(agent, 0, 1, 0);
-						agent.setOffsetY(-16);
-						finishedStep = false;
-						agent.setStepping(true);
-					}
-					else
-					{
-						finishedStep = true;
-						return;
-					}
+					finishedStep = true;
+					return;
 				}
 			}
 			
-			//Special case: Ascending ramp down
-			if (agent.isRampAscending())
+			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+			if (agent.getOffsetY() >= 0)
 			{
-				agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-				if (agent.getOffsetY() >= 0)
-				{
-					agent.setOffsetY(0);
-					agent.setRampAscending(false);
-					finishedStep = true;
-				}
-			}
-			//Normal case
-			else if (agent.isStepping())
-			{
-				agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-				if (agent.getOffsetY() >= 0)
-				{
-					swapFootstep(agent);
-					agent.setOffsetY(0);
-					agent.setStepping(false);
-					finishedStep = true;
-				}
+				swapFootstep(agent);
+				agent.setOffsetY(0);
+				agent.setStepping(false);
+				finishedStep = true;
 			}
 		}
-		
-		
 		else if (arg1.equals("down"))
 		{
-			if (!agent.isStepping() && !agent.isRampAscending() && !agent.isRampDescending())
+			if (!agent.isStepping())
 			{
 				agent.setDir(down);
-				
-				//Special case: Descending ramp down
-				int[] pos = agent.getPos();
-				if (world.hasThing(pos[0], pos[1] - 1, pos[2] - 1) && world.getThingAt(pos[0], pos[1] - 1, pos[2] - 1).isRamp()
-						&& world.getThingAt(pos[0], pos[1] - 1, pos[2] - 1).getDir() == down)
+
+				if(canStep(agent, world, down))
 				{
-					if (canStepRamp(agent, world, down, false))
-					{
-						//world.moveAgent(agent, 0, -1, -1);
-						Placeholder holder = new Placeholder(pos[0], pos[1] - 1, pos[2] - 1);
-						world.addAgent(holder);
-						finishedStep = false;
-						agent.setRampDescending(true);
-					}
-					else
-					{
-						finishedStep = true;
-						return;
-					}
+					world.moveAgent(agent, 0, -1, 0);
+					agent.setOffsetY(16);
+					finishedStep = false;
+					agent.setStepping(true);
 				}
 				else
 				{
-					if(canStep(agent, world, down))
-					{
-						world.moveAgent(agent, 0, -1, 0);
-						agent.setOffsetY(16);
-						finishedStep = false;
-						agent.setStepping(true);
-					}
-					else
-					{
-						finishedStep = true;
-						return;
-					}
+					finishedStep = true;
+					return;
 				}
 			}
-			//Special case: Descending ramp down
-			if (agent.isRampDescending())
+
+			agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
+			if (agent.getOffsetY() <= 0)
 			{
-				agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
-				if (agent.getOffsetY() <= -32)
-				{
-					agent.setOffsetY(0);
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] - 1);
-					world.moveAgent(agent, 0, -1, -1);
-					agent.setRampDescending(false);
-					finishedStep = true;
-				}
-			}
-			//Normal case
-			else if (agent.isStepping())
-			{
-				agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
-				if (agent.getOffsetY() <= 0)
-				{
-					swapFootstep(agent);
-					agent.setOffsetY(0);
-					agent.setStepping(false);
-					finishedStep = true;
-				}
+				swapFootstep(agent);
+				agent.setOffsetY(0);
+				agent.setStepping(false);
+				finishedStep = true;
 			}
 		}
-		
-		
 		else if (arg1.equals("left"))
 		{
-			if (!agent.isStepping() && !agent.isRampAscending() && !agent.isRampDescending())
+			if (!agent.isStepping())
 			{
 				agent.setDir(left);
 
@@ -192,11 +112,9 @@ public class Step implements Action {
 				finishedStep = true;
 			}
 		}
-		
-		
 		else if (arg1.equals("right"))
 		{
-			if (!agent.isStepping() && !agent.isRampAscending() && !agent.isRampDescending())
+			if (!agent.isStepping())
 			{
 				agent.setDir(right);
 
@@ -299,11 +217,10 @@ public class Step implements Action {
 	 * 
 	 * @param agent the agent taking the action
 	 * @param world the world
-	 * @param dir the direction of the ramp
-	 * @param ascending true if ascending a ramp, false otherwise
+	 * @param dir the direction of the step
 	 * @return true if the agent can step in the given direction, false otherwise
 	 */
-	private boolean canStepRamp(Agent agent, World world, direction dir, boolean ascending)
+	private boolean canStepRamp(Agent agent, World world, direction dir)
 	{
 		int[] pos = agent.getPos();
 		int x = pos[0];
@@ -312,15 +229,15 @@ public class Step implements Action {
 		
 		switch (dir)
 		{
-		case up:	y += 1;	break;
-		case down:	y -= 1;	break;
-		case left:	x -= 1;	break;
-		case right:	x += 1;	break;
-		}
-		if (ascending)
+		case up:
+			y += 1;
 			z += 1;
-		else
+		break;
+		case down:
+			y -= 1;
 			z -= 1;
+		break;
+		}
 		
 		for (int k = z; k < pos[2] + agent.getHeight(); k ++)
 		{

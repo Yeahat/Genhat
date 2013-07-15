@@ -272,6 +272,18 @@ public class World {
 	}
 	
 	/**
+	 * Add an agent to the agent list and the agent grid
+	 * @param newAgent the agent to be added to the world
+	 */
+	public void addAgent(Agent newAgent)
+	{
+		agents.add(newAgent);
+		
+		int[] pos = newAgent.getPos();
+		agentGrid[pos[0]][pos[1]][pos[2]] = newAgent;
+	}
+	
+	/**
 	 * Add agents to the agent list and the agent grid
 	 * @param newAgents agents to be added to the world
 	 */
@@ -283,6 +295,17 @@ public class World {
 			int[] pos = newAgents.get(i).getPos();
 			agentGrid[pos[0]][pos[1]][pos[2]] = newAgents.get(i);
 		}
+	}
+	
+	public Agent getAgentAt(int x, int y, int z)
+	{
+		return agentGrid[x][y][z];
+	}
+	
+	public void removeAgentAt(int x, int y, int z)
+	{
+		agents.remove(agentGrid[x][y][z]);
+		agentGrid[x][y][z] = null;
 	}
 	
 	public void addThing(Thing t, int x, int y, int z)
