@@ -208,59 +208,7 @@ public class SimpleStep implements Action {
 		
 		return true;
 	}
-	
-	/**
-	 * Determine whether it is possible to step to the next location, where that location is at the top
-	 * of a ramp, incorporating bounds checking,
-	 * collision checking with things and objects, and ensuring that the next location either has
-	 * solid ground below it or a crossable thing on it
-	 * 
-	 * @param agent the agent taking the action
-	 * @param world the world
-	 * @param dir the direction of the step
-	 * @return true if the agent can step in the given direction, false otherwise
-	 */
-	private boolean canStepRamp(Agent agent, World world, direction dir)
-	{
-		int[] pos = agent.getPos();
-		int x = pos[0];
-		int y = pos[1];
-		int z = pos[2];
 		
-		switch (dir)
-		{
-		case up:
-			y += 1;
-			z += 1;
-		break;
-		case down:
-			y -= 1;
-			z -= 1;
-		break;
-		}
-		
-		for (int k = z; k < pos[2] + agent.getHeight(); k ++)
-		{
-			//grid bounds check
-			if (!world.isInBounds(x, y, k))
-			{
-				return false;
-			}
-			//collision check
-			if (world.isBlocked(x, y, k))
-			{
-				return false;
-			}
-		}
-		//ground check
-		if (!world.isCrossable(x, y, z))
-		{
-			return false;
-		}
-		
-		return true;
-	}
-	
 	private void swapFootstep(Agent agent)
 	{
 		if (agent.getFootstep() == right)
