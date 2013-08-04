@@ -27,8 +27,8 @@ public class Step implements Action {
 		String arg1 = args.get(0);
 		if (arg1.equals("up"))
 		{
-			agent.setDir(up);
-			
+			if (!agent.isOnRamp())
+				agent.setDir(up);
 			//if any steps are already in progress, continue them,
 			//otherwise determine new steps that should be started
 			if (!continueStepping(agent, world, args))
@@ -46,7 +46,8 @@ public class Step implements Action {
 				}
 				else
 				{
-					simpleStep.execute(agent, world, args);
+					if (!agent.isOnRamp())
+						simpleStep.execute(agent, world, args);
 				}
 			}
 			
@@ -56,7 +57,8 @@ public class Step implements Action {
 		
 		else if (arg1.equals("down"))
 		{
-			agent.setDir(down);
+			if (!agent.isOnRamp())
+				agent.setDir(down);
 			
 			//if any steps are already in progress, continue them,
 			//otherwise determine new steps that should be started
@@ -75,7 +77,10 @@ public class Step implements Action {
 				}
 				else
 				{
-					simpleStep.execute(agent, world, args);
+					if (!agent.isOnRamp())
+					{
+						simpleStep.execute(agent, world, args);
+					}
 				}
 			}
 			
@@ -92,7 +97,35 @@ public class Step implements Action {
 			if (!continueStepping(agent, world, args))
 			{
 				finishedStep = false;
-				simpleStep.execute(agent, world, args);
+				//check for ramps
+				int[] pos = agent.getPos();
+				//Ascend ramp
+				if ((world.hasThing(pos[0] - 1, pos[1], pos[2]) && world.getThingAt(pos[0] - 1, pos[1], pos[2]).isRamp()
+						&& world.getThingAt(pos[0] - 1, pos[1], pos[2]).getDir() == right)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
+								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == right))
+				{
+					ArrayList<String> tempArgs = new ArrayList<String>();
+					tempArgs.addAll(args);
+					tempArgs.add("ascending");
+					rampStep.execute(agent, world, tempArgs);
+				}
+				//Descend ramp
+				else if ((world.hasThing(pos[0] - 1, pos[1], pos[2] - 1) && world.getThingAt(pos[0] - 1, pos[1], pos[2] - 1).isRamp()
+						&& world.getThingAt(pos[0] - 1, pos[1], pos[2] - 1).getDir() == left)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
+								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == left))
+				{
+					ArrayList<String> tempArgs = new ArrayList<String>();
+					tempArgs.addAll(args);
+					tempArgs.add("descending");
+					rampStep.execute(agent, world, tempArgs);
+				}
+				//Normal step
+				else
+				{
+					simpleStep.execute(agent, world, args);
+				}
 			}
 			
 			finishedStep = simpleStep.isFinished() && rampStep.isFinished();
@@ -108,7 +141,35 @@ public class Step implements Action {
 			if (!continueStepping(agent, world, args))
 			{
 				finishedStep = false;
-				simpleStep.execute(agent, world, args);
+				//check for ramps
+				int[] pos = agent.getPos();
+				//Ascend ramp
+				if ((world.hasThing(pos[0] + 1, pos[1], pos[2]) && world.getThingAt(pos[0] + 1, pos[1], pos[2]).isRamp()
+						&& world.getThingAt(pos[0] + 1, pos[1], pos[2]).getDir() == left)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
+								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == left))
+				{
+					ArrayList<String> tempArgs = new ArrayList<String>();
+					tempArgs.addAll(args);
+					tempArgs.add("ascending");
+					rampStep.execute(agent, world, tempArgs);
+				}
+				//Descend ramp
+				else if ((world.hasThing(pos[0] + 1, pos[1], pos[2] - 1) && world.getThingAt(pos[0] + 1, pos[1], pos[2] - 1).isRamp()
+						&& world.getThingAt(pos[0] + 1, pos[1], pos[2] - 1).getDir() == right)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
+								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == right))
+				{
+					ArrayList<String> tempArgs = new ArrayList<String>();
+					tempArgs.addAll(args);
+					tempArgs.add("descending");
+					rampStep.execute(agent, world, tempArgs);
+				}
+				//Normal step
+				else
+				{
+					simpleStep.execute(agent, world, args);
+				}
 			}
 			
 			finishedStep = simpleStep.isFinished() && rampStep.isFinished();

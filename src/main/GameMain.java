@@ -385,20 +385,48 @@ public class GameMain {
 		t[3][2][1] = new Terrain(grass);
 		t[3][3][1] = new Terrain(grass);
 		t[2][2][2] = new Terrain(dirt);
+		t[2][3][2] = new Terrain(dirt);
+		t[1][2][1] = new Terrain(grass);
+		t[0][2][1] = new Terrain(grass);
+		t[0][3][1] = new Terrain(grass);
+		t[0][3][2] = new Terrain(dirt);
+		t[1][3][1] = new Terrain(grass);
+		t[1][3][2] = new Terrain(dirt);
+		t[0][4][1] = new Terrain(grass);
+		t[0][4][2] = new Terrain(dirt);
+		t[1][4][1] = new Terrain(grass);
+		t[1][4][2] = new Terrain(dirt);
+		t[5][5][1] = new Terrain(grass);
+		
 		
 		Stairs s1 = new Stairs();
 		Stairs s2 = new Stairs();
-		
+		Stairs s3 = new Stairs(right);
+		Stairs s4 = new Stairs(right);
+		Stairs s5 = new Stairs(right);
+		Stairs s6 = new Stairs(left);
+		Stairs s7 = new Stairs();
+		Stairs s8 = new Stairs();
+		Stairs s9 = new Stairs(left);
+		Stairs s10 = new Stairs(left);
 		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
 		world.addThing(s1, 3, 1, 1);
 		world.addThing(s2, 2, 1, 1);
+		world.addThing(s3, 4, 2, 1);
+		world.addThing(s4, 4, 3, 1);
+		world.addThing(s5, 3, 3, 2);
+		world.addThing(s6, 1, 2, 2);
+		world.addThing(s7, 0, 1, 1);
+		world.addThing(s8, 0, 2, 2);
+		world.addThing(s9, 4, 5, 1);
+		world.addThing(s10, 5, 5, 2);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
-		int[] pos = {1, 1, 1};
+		int[] pos = {4, 1, 1};
 		hero.setPos(pos);
 		agents.add(hero);
 		

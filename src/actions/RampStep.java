@@ -12,6 +12,10 @@ import static entities.Agent.direction.*;
 public class RampStep implements Action {
 
 	boolean finishedStep = true;
+	boolean steppingOn = false;
+	boolean steppingOff = false;
+	boolean steppingContinue = false;
+	boolean ascending = true;
 	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)
@@ -32,19 +36,19 @@ public class RampStep implements Action {
 		if (!agent.isRampAscending() && !agent.isRampDescending())
 		{
 			if (arg2.equals("descending"))
-				agent.setPrepareRampAscend(false);
+				ascending = false;
 			else
-				agent.setPrepareRampAscend(true);
+				ascending = true;
 		}
 		
 		if (arg1.equals("up"))
 		{
 			//Ascending a down-facing ramp
-			if (agent.isPrepareRampAscend())
+			if (ascending)
 			{
 				if (!agent.isRampAscending())
 				{
-					if (canStepRamp(agent, world, up, true))
+					if (canStepRamp(agent, world, up, true, false))
 					{
 						world.moveAgent(agent, 0, 1, 1);
 						agent.setOffsetY(-32);
@@ -71,13 +75,13 @@ public class RampStep implements Action {
 		
 		else if (arg1.equals("down"))
 		{
-			if (!agent.isPrepareRampAscend())
+			if (!ascending)
 			{
 				if (!agent.isRampDescending())
 				{					
 					//Descending a down-facing ramp
 					int[] pos = agent.getPos();
-					if (canStepRamp(agent, world, down, false))
+					if (canStepRamp(agent, world, down, false, false))
 					{
 						//world.moveAgent(agent, 0, -1, -1);
 						Placeholder holder = new Placeholder(pos[0], pos[1] - 1, pos[2] - 1);
@@ -108,13 +112,493 @@ public class RampStep implements Action {
 		
 		else if (arg1.equals("left"))
 		{
+			//Ascending a right-facing ramp
+			if (ascending)
+			{
+				if (!agent.isRampAscending())
+				{
+					int[] pos = agent.getPos();
+					
+					//Case 1: stepping onto a ramp
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					{
+						if (canStepRamp(agent, world, left, true, false))
+						{
+							steppingOn = true;
+							steppingOff = false;
+							steppingContinue = false;
+							agent.setOnRamp(true);
+							world.moveAgent(agent, -1, 0, 1);
+							agent.setOffsetX(16);
+							agent.setOffsetY(-16);
+							finishedStep = false;
+							agent.setRampAscending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 2: stepping off of a ramp
+					else if (!world.hasThing(pos[0] - 1, pos[1], pos[2]) || !world.getThingAt(pos[0] - 1, pos[1], pos[2]).isRamp())
+					{
+						if (canStepRamp(agent, world, left, true, false))
+						{
+							steppingOn = false;
+							steppingOff = true;
+							steppingContinue = false;
+							world.moveAgent(agent, -1, 0, 0);
+							agent.setOffsetX(16);
+							finishedStep = false;
+							agent.setRampAscending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 3: stepping off of a ramp onto another ramp
+					else if (world.hasThing(pos[0] - 1, pos[1], pos[2]) && world.getThingAt(pos[0] - 1, pos[1], pos[2]).isRamp())
+					{
+						if (canStepRamp(agent, world, left, true, false))
+						{
+							steppingOn = false;
+							steppingOff = false;
+							steppingContinue = true;
+							world.moveAgent(agent, -1, 0, 1);
+							agent.setOffsetX(16);
+							agent.setOffsetY(-24);
+							finishedStep = false;
+							agent.setRampAscending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+				}
+				
+				//Case 1: stepping onto a ramp
+				if (steppingOn)
+				{
+					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetX() <= 8)
+					{
+						agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+						if (agent.getOffsetY() >= -7)
+							agent.setOffsetY(-7);
+					}
+					if (agent.getOffsetX() <= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setOffsetY(-7);
+						agent.setRampAscending(false);
+						finishedStep = true;
+					}
+				}
+				//Case 2: stepping off of a ramp
+				if (steppingOff)
+				{
+					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() >= 0)
+						agent.setOffsetY(0);
+					if (agent.getOffsetX() <= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampAscending(false);
+						agent.setOnRamp(false);
+						finishedStep = true;
+					}
+				}
+				//Case 3: stepping off of a ramp onto another ramp
+				if (steppingContinue)
+				{
+					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() >= -8)
+						agent.setOffsetY(-8);
+					if (agent.getOffsetX() <= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampAscending(false);
+						finishedStep = true;
+					}
+				}
+			}
 			
+			//Descending a left-facing ramp
+			else
+			{
+				if (!agent.isRampDescending())
+				{
+					int[] pos = agent.getPos();
+					
+					//Case 1: stepping onto a ramp
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					{
+						if (canStepRamp(agent, world, left, false, false))
+						{
+							steppingOn = true;
+							steppingOff = false;
+							steppingContinue = false;
+							agent.setOnRamp(true);
+							world.moveAgent(agent, -1, 0, 0);
+							agent.setOffsetX(16);
+							finishedStep = false;
+							agent.setRampDescending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 2: stepping off of a ramp
+					else if (!world.hasThing(pos[0] - 1, pos[1], pos[2] - 2) || !world.getThingAt(pos[0] - 1, pos[1], pos[2] - 2).isRamp())
+					{
+						if (canStepRamp(agent, world, left, false, false))
+						{
+							steppingOn = false;
+							steppingOff = true;
+							steppingContinue = false;
+							world.moveAgent(agent, -1, 0, -1);
+							agent.setOffsetX(16);
+							agent.setOffsetY(8);
+							finishedStep = false;
+							agent.setRampDescending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 3: stepping off of a ramp onto another ramp
+					else if (world.hasThing(pos[0] - 1, pos[1], pos[2] - 2) && world.getThingAt(pos[0] - 1, pos[1], pos[2] - 2).isRamp())
+					{
+						if (canStepRamp(agent, world, left, false, true))
+						{
+							steppingOn = false;
+							steppingOff = false;
+							steppingContinue = true;
+							world.moveAgent(agent, -1, 0, -1);
+							agent.setOffsetX(16);
+							agent.setOffsetY(8);
+							finishedStep = false;
+							agent.setRampDescending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+				}
+				
+				//Case 1: stepping onto a ramp
+				if (steppingOn)
+				{
+					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetX() <= 8)
+					{
+						agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
+						if (agent.getOffsetY() <= -9)
+							agent.setOffsetY(-9);
+					}
+					if (agent.getOffsetX() <= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setOffsetY(-9);
+						agent.setRampDescending(false);
+						finishedStep = true;
+					}
+				}
+				//Case 2: stepping off of a ramp
+				if (steppingOff)
+				{
+					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() <= 0)
+						agent.setOffsetY(0);
+					if (agent.getOffsetX() <= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampDescending(false);
+						agent.setOnRamp(false);
+						finishedStep = true;
+					}
+				}
+				//Case 3: stepping off of a ramp onto another ramp
+				if (steppingContinue)
+				{
+					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() <= -8)
+						agent.setOffsetY(-8);
+					if (agent.getOffsetX() <= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampDescending(false);
+						finishedStep = true;
+					}
+				}
+			}
 		}
 		
 		
 		else if (arg1.equals("right"))
 		{
+			//Ascending a left-facing ramp
+			if (ascending)
+			{
+				if (!agent.isRampAscending())
+				{
+					int[] pos = agent.getPos();
+					
+					//Case 1: stepping onto a ramp
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					{
+						if (canStepRamp(agent, world, right, true, false))
+						{
+							steppingOn = true;
+							steppingOff = false;
+							steppingContinue = false;
+							agent.setOnRamp(true);
+							world.moveAgent(agent, 1, 0, 1);
+							agent.setOffsetX(-16);
+							agent.setOffsetY(-16);
+							finishedStep = false;
+							agent.setRampAscending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 2: stepping off of a ramp
+					else if (!world.hasThing(pos[0] + 1, pos[1], pos[2]) || !world.getThingAt(pos[0] + 1, pos[1], pos[2]).isRamp())
+					{
+						if (canStepRamp(agent, world, right, true, false))
+						{
+							steppingOn = false;
+							steppingOff = true;
+							steppingContinue = false;
+							world.moveAgent(agent, 1, 0, 0);
+							agent.setOffsetX(-16);
+							finishedStep = false;
+							agent.setRampAscending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 3: stepping off of a ramp onto another ramp
+					else if (world.hasThing(pos[0] + 1, pos[1], pos[2]) && world.getThingAt(pos[0] + 1, pos[1], pos[2]).isRamp())
+					{
+						if (canStepRamp(agent, world, right, true, false))
+						{
+							steppingOn = false;
+							steppingOff = false;
+							steppingContinue = true;
+							world.moveAgent(agent, 1, 0, 1);
+							agent.setOffsetX(-16);
+							agent.setOffsetY(-24);
+							finishedStep = false;
+							agent.setRampAscending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+				}
+				
+				//Case 1: stepping onto a ramp
+				if (steppingOn)
+				{
+					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetX() >= -8)
+					{
+						agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+						if (agent.getOffsetY() >= -7)
+							agent.setOffsetY(-7);
+					}
+					if (agent.getOffsetX() >= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setOffsetY(-7);
+						agent.setRampAscending(false);
+						finishedStep = true;
+					}
+				}
+				//Case 2: stepping off of a ramp
+				if (steppingOff)
+				{
+					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() >= 0)
+						agent.setOffsetY(0);
+					if (agent.getOffsetX() >= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampAscending(false);
+						agent.setOnRamp(false);
+						finishedStep = true;
+					}
+				}
+				//Case 3: stepping off of a ramp onto another ramp
+				if (steppingContinue)
+				{
+					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() >= -8)
+						agent.setOffsetY(-8);
+					if (agent.getOffsetX() >= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampAscending(false);
+						finishedStep = true;
+					}
+				}
+			}
 			
+			//Descending a right-facing ramp
+			else
+			{
+				if (!agent.isRampDescending())
+				{
+					int[] pos = agent.getPos();
+					
+					//Case 1: stepping onto a ramp
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					{
+						if (canStepRamp(agent, world, right, false, false))
+						{
+							steppingOn = true;
+							steppingOff = false;
+							steppingContinue = false;
+							agent.setOnRamp(true);
+							world.moveAgent(agent, 1, 0, 0);
+							agent.setOffsetX(-16);
+							finishedStep = false;
+							agent.setRampDescending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 2: stepping off of a ramp
+					else if (!world.hasThing(pos[0] + 1, pos[1], pos[2] - 2) || !world.getThingAt(pos[0] + 1, pos[1], pos[2] - 2).isRamp())
+					{
+						if (canStepRamp(agent, world, right, false, false))
+						{
+							steppingOn = false;
+							steppingOff = true;
+							steppingContinue = false;
+							world.moveAgent(agent, 1, 0, -1);
+							agent.setOffsetX(-16);
+							agent.setOffsetY(8);
+							finishedStep = false;
+							agent.setRampDescending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+					//Case 3: stepping off of a ramp onto another ramp
+					else if (world.hasThing(pos[0] + 1, pos[1], pos[2] - 2) && world.getThingAt(pos[0] + 1, pos[1], pos[2] - 2).isRamp())
+					{
+						if (canStepRamp(agent, world, right, false, true))
+						{
+							steppingOn = false;
+							steppingOff = false;
+							steppingContinue = true;
+							world.moveAgent(agent, 1, 0, -1);
+							agent.setOffsetX(-16);
+							agent.setOffsetY(8);
+							finishedStep = false;
+							agent.setRampDescending(true);
+						}
+						else
+						{
+							finishedStep = true;
+							return;
+						}
+					}
+				}
+				
+				//Case 1: stepping onto a ramp
+				if (steppingOn)
+				{
+					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetX() >= -8)
+					{
+						agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
+						if (agent.getOffsetY() <= -9)
+							agent.setOffsetY(-9);
+					}
+					if (agent.getOffsetX() >= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setOffsetY(-9);
+						agent.setRampDescending(false);
+						finishedStep = true;
+					}
+				}
+				//Case 2: stepping off of a ramp
+				if (steppingOff)
+				{
+					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() <= 0)
+						agent.setOffsetY(0);
+					if (agent.getOffsetX() >= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampDescending(false);
+						agent.setOnRamp(false);
+						finishedStep = true;
+					}
+				}
+				//Case 3: stepping off of a ramp onto another ramp
+				if (steppingContinue)
+				{
+					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
+					agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
+					if (agent.getOffsetY() <= -8)
+						agent.setOffsetY(-8);
+					if (agent.getOffsetX() >= 0)
+					{
+						swapFootstep(agent);
+						agent.setOffsetX(0);
+						agent.setRampDescending(false);
+						finishedStep = true;
+					}
+				}
+			}
 		}
 		else
 		{
@@ -141,9 +625,10 @@ public class RampStep implements Action {
 	 * @param world the world
 	 * @param dir the direction of the ramp
 	 * @param ascending true if ascending a ramp, false otherwise
+	 * @param specialCase true for the special case of descending from a ramp onto another ramp, the z needs extra adjustment
 	 * @return true if the agent can step in the given direction, false otherwise
 	 */
-	private boolean canStepRamp(Agent agent, World world, direction dir, boolean ascending)
+	private boolean canStepRamp(Agent agent, World world, direction dir, boolean ascending, boolean specialCase)
 	{
 		int[] pos = agent.getPos();
 		int x = pos[0];
@@ -157,10 +642,19 @@ public class RampStep implements Action {
 		case left:	x -= 1;	break;
 		case right:	x += 1;	break;
 		}
+		
 		if (ascending)
-			z += 1;
+		{
+			if (dir != left && dir != right)
+				z += 1;
+		}
 		else
-			z -= 1;
+		{
+			if (specialCase)
+				z -= 2;
+			else
+				z -= 1;
+		}
 		
 		for (int k = z; k < pos[2] + agent.getHeight(); k ++)
 		{
@@ -169,8 +663,23 @@ public class RampStep implements Action {
 			{
 				return false;
 			}
+			
 			//collision check
-			if (world.isBlocked(x, y, k))
+			if (dir == left || dir == right)
+			{
+				if (world.hasThing(x, y, k) && (world.getThingAt(x, y, k).isRamp() && (world.getThingAt(x, y, k).getDir() == left || world.getThingAt(x, y, k).getDir() == right)))
+				{
+					if (world.getAgentAt(x, y, k) != null)
+					{
+						return false;
+					}
+				}
+				else if (world.isBlocked(x, y, k))
+				{
+					return false;
+				}
+			}
+			else if (world.isBlocked(x, y, k))
 			{
 				return false;
 			}
@@ -182,5 +691,17 @@ public class RampStep implements Action {
 		}
 		
 		return true;
+	}
+	
+	private void swapFootstep(Agent agent)
+	{
+		if (agent.getFootstep() == right)
+		{	
+			agent.setFootstep(left);
+		}
+		else
+		{
+			agent.setFootstep(right);
+		}
 	}
 }

@@ -25,11 +25,13 @@ public class Turn implements Action {
 		String arg1 = args.get(0);
 		if (arg1.equals("up"))
 		{
-			agent.setDir(up);
+			if (!agent.isOnRamp())
+				agent.setDir(up);
 		}
 		else if (arg1.equals("down"))
 		{
-			agent.setDir(down);
+			if (!agent.isOnRamp())
+				agent.setDir(down);
 		}
 		else if (arg1.equals("left"))
 		{

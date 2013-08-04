@@ -28,9 +28,9 @@ public abstract class Agent {
 	private direction dir = down;	//direction the agent is facing
 	private int speed = 2;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
 	boolean stepping = false;	//true if the agent is currently taking a step
-	private boolean prepareRampAscend = false; //true if the agent is about to start ascending a ramp, false if it is about to descend
 	private boolean rampAscending = false;	//true if the agent is currently taking a step up a ramp
 	private boolean rampDescending = false;	//true if the agent is currently taking a step down a ramp
+	private boolean onRamp = false;	//true if the agent is currently standing on top of a ramp
 	private direction footstep = left; //whether the next step is the left or right foot
 	private int height = 2;	//Agent height in tiles
 	private int[] homePos;
@@ -291,11 +291,11 @@ public abstract class Agent {
 		return rampDescending;
 	}
 
-	public void setPrepareRampAscend(boolean prepareRampAscend) {
-		this.prepareRampAscend = prepareRampAscend;
+	public void setOnRamp(boolean onRamp) {
+		this.onRamp = onRamp;
 	}
 
-	public boolean isPrepareRampAscend() {
-		return prepareRampAscend;
+	public boolean isOnRamp() {
+		return onRamp;
 	}
 }
