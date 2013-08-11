@@ -62,7 +62,10 @@ public class RampStep implements Action {
 					}
 				}
 				
-				agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+				if (agent.getOffsetY() < -24 || agent.getOffsetY() > -8)
+					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
+				else
+					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
 				if (agent.getOffsetY() >= 0)
 				{
 					agent.setOffsetY(0);

@@ -20,6 +20,7 @@ import world.World;
 import static world.Terrain.terrainType.*;
 import static entities.Agent.direction.*;
 
+
 public class GameMain {
 	
 	World world;
@@ -85,7 +86,16 @@ public class GameMain {
 		}
 		else if (Keyboard.isKeyDown(Keyboard.KEY_X))
 		{
-			
+			Hero player = world.getPlayer();
+			if (player != null)
+			{
+				if (player.isIdle())
+				{
+					ArrayList<String> newArgs = new ArrayList<String>();
+					player.setArgs(newArgs);
+					player.setCurrentAction(player.getJumpAction());
+				}
+			}
 		}
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
@@ -98,11 +108,11 @@ public class GameMain {
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("down");
-					world.getPlayer().setArgs(newArgs);
+					player.setArgs(newArgs);
 					if (arrowKeyInputCount < 3)
-						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+						player.setCurrentAction(player.getTurnAction());
 					else
-						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+						player.setCurrentAction(player.getStepAction());
 				}
 			}
 		}
@@ -116,11 +126,11 @@ public class GameMain {
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("up");
-					world.getPlayer().setArgs(newArgs);
+					player.setArgs(newArgs);
 					if (arrowKeyInputCount < 3)
-						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+						player.setCurrentAction(player.getTurnAction());
 					else
-						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+						player.setCurrentAction(player.getStepAction());
 				}
 			}
 		}
@@ -134,11 +144,11 @@ public class GameMain {
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("right");
-					world.getPlayer().setArgs(newArgs);
+					player.setArgs(newArgs);
 					if (arrowKeyInputCount < 3)
-						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+						player.setCurrentAction(player.getTurnAction());
 					else
-						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+						player.setCurrentAction(player.getStepAction());
 				}
 			}
 		}
@@ -152,11 +162,11 @@ public class GameMain {
 				{
 					ArrayList<String> newArgs = new ArrayList<String>();
 					newArgs.add("left");
-					world.getPlayer().setArgs(newArgs);
+					player.setArgs(newArgs);
 					if (arrowKeyInputCount < 3)
-						world.getPlayer().setCurrentAction(world.getPlayer().getTurnAction());
+						player.setCurrentAction(player.getTurnAction());
 					else
-						world.getPlayer().setCurrentAction(world.getPlayer().getStepAction());
+						player.setCurrentAction(player.getStepAction());
 				}
 			}
 		}
@@ -205,7 +215,8 @@ public class GameMain {
 		//genTestWorld0();
 		//genTestWorld1();
 		//genTestWorldHeroTest();
-		genTestWorldStairs();
+		//genTestWorldStairs();
+		genTestWorldJump();
 	}
 	
 	/**
@@ -397,6 +408,9 @@ public class GameMain {
 		t[1][4][1] = new Terrain(grass);
 		t[1][4][2] = new Terrain(dirt);
 		t[5][5][1] = new Terrain(grass);
+		//t[4][1][1] = new Terrain(grass);
+		//t[3][0][1] = new Terrain(grass);
+		//t[4][0][1] = new Terrain(grass);
 		
 		
 		Stairs s1 = new Stairs();
@@ -422,6 +436,61 @@ public class GameMain {
 		world.addThing(s8, 0, 2, 2);
 		world.addThing(s9, 4, 5, 1);
 		world.addThing(s10, 5, 5, 2);
+		
+		ArrayList<Agent> agents = new ArrayList<Agent>();
+		
+		Hero hero = new Hero();
+		int[] pos = {5, 1, 1};
+		hero.setPos(pos);
+		agents.add(hero);
+		
+		world.addAgents(agents);
+		world.setPlayer(hero);
+	}
+	
+	private void genTestWorldJump()
+	{
+		int xs = 6, ys = 6, zs = 8;
+		Terrain[][][] t = new Terrain[xs][ys][zs];
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				for (int k = 0; k < zs; k ++)
+				{
+					t[i][j][k] = new Terrain(air);
+				}
+			}
+		}
+		
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				t[i][j][0] = new Terrain(grass);
+			}
+		}
+		
+		t[2][2][1] = new Terrain(grass);
+		t[2][3][1] = new Terrain(grass);
+		t[3][2][1] = new Terrain(grass);
+		t[3][3][1] = new Terrain(grass);
+		t[2][2][2] = new Terrain(dirt);
+		t[2][3][2] = new Terrain(dirt);
+		t[1][2][1] = new Terrain(grass);
+		t[0][2][1] = new Terrain(grass);
+		t[0][3][1] = new Terrain(grass);
+		t[0][3][2] = new Terrain(dirt);
+		t[1][3][1] = new Terrain(grass);
+		t[1][3][2] = new Terrain(dirt);
+		t[0][4][1] = new Terrain(grass);
+		t[0][4][2] = new Terrain(dirt);
+		t[1][4][1] = new Terrain(grass);
+		t[1][4][2] = new Terrain(dirt);
+		t[5][5][1] = new Terrain(grass);
+		
+		world = new World(xs, ys, zs);
+		world.setTerrain(t);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		

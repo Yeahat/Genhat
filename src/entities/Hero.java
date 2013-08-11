@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import actions.Jump;
 import actions.Step;
 import actions.Turn;
 
@@ -20,6 +21,7 @@ public class Hero extends Agent {
 	//Actions
 	Step step;
 	Turn turn;
+	Jump jump;
 	
 	/**
 	 * Constructor
@@ -35,6 +37,7 @@ public class Hero extends Agent {
 		super.setActions();
 		step = new Step();
 		turn = new Turn();
+		jump = new Jump();
 	}
 	
 	@Override
@@ -159,9 +162,23 @@ public class Hero extends Agent {
 							texX = 1;
 						}
 				}
-				else
+				else if (getDir() == down)
 				{
 					if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
+					{
+						if (getFootstep() == right)
+							texX = 2;
+						else
+							texX = 0;
+					}
+					else
+					{
+						texX = 1;
+					}
+				}
+				else
+				{
+					if (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0)
 					{
 						if (getFootstep() == right)
 							texX = 2;
@@ -212,6 +229,16 @@ public class Hero extends Agent {
 	public Turn getTurnAction()
 	{
 		return turn;
+	}
+	
+	/**
+	 * Getter for the hero's jump action, this is required to allow the keyboard polling to set
+	 * the agent's action from outside of the scope of the class
+	 * @return the agent's jump action
+	 */
+	public Jump getJumpAction()
+	{
+		return jump;
 	}
 	
 	/**

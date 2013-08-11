@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import world.World;
 import entities.Agent;
+import entities.Placeholder;
 import entities.Agent.direction;
 
 import static entities.Agent.direction.*;
@@ -33,8 +34,9 @@ public class SimpleStep implements Action {
 				
 				if(canStep(agent, world, up))
 				{
-					world.moveAgent(agent, 0, 1, 0);
-					agent.setOffsetY(-16);
+					int[] pos = agent.getPos();
+					Placeholder holder = new Placeholder(pos[0], pos[1] + 1, pos[2]);
+					world.addAgent(holder);
 					finishedStep = false;
 					agent.setStepping(true);
 				}
@@ -46,9 +48,12 @@ public class SimpleStep implements Action {
 			}
 			
 			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-			if (agent.getOffsetY() >= 0)
+			if (agent.getOffsetY() >= 16)
 			{
 				swapFootstep(agent);
+				int[] pos = agent.getPos();
+				world.removeAgentAt(pos[0], pos[1] + 1, pos[2]);
+				world.moveAgent(agent, 0, 1, 0);
 				agent.setOffsetY(0);
 				agent.setStepping(false);
 				finishedStep = true;

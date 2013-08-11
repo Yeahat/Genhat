@@ -13,6 +13,7 @@ import entities.Agent;
 import entities.Hero;
 
 import static world.Terrain.terrainType.*;
+import static entities.Agent.direction.*;
 
 public class World {
 	Terrain[][][] terrainGrid;
@@ -93,9 +94,16 @@ public class World {
 	{
 		for (int k = 0; k < terrainGrid[0][0].length; k ++)
 		{
-			
 			//***************************************************************************************************************
 			//********* TERRAIN RENDERING ***********************************************************************************
+			//***************************************************************************************************************
+			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
+			{
+				
+			}
+			
+			//***************************************************************************************************************
+			//********* THING AND AGENT RENDERING ***************************************************************************
 			//***************************************************************************************************************
 			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
 			{
@@ -233,13 +241,6 @@ public class World {
 						}
 					}
 				}
-			}
-			
-			//***************************************************************************************************************
-			//********* THING AND AGENT RENDERING ***************************************************************************
-			//***************************************************************************************************************
-			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
-			{
 				for (int i = 0; i < terrainGrid.length; i ++)
 				{					
 					if (this.hasThing(i, j, k))
@@ -425,7 +426,10 @@ public class World {
 	 */
 	public boolean isOccupied(int x, int y, int z)
 	{
-		return agentGrid[x][y][z] != null;
+		if (this.isInBounds(x, y, z))
+			return agentGrid[x][y][z] != null;
+		else
+			return false;
 	}
 	
 	/**
@@ -488,6 +492,15 @@ public class World {
 		}
 	}
 	
+	public boolean isLandable(int x, int y, int z)
+	{
+		//Add things that can't be landed on here
+		if (this.hasThing(x, y, z) && (this.thingGrid[x][y][z].isRamp() && this.thingGrid[x][y][z].getDir() != down))
+			return false;
+		else
+			return isCrossable(x, y, z);
+	}
+	
 	/**
 	 * Check whether a specified location is within the bounds of the world grid
 	 * 
@@ -514,7 +527,7 @@ public class World {
 				for (int k = 0; k < t[0][0].length; k ++)
 				{
 					//bounds checking
-					if (i < terrainGrid.length && j < terrainGrid[0].length && k < terrainGrid[0].length)
+					if (i < terrainGrid.length && j < terrainGrid[0].length && k < terrainGrid[0][0].length)
 					{
 						terrainGrid[i][j][k] = t[i][j][k];
 					}
