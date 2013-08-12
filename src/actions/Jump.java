@@ -29,7 +29,8 @@ public class Jump implements Action {
 					switch (agent.getDir())
 					{
 					case up:
-							world.moveAgent(agent, 0, 1, 1);
+						world.moveAgent(agent, 0, 1, 1);
+						agent.setOffsetY(-32);
 						break;
 					case down:
 						world.moveAgent(agent, 0, -1, 1);
@@ -55,7 +56,8 @@ public class Jump implements Action {
 							world.moveAgent(agent, 0, 1, -1);
 						break;
 					case down:
-						world.moveAgent(agent, 0, -1, -1);
+						Placeholder holder3 = new Placeholder(pos[0], pos[1] - 1, pos[2] - 1);
+						world.addAgent(holder3);
 						break;
 					case left:
 						Placeholder holder1 = new Placeholder(pos[0] - 1, pos[1], pos[2] - 1);
@@ -81,8 +83,15 @@ public class Jump implements Action {
 			switch (agent.getDir())
 			{
 			case up:
-				finishedJump = true;
-				agent.setJumping(false);
+				float i3 = agent.getSpeed() * 16.0f / 32.0f;
+				dstJumped += Math.abs(i3);
+				agent.setOffsetY(dstJumped + lookupHeight() - 32);
+				if (agent.getOffsetY() >= 0)
+				{
+					agent.setOffsetY(0);
+					agent.setJumping(false);
+					finishedJump = true;
+				}
 			break;
 			case down:
 				finishedJump = true;
@@ -125,8 +134,19 @@ public class Jump implements Action {
 				agent.setJumping(false);
 			break;
 			case down:
-				finishedJump = true;
-				agent.setJumping(false);
+				//Add in placeholder, and setup the initial move above
+				float i3 = -agent.getSpeed() * 16.0f / 32.0f;
+				dstJumped += Math.abs(i3);
+				agent.setOffsetY(-dstJumped - (16 - lookupHeight()));
+				if (agent.getOffsetY() <= -32)
+				{
+					int[] pos = agent.getPos();
+					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] - 1);
+					world.moveAgent(agent, 0, -1, -1);
+					agent.setOffsetY(0);
+					agent.setJumping(false);
+					finishedJump = true;
+				}
 			break;
 			case left:
 				float i1 = -agent.getSpeed() * 16.0f / 32.0f;
