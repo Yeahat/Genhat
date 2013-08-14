@@ -33,6 +33,7 @@ public abstract class Agent {
 	private boolean rampDescending = false;	//true if the agent is currently taking a step down a ramp
 	private boolean onRamp = false;	//true if the agent is currently standing on top of a ramp
 	private direction footstep = left; //whether the next step is the left or right foot
+	private direction stance = right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
 	private int[] homePos;
 	
@@ -306,5 +307,13 @@ public abstract class Agent {
 
 	public boolean isJumping() {
 		return jumping;
+	}
+
+	public void setStance(direction stance) {
+		this.stance = stance;
+	}
+
+	public direction getStance() {
+		return stance;
 	}
 }

@@ -6,9 +6,12 @@ import world.World;
 import entities.Agent;
 import entities.Placeholder;
 
+import static entities.Agent.direction.*;
+
 public class Jump implements Action {
 	boolean finishedJump = false;
 	boolean jumpingUp = true;	//true if jump is ascending, false if jump is descending
+	boolean switched = false;	//flag for switching position on an descending up-facing jump to correctly occlude agent
 	int stepSize;
 	float dstJumped = 0;	//measures the distance jumped
 	
@@ -33,7 +36,10 @@ public class Jump implements Action {
 						agent.setOffsetY(-32);
 						break;
 					case down:
-						world.moveAgent(agent, 0, -1, 1);
+						switched = false;
+						int[] pos = agent.getPos();
+						Placeholder holder1 = new Placeholder(pos[0], pos[1] - 1, pos[2] + 1);
+						world.addAgent(holder1);
 						break;
 					case left:
 						world.moveAgent(agent, -1, 0, 1);
@@ -53,7 +59,9 @@ public class Jump implements Action {
 					switch (agent.getDir())
 					{
 					case up:
-							world.moveAgent(agent, 0, 1, -1);
+						switched = false;
+						Placeholder holder4 = new Placeholder(pos[0], pos[1] + 1, pos[2] - 1);
+						world.addAgent(holder4);
 						break;
 					case down:
 						Placeholder holder3 = new Placeholder(pos[0], pos[1] - 1, pos[2] - 1);
@@ -90,12 +98,39 @@ public class Jump implements Action {
 				{
 					agent.setOffsetY(0);
 					agent.setJumping(false);
+					swapFootstep(agent);
 					finishedJump = true;
 				}
 			break;
 			case down:
-				finishedJump = true;
-				agent.setJumping(false);
+				float i4 = -agent.getSpeed() * 16.0f / 32.0f;
+				dstJumped += Math.abs(i4);
+				
+				if (dstJumped < 5)
+					agent.setOffsetY(-dstJumped + lookupHeight());
+				else
+				{
+					if (!switched)
+					{
+						int[] pos = agent.getPos();
+						Placeholder h = new Placeholder(pos[0], pos[1], pos[2]);
+						world.removeAgentAt(pos[0], pos[1] - 1, pos[2] + 1);
+						world.moveAgent(agent, 0, -1, 1);
+						world.addAgent(h);
+						switched = true;
+					}
+					agent.setOffsetY(-dstJumped + lookupHeight());
+				}
+					
+				if (dstJumped >= 16)
+				{
+					int[] pos = agent.getPos();
+					world.removeAgentAt(pos[0], pos[1] + 1, pos[2] - 1);
+					agent.setOffsetY(0);
+					agent.setJumping(false);
+					swapFootstep(agent);
+					finishedJump = true;
+				}
 			break;
 			case left:
 				float i1 = -agent.getSpeed() * 16.0f / 32.0f;
@@ -107,6 +142,7 @@ public class Jump implements Action {
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
+					swapFootstep(agent);
 					finishedJump = true;
 				}
 			break;
@@ -120,6 +156,7 @@ public class Jump implements Action {
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
+					swapFootstep(agent);
 					finishedJump = true;
 				}
 			break;
@@ -130,8 +167,34 @@ public class Jump implements Action {
 			switch (agent.getDir())
 			{
 			case up:
-				finishedJump = true;
-				agent.setJumping(false);
+				float i4 = agent.getSpeed() * 16.0f / 32.0f;
+				dstJumped += Math.abs(i4);
+				
+				if (dstJumped < 12)
+					agent.setOffsetY(dstJumped - (16 - lookupHeight()));
+				else
+				{
+					if (!switched)
+					{
+						int[] pos = agent.getPos();
+						Placeholder h = new Placeholder(pos[0], pos[1], pos[2]);
+						world.removeAgentAt(pos[0], pos[1] + 1, pos[2] - 1);
+						world.moveAgent(agent, 0, 1, -1);
+						world.addAgent(h);
+						switched = true;
+					}
+					agent.setOffsetY(dstJumped - (16 - lookupHeight()));
+				}
+					
+				if (dstJumped >= 16)
+				{
+					int[] pos = agent.getPos();
+					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] + 1);
+					agent.setOffsetY(0);
+					agent.setJumping(false);
+					swapFootstep(agent);
+					finishedJump = true;
+				}
 			break;
 			case down:
 				//Add in placeholder, and setup the initial move above
@@ -145,6 +208,7 @@ public class Jump implements Action {
 					world.moveAgent(agent, 0, -1, -1);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
+					swapFootstep(agent);
 					finishedJump = true;
 				}
 			break;
@@ -161,6 +225,7 @@ public class Jump implements Action {
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
+					swapFootstep(agent);
 					finishedJump = true;
 				}
 			break;
@@ -177,6 +242,7 @@ public class Jump implements Action {
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
+					swapFootstep(agent);
 					finishedJump = true;
 				}
 			break;
@@ -248,6 +314,14 @@ public class Jump implements Action {
 		{
 			return false;
 		}
+	}
+	
+	private void swapFootstep(Agent agent)
+	{
+		if (agent.getStance() == left)
+			agent.setFootstep(right);
+		else
+			agent.setFootstep(left);
 	}
 	
 	private int lookupHeight()

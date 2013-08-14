@@ -121,6 +121,14 @@ public class Hero extends Agent {
 					texX = 1;
 				}
 			}
+			//Set footstep animation for jumping
+			else if (this.isJumping())
+			{
+				if (getStance() == right)
+					texX = 2;
+				else
+					texX = 0;
+			}
 			//Set footstep animation for walking down down-facing ramps
 			else if (this.isRampDescending() && this.getDir() == down)
 			{
