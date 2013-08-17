@@ -215,8 +215,8 @@ public class GameMain {
 		//genTestWorld0();
 		//genTestWorld1();
 		//genTestWorldHeroTest();
-		//genTestWorldStairs();
-		genTestWorldJump();
+		genTestWorldStairs();
+		//genTestWorldJump();
 	}
 	
 	/**

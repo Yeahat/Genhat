@@ -34,22 +34,31 @@ public class Jump implements Action {
 					case up:
 						world.moveAgent(agent, 0, 1, 1);
 						agent.setOffsetY(-32);
+						int[] p1 = agent.getPos();
+						Placeholder h1 = new Placeholder(p1[0], p1[1] - 1, p1[2] - 1);
+						world.addAgent(h1);
 						break;
 					case down:
 						switched = false;
-						int[] pos = agent.getPos();
-						Placeholder holder1 = new Placeholder(pos[0], pos[1] - 1, pos[2] + 1);
+						int[] p2 = agent.getPos();
+						Placeholder holder1 = new Placeholder(p2[0], p2[1] - 1, p2[2] + 1);
 						world.addAgent(holder1);
 						break;
 					case left:
 						world.moveAgent(agent, -1, 0, 1);
 						agent.setOffsetX(16);
 						agent.setOffsetY(-16);
+						int[] p3 = agent.getPos();
+						Placeholder h3 = new Placeholder(p3[0] + 1, p3[1], p3[2] - 1);
+						world.addAgent(h3);
 						break;
 					case right:
 						world.moveAgent(agent, 1, 0, 1);
 						agent.setOffsetX(-16);
 						agent.setOffsetY(-16);
+						int[] p4 = agent.getPos();
+						Placeholder h4 = new Placeholder(p4[0] - 1, p4[1], p4[2] - 1);
+						world.addAgent(h4);
 						break;
 					}
 				}
@@ -96,6 +105,8 @@ public class Jump implements Action {
 				agent.setOffsetY(dstJumped + lookupHeight() - 32);
 				if (agent.getOffsetY() >= 0)
 				{
+					int[] pos = agent.getPos();
+					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] - 1);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
@@ -139,6 +150,8 @@ public class Jump implements Action {
 				agent.setOffsetY(-16 + lookupHeight());
 				if (agent.getOffsetX() <= 0)
 				{
+					int[] pos = agent.getPos();
+					world.removeAgentAt(pos[0] + 1, pos[1], pos[2] - 1);
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
@@ -153,6 +166,8 @@ public class Jump implements Action {
 				agent.setOffsetY(-16 + lookupHeight());
 				if (agent.getOffsetX() >= 0)
 				{
+					int[] pos = agent.getPos();
+					world.removeAgentAt(pos[0] - 1, pos[1], pos[2] - 1);
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);

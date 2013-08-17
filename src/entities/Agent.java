@@ -2,6 +2,7 @@ package entities;
 
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import static entities.Agent.direction.*;
 
@@ -154,11 +155,161 @@ public abstract class Agent {
 	}
 	
 	/**
-	 * Render the agent using OpenGL
+	 * Render the agent using OpenGL, this is currently implemented with a default
+	 * rendering that assumes the texture has a left, middle, and right step.  This method
+	 * can be overridden if more specific or different rendering is required.
 	 * @param pixelSize how many screen pixels make up a "game" pixel
 	 * @param terrainTextureSize size of the terrain texture (i.e. dimensions of the world grid)
 	 */
-	public abstract void renderAgent(int pixelSize, int terrainTextureSize);
+	public void renderAgent(int pixelSize, int terrainTextureSize)
+	{
+		GL11.glPushMatrix();
+		
+			texture.bind();
+			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		
+			float tConvX = ((float)TEXTURE_SIZE_X)/((float)TEXTURE_SHEET_WIDTH);
+			float tConvY = ((float)TEXTURE_SIZE_Y)/((float)TEXTURE_SHEET_HEIGHT);
+			
+			int texX = 0, texY = 0;
+			switch (getDir())
+			{
+			case down:
+				texY = 0;
+				break;
+			case right:
+				texY = 1;
+				break;
+			case left:
+				texY = 2;
+				break;
+			case up:
+				texY = 3;				
+				break;
+			}
+			
+			//Special case footstep animations
+			//Set footstep animation for walking up ramps down-facing ramps
+			if (this.isRampAscending() && this.getDir() == up)
+			{
+				if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+					|| (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7))
+				{
+					if (getFootstep() == right)
+						texX = 0;
+					else
+						texX = 2;
+				}
+				else if ((Math.abs(offset[0]) <= 32 && Math.abs(offset[0]) > 23)
+				|| (Math.abs(offset[1]) <= 32 && Math.abs(offset[1]) > 23))
+				{
+					if (getFootstep() == right)
+						texX = 2;
+					else
+						texX = 0;
+				}
+				else
+				{
+					texX = 1;
+				}
+			}
+			//Set footstep animation for jumping
+			else if (this.isJumping())
+			{
+				if (getStance() == right)
+					texX = 2;
+				else
+					texX = 0;
+			}
+			//Set footstep animation for walking down down-facing ramps
+			else if (this.isRampDescending() && this.getDir() == down)
+			{
+				if ((Math.abs(offset[0]) <= 7 && Math.abs(offset[0]) > 0)
+					|| (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0))
+				{
+					if (getFootstep() == right)
+						texX = 2;
+					else
+						texX = 0;
+				}
+				else if ((Math.abs(offset[0]) <= 23 && Math.abs(offset[0]) > 16)
+				|| (Math.abs(offset[1]) <= 23 && Math.abs(offset[1]) > 16))
+				{
+					if (getFootstep() == right)
+						texX = 0;
+					else
+						texX = 2;
+				}
+				else
+				{
+					texX = 1;
+				}
+			}
+			//Set footstep animation for regular stepping
+			else
+			{
+				if (getDir() == left || getDir() == right)
+				{
+					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+						{
+							if (getFootstep() == right)
+								texX = 2;
+							else
+								texX = 0;
+						}
+						else
+						{
+							texX = 1;
+						}
+				}
+				else if (getDir() == down)
+				{
+					if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
+					{
+						if (getFootstep() == right)
+							texX = 2;
+						else
+							texX = 0;
+					}
+					else
+					{
+						texX = 1;
+					}
+				}
+				else
+				{
+					if (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0)
+					{
+						if (getFootstep() == right)
+							texX = 2;
+						else
+							texX = 0;
+					}
+					else
+					{
+						texX = 1;
+					}
+				}
+			}
+			
+			int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2 + (int)(offset[0]));
+			int xMax = xMin + pixelSize * (TEXTURE_SIZE_X);
+			int yMin = pixelSize * ((int)(offset[1]));
+			int yMax = yMin + pixelSize * (TEXTURE_SIZE_Y);
+			
+			GL11.glBegin(GL11.GL_QUADS);
+				GL11.glTexCoord2f(texX * tConvX, texY*tConvY + tConvY);
+				GL11.glVertex2f(xMin, yMin);
+				GL11.glTexCoord2f(texX*tConvX + tConvX, texY*tConvY + tConvY);
+				GL11.glVertex2f(xMax, yMin);
+				GL11.glTexCoord2f(texX*tConvX + tConvX, texY * tConvY);
+				GL11.glVertex2f(xMax, yMax);
+				GL11.glTexCoord2f(texX*tConvX, texY * tConvY);
+				GL11.glVertex2f(xMin, yMax);
+			GL11.glEnd();
+			
+		GL11.glPopMatrix();
+	}
 
 	
 	//***********************************************************
