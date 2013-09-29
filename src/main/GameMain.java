@@ -214,8 +214,8 @@ public class GameMain {
 	{
 		//genTestWorld0();
 		//genTestWorld1();
-		//genTestWorldHeroTest();
-		genTestWorldStairs();
+		genTestWorldHeroTest();
+		//genTestWorldStairs();
 		//genTestWorldJump();
 	}
 	
@@ -356,6 +356,7 @@ public class GameMain {
 		
 		Hero hero = new Hero();
 		int[] pos = {1, 1, 2};
+		world.setDisplayCenter(pos);
 		hero.setPos(pos);
 		agents.add(hero);
 		
@@ -441,6 +442,7 @@ public class GameMain {
 		
 		Hero hero = new Hero();
 		int[] pos = {5, 1, 1};
+		world.setDisplayCenter(pos);
 		hero.setPos(pos);
 		agents.add(hero);
 		
@@ -496,6 +498,7 @@ public class GameMain {
 		
 		Hero hero = new Hero();
 		int[] pos = {4, 1, 1};
+		world.setDisplayCenter(pos);
 		hero.setPos(pos);
 		agents.add(hero);
 		

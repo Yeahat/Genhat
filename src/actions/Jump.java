@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import world.World;
 import entities.Agent;
+import entities.Hero;
 import entities.Placeholder;
 
 import static entities.Agent.direction.*;
@@ -14,6 +15,8 @@ public class Jump implements Action {
 	boolean switched = false;	//flag for switching position on an descending up-facing jump to correctly occlude agent
 	int stepSize;
 	float dstJumped = 0;	//measures the distance jumped
+	
+	StepCamera stepCamera = new StepCamera();
 	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)
@@ -103,7 +106,7 @@ public class Jump implements Action {
 				float i3 = agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i3);
 				agent.setOffsetY(dstJumped + lookupHeight() - 32);
-				if (agent.getOffsetY() >= 0)
+				if (dstJumped >= 16)
 				{
 					int[] pos = agent.getPos();
 					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] - 1);
@@ -112,7 +115,17 @@ public class Jump implements Action {
 					swapFootstep(agent);
 					finishedJump = true;
 				}
+				
+				//Camera for Hero
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("up");
+					cArgs.add("up");
+					stepCamera.execute(agent, world, cArgs);
+				}
 			break;
+			
 			case down:
 				float i4 = -agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i4);
@@ -142,6 +155,15 @@ public class Jump implements Action {
 					swapFootstep(agent);
 					finishedJump = true;
 				}
+				
+				//Camera for Hero
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("down");
+					cArgs.add("up");
+					stepCamera.execute(agent, world, cArgs);
+				}
 			break;
 			case left:
 				float i1 = -agent.getSpeed() * 16.0f / 32.0f;
@@ -158,6 +180,14 @@ public class Jump implements Action {
 					swapFootstep(agent);
 					finishedJump = true;
 				}
+				//Camera for Hero
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("left");
+					cArgs.add("up");
+					stepCamera.execute(agent, world, cArgs);
+				}
 			break;
 			case right:
 				float i2 = agent.getSpeed() * 16.0f / 32.0f;
@@ -173,6 +203,13 @@ public class Jump implements Action {
 					agent.setJumping(false);
 					swapFootstep(agent);
 					finishedJump = true;
+				}
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("right");
+					cArgs.add("up");
+					stepCamera.execute(agent, world, cArgs);
 				}
 			break;
 			}
@@ -210,13 +247,21 @@ public class Jump implements Action {
 					swapFootstep(agent);
 					finishedJump = true;
 				}
+				
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("up");
+					cArgs.add("down");
+					stepCamera.execute(agent, world, cArgs);
+				}
 			break;
 			case down:
 				//Add in placeholder, and setup the initial move above
 				float i3 = -agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i3);
 				agent.setOffsetY(-dstJumped - (16 - lookupHeight()));
-				if (agent.getOffsetY() <= -32)
+				if (dstJumped >= 16)
 				{
 					int[] pos = agent.getPos();
 					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] - 1);
@@ -225,6 +270,14 @@ public class Jump implements Action {
 					agent.setJumping(false);
 					swapFootstep(agent);
 					finishedJump = true;
+				}
+				
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("down");
+					cArgs.add("down");
+					stepCamera.execute(agent, world, cArgs);
 				}
 			break;
 			case left:
@@ -243,6 +296,14 @@ public class Jump implements Action {
 					swapFootstep(agent);
 					finishedJump = true;
 				}
+				
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("left");
+					cArgs.add("down");
+					stepCamera.execute(agent, world, cArgs);
+				}
 			break;
 			case right:
 				float i2 = agent.getSpeed() * 16.0f / 32.0f;
@@ -259,6 +320,14 @@ public class Jump implements Action {
 					agent.setJumping(false);
 					swapFootstep(agent);
 					finishedJump = true;
+				}
+				
+				if (agent.getClass().equals(Hero.class))
+				{
+					ArrayList<String> cArgs = new ArrayList<String>();
+					cArgs.add("right");
+					cArgs.add("down");
+					stepCamera.execute(agent, world, cArgs);
 				}
 			break;
 			}
