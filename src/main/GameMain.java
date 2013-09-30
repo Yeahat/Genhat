@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -214,9 +215,10 @@ public class GameMain {
 	{
 		//genTestWorld0();
 		//genTestWorld1();
-		genTestWorldHeroTest();
+		//genTestWorldHeroTest();
 		//genTestWorldStairs();
 		//genTestWorldJump();
+		genLargeWorld();
 	}
 	
 	/**
@@ -490,6 +492,48 @@ public class GameMain {
 		t[1][4][1] = new Terrain(grass);
 		t[1][4][2] = new Terrain(dirt);
 		t[5][5][1] = new Terrain(grass);
+		
+		world = new World(xs, ys, zs);
+		world.setTerrain(t);
+		
+		ArrayList<Agent> agents = new ArrayList<Agent>();
+		
+		Hero hero = new Hero();
+		int[] pos = {4, 1, 1};
+		world.setDisplayCenter(pos);
+		hero.setPos(pos);
+		agents.add(hero);
+		
+		world.addAgents(agents);
+		world.setPlayer(hero);
+	}
+	
+	private void genLargeWorld()
+	{
+		int xs = 50, ys = 50, zs = 10;
+		Terrain[][][] t = new Terrain[xs][ys][zs];
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				for (int k = 0; k < zs; k ++)
+				{
+					t[i][j][k] = new Terrain(air);
+				}
+			}
+		}
+		
+		Random rand = new Random();
+		for (int i = 0; i < xs; i ++)
+		{
+			for (int j = 0; j < ys; j ++)
+			{
+				if (rand.nextInt(2) == 0)
+					t[i][j][0] = new Terrain(grass);
+				else
+					t[i][j][0] = new Terrain(dirt);
+			}
+		}
 		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);

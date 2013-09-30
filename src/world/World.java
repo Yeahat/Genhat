@@ -92,22 +92,35 @@ public class World {
 	
 	public void renderWorld()
 	{
-		for (int k = 0; k < terrainGrid[0][0].length; k ++)
+		int iMin, iMax, jMin, jMax, kMin, kMax;
+		kMin = 0;
+		kMax = terrainGrid[0][0].length;
+		iMin = (int)(displayCenter[0] - 13);
+		iMax = (int)(displayCenter[0] + 15);
+		jMin = (int)(displayCenter[1] - 10);
+		jMax = (int)(displayCenter[1] + 11 + kMax);
+		
+		if (iMin < 0)
+			iMin = 0;
+		if (iMax > terrainGrid.length)
+			iMax = terrainGrid.length;
+		if (jMin < 0)
+			jMin = 0;
+		if (jMax > terrainGrid[0].length)
+			jMax = terrainGrid[0].length;
+		if (kMin < 0)
+			kMin = 0;
+		if (kMax > terrainGrid[0][0].length)
+			kMax = terrainGrid[0][0].length;
+		
+		for (int k = kMin; k < kMax; k ++)
 		{
-			//***************************************************************************************************************
-			//********* TERRAIN RENDERING ***********************************************************************************
-			//***************************************************************************************************************
-			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
-			{
-				
-			}
-			
 			//***************************************************************************************************************
 			//********* THING AND AGENT RENDERING ***************************************************************************
 			//***************************************************************************************************************
-			for (int j = terrainGrid[0].length - 1; j >= 0; j --)
+			for (int j = jMax - 1; j >= jMin; j --)
 			{
-				for (int i = 0; i < terrainGrid.length; i ++)
+				for (int i = iMin; i < iMax; i ++)
 				{
 					Terrain t = terrainGrid[i][j][k];					
 					
@@ -241,7 +254,7 @@ public class World {
 						}
 					}
 				}
-				for (int i = 0; i < terrainGrid.length; i ++)
+				for (int i = iMin; i < iMax; i ++)
 				{					
 					if (this.hasThing(i, j, k))
 					{
@@ -254,7 +267,7 @@ public class World {
 						GL11.glPopMatrix();
 					}
 				}
-				for (int i = 0; i < terrainGrid.length; i ++)
+				for (int i = iMin; i < iMax; i ++)
 				{
 					Agent agent = agentGrid[i][j][k];
 					if (agent != null)
