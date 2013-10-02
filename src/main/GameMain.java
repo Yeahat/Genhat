@@ -535,13 +535,51 @@ public class GameMain {
 			}
 		}
 		
+		//house test
+		for (int k = 1; k < 5; k ++)
+		{
+			for (int j = 30; j <= 38; j ++)
+			{
+				t[30][j][k] = new Terrain(rock);	
+				t[42][j][k] = new Terrain(rock);
+			}
+			
+			for (int i = 31; i <= 41; i ++)
+			{
+				t[i][38][k] = new Terrain(rock);
+				if (i < 36 || i > 37 || k > 2)
+					t[i][30][k] = new Terrain(rock);
+			}
+		}
+		for (int i = 30; i <= 42; i ++)
+		{
+			for (int j = 30; j <= 38; j ++)
+			{
+				t[i][j][0] = new Terrain(dirt);
+				t[i][j][5] = new Terrain(rock);
+				if (i > 34 && j > 35)
+					t[i][j][1] = new Terrain(dirt);
+			}
+		}
+		
+		t[31][30][5] = new Terrain(air);
+		t[32][30][5] = new Terrain(air);
+		t[32][30][4] = new Terrain(air);
+		t[33][30][5] = new Terrain(air);
+		t[33][30][4] = new Terrain(air);
+		t[33][30][3] = new Terrain(air);
+		t[34][30][5] = new Terrain(air);
+		t[34][30][4] = new Terrain(air);
+		t[34][30][3] = new Terrain(air);
+		t[34][30][2] = new Terrain(air);
+		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
-		int[] pos = {4, 1, 1};
+		int[] pos = {25, 25, 1};
 		world.setDisplayCenter(pos);
 		hero.setPos(pos);
 		agents.add(hero);
