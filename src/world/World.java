@@ -104,11 +104,27 @@ public class World {
 		int y = player.getPos()[1];
 		int z = player.getPos()[2];
 		
+		//roof check
 		for (int k = z; k < terrainGrid[0][0].length; k ++)
 		{
 			if (terrainGrid[x][y][k].getTerrainType() != air)
 			{
 				return z + 2;
+			}
+		}
+		
+		//occluding wall check
+		for (int j = y - 1; j >= 0; j --)
+		{
+			int k = z + (y - j);
+			if (k >= terrainGrid[0][0].length)
+				break;
+			for (int i = 0; i < 10; i ++)
+			{
+				if (k + i >= terrainGrid[0][0].length)
+					break;
+				if (terrainGrid[x][j][k + i].getTerrainType() != air)
+					return z + 2;
 			}
 		}
 		

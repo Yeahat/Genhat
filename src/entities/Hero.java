@@ -44,7 +44,7 @@ public class Hero extends Agent {
 	{
 		super.initState();
 		setDir(down);
-		setSpeed(2);
+		setSpeed(4);
 		setFootstep(left);
 		setHeight(2);
 	}
