@@ -3,6 +3,8 @@ package world;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -68,6 +70,8 @@ public class World {
 		thingGrid = new Thing[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
 		
+		agents = new ArrayList<Agent>();
+		
 		displayCenter[0] = center[0];
 		displayCenter[1] = center[1];
 		displayCenter[2] = center[2];
@@ -131,29 +135,38 @@ public class World {
 		return terrainGrid[0][0].length;
 	}
 	
+	private boolean isShadowed(int x, int y, int z)
+	{		
+		for (int k = 0; k + z < terrainGrid[0][0].length; k ++)
+		{
+			if (k % 1 == 0)
+				x --;
+			//if (k % 100 == 0)
+				//y ++;
+
+			if (x < 0 || y >= terrainGrid[0].length)
+				break;
+			
+			if (terrainGrid[x][y][k + z].getTerrainType() != air)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Render terrain, things, and agents by layers
+	 */
 	public void renderWorld()
 	{
 		int iMin, iMax, jMin, jMax, kMin, kMax;
 		kMin = 0;
-		kMax = updateHeightMax();
-		iMin = (int)(displayCenter[0] - 13);
-		iMax = (int)(displayCenter[0] + 15);
-		jMin = (int)(displayCenter[1] - 10 - kMax);
-		jMax = (int)(displayCenter[1] + 11 + kMax);
-		
-		if (iMin < 0)
-			iMin = 0;
-		if (iMax > terrainGrid.length)
-			iMax = terrainGrid.length;
-		if (jMin < 0)
-			jMin = 0;
-		if (jMax > terrainGrid[0].length)
-			jMax = terrainGrid[0].length;
-		if (kMin < 0)
-			kMin = 0;
-		if (kMax > terrainGrid[0][0].length)
-			kMax = terrainGrid[0][0].length;
-		
+		kMax = Math.min(terrainGrid[0][0].length, updateHeightMax());
+		iMin = Math.max(0, (int)(displayCenter[0] - 13));
+		iMax = Math.min(terrainGrid.length, (int)(displayCenter[0] + 15));
+		jMin = Math.max(0, (int)(displayCenter[1] - 10 - kMax));
+		jMax = Math.min(terrainGrid[0].length, (int)(displayCenter[1] + 11 + kMax));
+				
 		for (int k = kMin; k < kMax; k ++)
 		{
 			//***************************************************************************************************************
@@ -298,7 +311,10 @@ public class World {
 						    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
 						    		
 						    		GL11.glBegin(GL11.GL_QUADS);
-										GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
+						    			boolean shadowFlag = isShadowed(i, j, k);
+						    			if (shadowFlag)
+						    				GL11.glColor3f(.7f, .7f, .7f);
+						    			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 										GL11.glVertex2f(0, 0);
 										GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
 										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
@@ -306,6 +322,8 @@ public class World {
 										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
 										GL11.glTexCoord2f(texX*tConv, texY * tConv);
 										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+										if (shadowFlag)
+											GL11.glColor3f(1, 1, 1);
 									GL11.glEnd();
 								
 								GL11.glPopMatrix();
@@ -322,8 +340,13 @@ public class World {
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
+								boolean shadowFlag = isShadowed(i, j, k);
+				    			if (shadowFlag)
+				    				GL11.glColor3f(.7f, .7f, .7f);
 								GL11.glTranslatef(x, y, 0);
 								thingGrid[i][j][k].renderThing(PIXEL_SIZE, TEXTURE_SIZE);
+				    			if (shadowFlag)
+				    				GL11.glColor3f(1, 1, 1);
 							GL11.glPopMatrix();
 						}
 					}
@@ -338,8 +361,13 @@ public class World {
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
+								boolean shadowFlag = isShadowed(i, j, k);
+				    			if (shadowFlag)
+				    				GL11.glColor3f(.7f, .7f, .7f);
 								GL11.glTranslatef(x, y, 0);
 								agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
+				    			if (shadowFlag)
+				    				GL11.glColor3f(1, 1, 1);
 							GL11.glPopMatrix();
 						}
 					}

@@ -215,10 +215,10 @@ public class GameMain {
 	{
 		//genTestWorld0();
 		//genTestWorld1();
-		//genTestWorldHeroTest();
+		genTestWorldHeroTest();
 		//genTestWorldStairs();
 		//genTestWorldJump();
-		genLargeWorld();
+		//genLargeWorld();
 	}
 	
 	/**
