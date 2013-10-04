@@ -9,6 +9,7 @@ public class Terrain {
 	}
 	
 	boolean blocking;
+	boolean transparent;
 	terrainType type;
 	terrainType top;
 	int texRow;
@@ -104,12 +105,22 @@ public class Terrain {
 	}
 	
 	/**
+	 * Getter for transparent
+	 * @return true if transparent
+	 */
+	public boolean isTransparent()
+	{
+		return transparent;
+	}
+	
+	/**
 	 * Updates the internal attributes of the terrain type.
 	 * This must be called any time the terrain type is set.
 	 */
 	private void updateAttributes()
 	{
 		setBlocking();
+		setTransparent();
 		setTexPos();
 	}
 	
@@ -123,6 +134,18 @@ public class Terrain {
 			blocking = false;
 		else
 			blocking = true;
+	}
+	
+	/**
+	 * Determines whether or not a terrain type is transparent and updates accordingly
+	 */
+	private void setTransparent()
+	{
+		//add the names of any new transparent terrain types here
+		if (type == air)
+			transparent = true;
+		else
+			transparent = false;
 	}
 	
 	/**

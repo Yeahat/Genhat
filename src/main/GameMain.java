@@ -14,12 +14,12 @@ import entities.Hero;
 import entities.Wanderer;
 
 import things.Stairs;
-import things.Thing;
 import world.Terrain;
 import world.World;
 
 import static world.Terrain.terrainType.*;
 import static entities.Agent.direction.*;
+import static world.World.timeOfDay.*;
 
 
 public class GameMain {
@@ -67,6 +67,7 @@ public class GameMain {
 		//Check for key state changes
 		while (Keyboard.next())
 		{
+			//Debugging stuff
 			if (Keyboard.getEventKeyState())
 			{
 				if (Keyboard.getEventKey() == Keyboard.KEY_Q)
@@ -77,28 +78,47 @@ public class GameMain {
 				{
 					world.rotateC();
 				}
-			}
-		}
-		
-		//Check for keys being held down
-		if (Keyboard.isKeyDown(Keyboard.KEY_Z))
-		{
-			
-		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_X))
-		{
-			Hero player = world.getPlayer();
-			if (player != null)
-			{
-				if (player.isIdle())
+				if (Keyboard.getEventKey() == Keyboard.KEY_T)
 				{
-					ArrayList<String> newArgs = new ArrayList<String>();
-					player.setArgs(newArgs);
-					player.setCurrentAction(player.getJumpAction());
+					world.cycleTimeOfDay();
+				}
+				
+				//Pressed Action Keys
+				if (Keyboard.getEventKey() == Keyboard.KEY_Z)
+				{
+					
+				}
+				else if (Keyboard.getEventKey() == Keyboard.KEY_X)
+				{
+					Hero player = world.getPlayer();
+					if (player != null)
+					{
+						if (player.isIdle())
+						{
+							ArrayList<String> newArgs = new ArrayList<String>();
+							player.setArgs(newArgs);
+							player.setCurrentAction(player.getJumpAction());
+						}
+					}
 				}
 			}
 		}
 		
+		//Held Action Keys	
+		if (Keyboard.isKeyDown(Keyboard.KEY_C))
+		{
+			Hero player = world.getPlayer();
+			if (player != null)
+				player.setSpeed(4);
+		}
+		else
+		{
+			Hero player = world.getPlayer();
+			if (player != null)
+				player.setSpeed(2);
+		}
+		
+		//Arrow Keys
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 		{
 			Hero player = world.getPlayer();
@@ -215,10 +235,10 @@ public class GameMain {
 	{
 		//genTestWorld0();
 		//genTestWorld1();
-		genTestWorldHeroTest();
+		//genTestWorldHeroTest();
 		//genTestWorldStairs();
 		//genTestWorldJump();
-		//genLargeWorld();
+		genLargeWorld();
 	}
 	
 	/**
@@ -573,6 +593,17 @@ public class GameMain {
 		t[34][30][3] = new Terrain(air);
 		t[34][30][2] = new Terrain(air);
 		
+		//shadow tests
+		for (int i = 1; i < 8; i ++)
+		{
+			t[22][28][i] = new Terrain(dirt, grass);
+			t[18][25][i] = new Terrain(dirt, grass);
+		}
+		t[19][25][7] = new Terrain(dirt, grass);
+		t[19][24][7] = new Terrain(dirt, grass);
+		t[17][26][7] = new Terrain(dirt, grass);
+		t[17][25][7] = new Terrain(dirt, grass);
+		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
 		
@@ -583,6 +614,8 @@ public class GameMain {
 		world.setDisplayCenter(pos);
 		hero.setPos(pos);
 		agents.add(hero);
+		
+		world.setTod(sunrise);
 		
 		world.addAgents(agents);
 		world.setPlayer(hero);

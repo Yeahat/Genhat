@@ -3,8 +3,6 @@ package world;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
-
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -16,6 +14,7 @@ import entities.Hero;
 
 import static world.Terrain.terrainType.*;
 import static entities.Agent.direction.*;
+import static world.World.timeOfDay.*;
 
 public class World {
 	Terrain[][][] terrainGrid;
@@ -23,7 +22,13 @@ public class World {
 	Agent[][][] agentGrid;
 	ArrayList<Agent> agents;
 	
+	//TODO: refactor this stuff to a new Game State class
 	Hero player;
+	public enum timeOfDay
+	{
+		sunrise, morning, midday, afternoon, sunset, night;
+	}
+	private timeOfDay tod;
 	
 	private final int PIXEL_SIZE = 2;
 	private final int TEXTURE_SIZE = 16;
@@ -54,6 +59,8 @@ public class World {
 		displayCenter[0] = (float)xSize/2;
 		displayCenter[1] = (float)ySize/2;
 		displayCenter[2] = (float)zSize/2;
+		
+		setTod(midday);
 	}
 	
 	/**
@@ -75,6 +82,8 @@ public class World {
 		displayCenter[0] = center[0];
 		displayCenter[1] = center[1];
 		displayCenter[2] = center[2];
+		
+		setTod(midday);
 	}
 	
 	public void loadTextures()
@@ -136,18 +145,49 @@ public class World {
 	}
 	
 	private boolean isShadowed(int x, int y, int z)
-	{		
+	{
+		int shadowLength = 1;
+		int shadowDirection = 1;
+		boolean longShadows = false;
+		switch (tod)
+		{
+		case sunrise:
+			longShadows = true;
+			break;
+		case morning:
+			shadowLength = 3;
+			break;
+		case midday: 
+			shadowDirection = 0;
+			break;
+		case afternoon: 
+			shadowLength = 3;
+			shadowDirection = -1;
+			break;
+		case sunset: 
+			shadowDirection = -1;
+			longShadows = true;
+			break;
+		case night: 
+			//no shadows
+			return false;
+		default: 
+			shadowDirection = 0;
+			break;
+		}
+		
 		for (int k = 0; k + z < terrainGrid[0][0].length; k ++)
 		{
-			if (k % 1 == 0)
-				x --;
-			//if (k % 100 == 0)
-				//y ++;
+			if (k % shadowLength == 0)
+				x += shadowDirection;
 
-			if (x < 0 || y >= terrainGrid[0].length)
+			if (x < 0 || x >= terrainGrid[0].length || y < 0 || y >= terrainGrid[0].length)
 				break;
 			
-			if (terrainGrid[x][y][k + z].getTerrainType() != air)
+			if (!terrainGrid[x][y][k + z].isTransparent())
+				return true;
+			
+			if (longShadows && y + 1 < terrainGrid[0].length && !terrainGrid[x][y + 1][k + z].isTransparent())
 				return true;
 		}
 		
@@ -220,6 +260,7 @@ public class World {
 							    	
 						    		
 							    	GL11.glBegin(GL11.GL_QUADS);
+							    		setLighting(false);
 										GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 										GL11.glVertex2f(0, 0);
 										GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
@@ -311,9 +352,7 @@ public class World {
 						    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
 						    		
 						    		GL11.glBegin(GL11.GL_QUADS);
-						    			boolean shadowFlag = isShadowed(i, j, k);
-						    			if (shadowFlag)
-						    				GL11.glColor3f(.7f, .7f, .7f);
+						    			setLighting(isShadowed(i, j, k));
 						    			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 										GL11.glVertex2f(0, 0);
 										GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
@@ -322,8 +361,6 @@ public class World {
 										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
 										GL11.glTexCoord2f(texX*tConv, texY * tConv);
 										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-										if (shadowFlag)
-											GL11.glColor3f(1, 1, 1);
 									GL11.glEnd();
 								
 								GL11.glPopMatrix();
@@ -340,13 +377,9 @@ public class World {
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
-								boolean shadowFlag = isShadowed(i, j, k);
-				    			if (shadowFlag)
-				    				GL11.glColor3f(.7f, .7f, .7f);
+								setLighting(isShadowed(i, j, k));
 								GL11.glTranslatef(x, y, 0);
 								thingGrid[i][j][k].renderThing(PIXEL_SIZE, TEXTURE_SIZE);
-				    			if (shadowFlag)
-				    				GL11.glColor3f(1, 1, 1);
 							GL11.glPopMatrix();
 						}
 					}
@@ -361,18 +394,67 @@ public class World {
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
-								boolean shadowFlag = isShadowed(i, j, k);
-				    			if (shadowFlag)
-				    				GL11.glColor3f(.7f, .7f, .7f);
+								setLighting(isShadowed(i, j, k));
 								GL11.glTranslatef(x, y, 0);
 								agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
-				    			if (shadowFlag)
-				    				GL11.glColor3f(1, 1, 1);
 							GL11.glPopMatrix();
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Determine the lighting for rendering something depending on shadows and
+	 * time of day
+	 */
+	private void setLighting(boolean shadowed)
+	{
+		switch (tod)
+		{
+		case sunrise:
+			if (shadowed)
+				GL11.glColor3f(.5f, .5f, .5f);
+			else
+				GL11.glColor3f(.9f, .8f, .8f); 
+			return;
+		case morning:
+			if (shadowed)
+				GL11.glColor3f(.7f, .7f, .7f);
+			else
+				GL11.glColor3f(1f, 1f, 1f); 
+			return;
+		case midday: 
+			if (shadowed)
+				GL11.glColor3f(.8f, .8f, .8f);
+			else
+				GL11.glColor3f(1f, 1f, 1f); 
+			return;
+		case afternoon: 
+			if (shadowed)
+				GL11.glColor3f(.7f, .7f, .7f);
+			else
+				GL11.glColor3f(1f, 1f, 1f); 
+			return;
+		case sunset: 
+			if (shadowed)
+				GL11.glColor3f(.5f, .5f, .5f);
+			else
+				GL11.glColor3f(.9f, .75f, .85f); 
+			return;
+		case night: 
+			if (shadowed)
+				GL11.glColor3f(.3f, .3f, .5f);
+			else
+				GL11.glColor3f(.4f, .4f, .6f);
+			return;
+		default: 
+			if (shadowed)
+				GL11.glColor3f(.8f, .8f, .8f);
+			else
+				GL11.glColor3f(1f, 1f, 1f); 
+			return;
 		}
 	}
 	
@@ -464,7 +546,7 @@ public class World {
 	 * 
 	 * @param x the amount to increment the display x center, in pixels
 	 */
-	public void IncrementDisplayX(int x)
+	public void incrementDisplayX(int x)
 	{
 		displayCenter[0] += (float)x/TEXTURE_SIZE;
 	}
@@ -474,20 +556,32 @@ public class World {
 	 * 
 	 * @param y the amount to increment the display y center, in pixels
 	 */
-	public void IncrementDisplayY(int y)
+	public void incrementDisplayY(int y)
 	{
 		displayCenter[1] += (float)y/TEXTURE_SIZE;
 	}
-	
 	
 	/**
 	 * Incrementer for the display z
 	 * 
 	 * @param z the amount to increment the display z center, in pixels
 	 */
-	public void IncrementDisplayZ(int z)
+	public void incrementDisplayZ(int z)
 	{
 		displayCenter[2] += (float)z/TEXTURE_SIZE;
+	}
+	
+	public void cycleTimeOfDay()
+	{
+		switch (tod)
+		{
+		case sunrise: tod = morning; break;
+		case morning: tod = midday; break;
+		case midday: tod = afternoon; break;
+		case afternoon: tod = sunset; break;
+		case sunset: tod = night; break;
+		case night: tod = sunrise; break;
+		}
 	}
 	
 	/**
@@ -704,5 +798,13 @@ public class World {
 	public void setPlayer(Hero hero)
 	{
 		player = hero;
+	}
+
+	public void setTod(timeOfDay tod) {
+		this.tod = tod;
+	}
+
+	public timeOfDay getTod() {
+		return tod;
 	}
 }
