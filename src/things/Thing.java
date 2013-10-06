@@ -6,12 +6,12 @@ import entities.Agent.direction;
 
 public abstract class Thing {
 	//State
-	boolean blocking;
-	boolean crossable;
-	boolean ramp;
+	boolean blocking = true;
+	boolean crossable = false;
+	boolean ramp = false;
+	private boolean lightSource = false;
 	private int[] pos = new int[3]; //Position (x, y, z)
 	private direction dir;	//direction the thing is facing
-	boolean tall; //tall things render over heros and other things if they are in front of them
 	
 	//Texture
 	Texture texture;
@@ -76,5 +76,13 @@ public abstract class Thing {
 
 	public direction getDir() {
 		return dir;
+	}
+
+	public void setLightSource(boolean lightSource) {
+		this.lightSource = lightSource;
+	}
+
+	public boolean isLightSource() {
+		return lightSource;
 	}
 }

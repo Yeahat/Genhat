@@ -21,7 +21,6 @@ public class Stairs extends Thing {
 		setDir(down);
 		blocking = false;
 		crossable = true;
-		tall = false;
 		ramp = true;
 	}
 	
@@ -38,17 +37,14 @@ public class Stairs extends Thing {
 		if (d == down)
 		{
 			blocking = false;
-			tall = false;
 		}
 		else if (d == right)
 		{
 			blocking = true;
-			tall = true;
 		}
 		else if (d == left)
 		{
 			blocking = true;
-			tall = true;
 		}
 	}
 	

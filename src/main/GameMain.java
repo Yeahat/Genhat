@@ -13,6 +13,7 @@ import entities.Agent;
 import entities.Hero;
 import entities.Wanderer;
 
+import things.LightSource;
 import things.Stairs;
 import world.Terrain;
 import world.World;
@@ -52,7 +53,7 @@ public class GameMain {
 			
 			//update the screen
 			Display.update();
-			Display.sync(32);
+			Display.sync(32);			
 		}
 		
 		//Exit
@@ -606,6 +607,9 @@ public class GameMain {
 		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
+		
+		LightSource l1 = new LightSource();
+		world.addThing(l1, 33, 33, 1);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		

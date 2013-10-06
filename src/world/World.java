@@ -20,6 +20,7 @@ public class World {
 	Terrain[][][] terrainGrid;
 	Thing[][][] thingGrid;
 	Agent[][][] agentGrid;
+	float[][][] lightModGrid;
 	ArrayList<Agent> agents;
 	
 	//TODO: refactor this stuff to a new Game State class
@@ -53,6 +54,7 @@ public class World {
 		terrainGrid = new Terrain[xSize][ySize][zSize];
 		thingGrid = new Thing[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
+		lightModGrid = new float[xSize][ySize][zSize];
 		
 		agents = new ArrayList<Agent>();
 		
@@ -76,6 +78,7 @@ public class World {
 		terrainGrid = new Terrain[xSize][ySize][zSize];
 		thingGrid = new Thing[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
+		lightModGrid = new float[xSize][ySize][zSize];
 		
 		agents = new ArrayList<Agent>();
 		
@@ -122,7 +125,7 @@ public class World {
 		{
 			if (terrainGrid[x][y][k].getTerrainType() != air)
 			{
-				return z + 2;
+				return z + 1;
 			}
 		}
 		
@@ -137,14 +140,14 @@ public class World {
 				if (k + i >= terrainGrid[0][0].length)
 					break;
 				if (terrainGrid[x][j][k + i].getTerrainType() != air)
-					return z + 2;
+					return z + 1;
 			}
 		}
 		
 		return terrainGrid[0][0].length;
 	}
 	
-	private boolean isShadowed(int x, int y, int z)
+	public boolean isShadowed(int x, int y, int z)
 	{
 		int shadowLength = 1;
 		int shadowDirection = 1;
@@ -195,210 +198,266 @@ public class World {
 	}
 	
 	/**
+	 * Update specified portion of the grid for light modifications; grid parameters are assumed to be
+	 * in bounds.
+	 * 
+	 * @param xMin minimum x coordinate
+	 * @param xMax maximum x coordinate
+	 * @param yMin minimum y coordinate
+	 * @param yMax maximum y coordinate
+	 * @param zMin minimum z coordinate
+	 * @param zMax maximum z coordinate
+	 */
+	public void updateLightModGrid(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax)
+	{
+		float[][][] clearFloatGrid = new float[terrainGrid.length][terrainGrid[0].length][terrainGrid[0][0].length];
+		lightModGrid = clearFloatGrid;
+		
+		for (int i = xMin; i <= xMax; i ++)
+		{
+			for (int j = yMin; j <= yMax; j ++)
+			{
+				for (int k = zMin; k <= zMax; k ++)
+				{
+					if (producesLight(i, j, k))
+					{
+						//TODO: Update this to distinguish between point and directed lights
+						//point light update
+						int lightDst = 6;
+						int iMin = Math.max(i - lightDst, 0);
+						int jMin = Math.max(j - lightDst, 0);
+						int kMin = Math.max(k - lightDst, 0);
+						int iMax = Math.min(i + lightDst, terrainGrid.length - 1);
+						int jMax = Math.min(j + lightDst, terrainGrid[0].length - 1);
+						int kMax = Math.min(k + lightDst, terrainGrid[0][0].length - 1);
+						for (int i2 = iMin; i2 <= iMax; i2 ++)
+						{
+							for (int j2 = jMin; j2 <= jMax; j2 ++)
+							{
+								for (int k2 = kMin; k2 <= kMax; k2 ++)
+								{
+									if (!checkLightBlockingLineOfSight(i, j, k, i2, j2, k2))
+									{
+										//increase light modification based on distance to light source
+										float lightPower = .7f;
+										float dst = (float)Math.sqrt(Math.pow(i - i2, 2) + Math.pow(j - j2, 2) + Math.pow(k - k2, 2));
+										float updateVal = Math.max(lightPower - dst/10.0f, 0);
+										if (updateVal > lightModGrid[i2][j2][k2])
+											lightModGrid[i2][j2][k2] = updateVal;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+		
+	/**
 	 * Render terrain, things, and agents by layers
 	 */
 	public void renderWorld()
 	{
 		int iMin, iMax, jMin, jMax, kMin, kMax;
 		kMin = 0;
-		kMax = Math.min(terrainGrid[0][0].length, updateHeightMax());
+		kMax = Math.min(terrainGrid[0][0].length - 1, updateHeightMax());
 		iMin = Math.max(0, (int)(displayCenter[0] - 13));
-		iMax = Math.min(terrainGrid.length, (int)(displayCenter[0] + 15));
+		iMax = Math.min(terrainGrid.length - 1, (int)(displayCenter[0] + 15));
 		jMin = Math.max(0, (int)(displayCenter[1] - 10 - kMax));
-		jMax = Math.min(terrainGrid[0].length, (int)(displayCenter[1] + 11 + kMax));
-				
-		for (int k = kMin; k < kMax; k ++)
+		jMax = Math.min(terrainGrid[0].length - 1, (int)(displayCenter[1] + 11 + kMax));
+		
+		updateLightModGrid(iMin, iMax, jMin, jMax, kMin, kMax);
+		
+		for (int k = kMin; k <= kMax; k ++)
 		{
 			//***************************************************************************************************************
 			//********* TERRAIN AND THING AND AGENT RENDERING ***************************************************************
 			//***************************************************************************************************************
-			if (k < kMax)
+			for (int j = jMax; j >= jMin; j --)
 			{
-				for (int j = jMax - 1; j >= jMin; j --)
+				for (int i = iMin; i <= iMax; i ++)
 				{
-					for (int i = iMin; i < iMax; i ++)
+					Terrain t = terrainGrid[i][j][k];					
+					
+					//Display vertical textures
+					if (t.getTerrainType() != air)
 					{
-						Terrain t = terrainGrid[i][j][k];					
+						//Determine position on screen
+						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
-						//Display vertical textures
-						if (t.getTerrainType() != air)
+						GL11.glPushMatrix();
+						
+							//Translate to screen position and bind appropriate texture
+							GL11.glColor3f(1.0f, 1.0f, 1.0f);
+							GL11.glEnable(GL11.GL_TEXTURE_2D);
+							GL11.glTranslatef(x, y, 0);
+							vTerrainTexture.bind();
+							GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+					    	
+							if (k != kMax)
+							{
+						    	//Determine which part of the texture to use based on how many neighbors are air
+						    	int texX = t.getTexCol();
+						    	int texY = t.getTexRow();
+					    		if ((i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air) && 
+					    				(i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air))
+					    		{
+					    			texY += 1;
+					    		}
+					    		else if (i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air)
+					    		{
+					    			texX += 1;
+					    			texY += 1;
+					    		}
+					    		else if (i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air)
+					    		{
+					    			texX += 1;
+					    		}
+				    		
+					    		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
+						    	
+					    		
+						    	GL11.glBegin(GL11.GL_QUADS);
+						    		setLighting(false, lightModGrid[i][j][k]);
+									GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
+									GL11.glVertex2f(0, 0);
+									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
+									GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
+									GL11.glTexCoord2f(texX*tConv, texY * tConv);
+									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+								GL11.glEnd();
+							}
+							else
+							{
+								GL11.glColor3f(0, 0, 0);
+								GL11.glBegin(GL11.GL_QUADS);
+									GL11.glVertex2f(0, 0);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
+									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+								GL11.glEnd();
+								GL11.glColor3f(1, 1, 1);
+							}
+							
+						GL11.glPopMatrix();
+						
+					}
+					//Display horizontal textures
+					else if (k - 1 >= 0)
+					{
+						if (terrainGrid[i][j][k-1].getTerrainType() != air)
 						{
+							t = terrainGrid[i][j][k-1];
 							//Determine position on screen
 							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
-							
+								
 								//Translate to screen position and bind appropriate texture
 								GL11.glColor3f(1.0f, 1.0f, 1.0f);
 								GL11.glEnable(GL11.GL_TEXTURE_2D);
 								GL11.glTranslatef(x, y, 0);
-								vTerrainTexture.bind();
+								hTerrainTexture.bind();
 								GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 						    	
-								if (k != kMax - 1)
-								{
-							    	//Determine which part of the texture to use based on how many neighbors are air
-							    	int texX = t.getTexCol();
-							    	int texY = t.getTexRow();
-						    		if ((i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air) && 
-						    				(i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air))
-						    		{
-						    			texY += 1;
-						    		}
-						    		else if (i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air)
-						    		{
-						    			texX += 1;
-						    			texY += 1;
-						    		}
-						    		else if (i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air)
-						    		{
-						    			texX += 1;
-						    		}
-					    		
-						    		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
-							    	
-						    		
-							    	GL11.glBegin(GL11.GL_QUADS);
-							    		setLighting(false);
-										GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-										GL11.glVertex2f(0, 0);
-										GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-										GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-										GL11.glTexCoord2f(texX*tConv, texY * tConv);
-										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-									GL11.glEnd();
-								}
-								else
-								{
-									GL11.glColor3f(0, 0, 0);
-									GL11.glBegin(GL11.GL_QUADS);
-										GL11.glVertex2f(0, 0);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-									GL11.glEnd();
-									GL11.glColor3f(1, 1, 1);
-								}
-								
-							GL11.glPopMatrix();
+						    	//Determine which part of the texture to use based on how many neighbors are air
+						    	int texX = t.getTexColTop();
+						    	int texY = t.getTexRowTop();
+						    	float tConv;
 							
-						}
-						//Display horizontal textures
-						else if (k - 1 >= 0)
-						{
-							if (terrainGrid[i][j][k-1].getTerrainType() != air)
-							{
-								t = terrainGrid[i][j][k-1];
-								//Determine position on screen
-								int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-								int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-								
-								GL11.glPushMatrix();
-									
-									//Translate to screen position and bind appropriate texture
-									GL11.glColor3f(1.0f, 1.0f, 1.0f);
-									GL11.glEnable(GL11.GL_TEXTURE_2D);
-									GL11.glTranslatef(x, y, 0);
-									hTerrainTexture.bind();
-									GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-							    	
-							    	//Determine which part of the texture to use based on how many neighbors are air
-							    	int texX = t.getTexColTop();
-							    	int texY = t.getTexRowTop();
-							    	float tConv;
-								
-									boolean topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainType() == air,
-					    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainType() == air,
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainType() == air,
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainType() == air;
+								boolean topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainType() == air,
+				    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainType() == air,
+				    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainType() == air,
+				    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainType() == air;
+				    		
+					    		if (topEmpty && bottomEmpty)
+					    		{
+					    			texY += 3;
+					    		}
+					    		else if (topEmpty)
+					    		{
+					    			//texY is unchanged, this case is required for the else case and organizational purposes
+					    		}
+					    		else if (bottomEmpty)
+					    		{
+					    			texY += 2;
+					    		}
+					    		else
+					    		{
+					    			texY += 1;
+					    		}
 					    		
-						    		if (topEmpty && bottomEmpty)
-						    		{
-						    			texY += 3;
-						    		}
-						    		else if (topEmpty)
-						    		{
-						    			//texY is unchanged, this case is required for the else case and organizational purposes
-						    		}
-						    		else if (bottomEmpty)
-						    		{
-						    			texY += 2;
-						    		}
-						    		else
-						    		{
-						    			texY += 1;
-						    		}
-						    		
-						    		if (leftEmpty && rightEmpty)
-						    		{
-						    			texX += 3;
-						    		}
-						    		else if (leftEmpty)
-						    		{
-						    			//texX is unchanged, this case is required for the else case and organizational purposes
-						    		}
-						    		else if (rightEmpty)
-						    		{
-						    			texX += 2;
-						    		}
-						    		else
-						    		{
-						    			texX += 1;
-						    		}
-						    		
-						    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
-						    		
-						    		GL11.glBegin(GL11.GL_QUADS);
-						    			setLighting(isShadowed(i, j, k));
-						    			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-										GL11.glVertex2f(0, 0);
-										GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-										GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-										GL11.glTexCoord2f(texX*tConv, texY * tConv);
-										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-									GL11.glEnd();
-								
-								GL11.glPopMatrix();
-							}
-						}
-					}
-					
-					// Render Things
-					for (int i = iMin; i < iMax; i ++)
-					{					
-						if (this.hasThing(i, j, k))
-						{
-							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+					    		if (leftEmpty && rightEmpty)
+					    		{
+					    			texX += 3;
+					    		}
+					    		else if (leftEmpty)
+					    		{
+					    			//texX is unchanged, this case is required for the else case and organizational purposes
+					    		}
+					    		else if (rightEmpty)
+					    		{
+					    			texX += 2;
+					    		}
+					    		else
+					    		{
+					    			texX += 1;
+					    		}
+					    		
+					    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
+					    		
+					    		GL11.glBegin(GL11.GL_QUADS);
+					    			setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+					    			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
+									GL11.glVertex2f(0, 0);
+									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
+									GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
+									GL11.glTexCoord2f(texX*tConv, texY * tConv);
+									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+								GL11.glEnd();
 							
-							GL11.glPushMatrix();
-								setLighting(isShadowed(i, j, k));
-								GL11.glTranslatef(x, y, 0);
-								thingGrid[i][j][k].renderThing(PIXEL_SIZE, TEXTURE_SIZE);
 							GL11.glPopMatrix();
 						}
 					}
-					
-					//Render Agents
-					for (int i = iMin; i < iMax; i ++)
+				}
+				
+				// Render Things
+				for (int i = iMin; i <= iMax; i ++)
+				{					
+					if (this.hasThing(i, j, k))
 					{
-						Agent agent = agentGrid[i][j][k];
-						if (agent != null)
-						{
-							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							
-							GL11.glPushMatrix();
-								setLighting(isShadowed(i, j, k));
-								GL11.glTranslatef(x, y, 0);
-								agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
-							GL11.glPopMatrix();
-						}
+						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						
+						GL11.glPushMatrix();
+							setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+							GL11.glTranslatef(x, y, 0);
+							thingGrid[i][j][k].renderThing(PIXEL_SIZE, TEXTURE_SIZE);
+						GL11.glPopMatrix();
+					}
+				}
+				
+				//Render Agents
+				for (int i = iMin; i <= iMax; i ++)
+				{
+					Agent agent = agentGrid[i][j][k];
+					if (agent != null)
+					{
+						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						
+						GL11.glPushMatrix();
+							setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+							GL11.glTranslatef(x, y, 0);
+							agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
+						GL11.glPopMatrix();
 					}
 				}
 			}
@@ -406,56 +465,127 @@ public class World {
 	}
 	
 	/**
-	 * Determine the lighting for rendering something depending on shadows and
-	 * time of day
+	 * Determine the lighting for rendering something depending on shadows,
+	 * light sources, and time of day
 	 */
-	private void setLighting(boolean shadowed)
+	private void setLighting(boolean shadowed, float lightMod)
 	{
+		float r, g, b;
 		switch (tod)
 		{
 		case sunrise:
 			if (shadowed)
-				GL11.glColor3f(.5f, .5f, .5f);
+			{
+				r = .5f;
+				g = .5f;
+				b = .5f;
+			}
 			else
-				GL11.glColor3f(.9f, .8f, .8f); 
-			return;
+			{
+				r = .9f;
+				g = .8f;
+				b = .8f;
+			}
+		break;
 		case morning:
 			if (shadowed)
-				GL11.glColor3f(.7f, .7f, .7f);
+			{
+				r = .7f;
+				g = .7f;
+				b = .7f;
+			}
 			else
-				GL11.glColor3f(1f, 1f, 1f); 
-			return;
+			{
+				r = 1f;
+				g = 1f;
+				b = 1f;
+			}
+		break;
 		case midday: 
 			if (shadowed)
-				GL11.glColor3f(.8f, .8f, .8f);
+			{
+				r = .8f;
+				g = .8f;
+				b = .8f;
+			}
 			else
-				GL11.glColor3f(1f, 1f, 1f); 
-			return;
+			{
+				r = 1f;
+				g = 1f;
+				b = 1f;
+			}
+		break;
 		case afternoon: 
 			if (shadowed)
-				GL11.glColor3f(.7f, .7f, .7f);
+			{
+				r = .7f;
+				g = .7f;
+				b = .7f;
+			}
 			else
-				GL11.glColor3f(1f, 1f, 1f); 
-			return;
+			{
+				r = 1f;
+				g = 1f;
+				b = 1f;
+			}
+		break;
 		case sunset: 
 			if (shadowed)
-				GL11.glColor3f(.5f, .5f, .5f);
+			{
+				r = .5f;
+				g = .5f;
+				b = .5f;
+			}
 			else
-				GL11.glColor3f(.9f, .75f, .85f); 
-			return;
+			{
+				r = .9f;
+				g = .75f;
+				b = .85f;
+			}
+		break;
 		case night: 
 			if (shadowed)
-				GL11.glColor3f(.3f, .3f, .5f);
+			{
+				r = .3f;
+				g = .3f;
+				b = .5f;
+			}
 			else
-				GL11.glColor3f(.4f, .4f, .6f);
-			return;
+			{
+				r = .4f;
+				g = .4f;
+				b = .6f;
+			}
+		break;
 		default: 
 			if (shadowed)
-				GL11.glColor3f(.8f, .8f, .8f);
+			{
+				r = .8f;
+				g = .8f;
+				b = .8f;
+			}
 			else
-				GL11.glColor3f(1f, 1f, 1f); 
-			return;
+			{
+				r = 1f;
+				g = 1f;
+				b = 1f;
+			}
 		}
+		
+		if (lightMod > 0)
+		{
+			r = Math.max(0, r + 1.2f * lightMod);
+			g = Math.max(0, g + lightMod);
+			b = Math.max(0, b + lightMod);
+		}
+		else if (lightMod < 0)
+		{
+			r = Math.min(1, r + .9f * lightMod);
+			g = Math.min(1, g + lightMod);
+			b = Math.min(1, b + .8f * lightMod);
+		}
+		
+		GL11.glColor3f(r, g, b);
 	}
 	
 	/**
@@ -669,6 +799,74 @@ public class World {
 		{
 			return terrainGrid[x][y][z].isBlocking();
 		}
+	}
+	
+	public boolean isLightBlocking(int x, int y, int z)
+	{
+		if (isOccupied(x, y, z))
+			return true;
+		else if (hasThing(x, y, z) && thingGrid[x][y][z].isBlocking())
+			return true;
+		else
+			return !terrainGrid[x][y][z].isTransparent();
+	}
+	
+	public boolean producesLight(int x, int y, int z)
+	{
+		if (hasThing(x, y, z) && thingGrid[x][y][z].isLightSource())
+			return true;
+		else
+			return false;
+	}
+	
+	/**
+	 * Determine whether a light source is blocked before reaching a test cell
+	 * 
+	 * @param x1 light source x
+	 * @param y1 light source y
+	 * @param z1 light source z
+	 * @param x2 test cell x
+	 * @param y2 test cell y
+	 * @param z2 test cell z
+	 * @return true if the cell is blocked, false otherwise
+	 */
+	public boolean checkLightBlockingLineOfSight(int x1, int y1, int z1, int x2, int y2, int z2)
+	{
+		int dx = x2 - x1;
+		int dy = y2 - y1;
+		int dz = z2 - z1;
+		
+		//handle special cases of light-blocking test cells
+		if (isLightBlocking(x2, y2, z2))
+		{
+			if (dy < 0)
+				return true;
+			else if (dy == 0 && dz > 0)
+				return true;
+		}
+		
+		//calculate steps for iterating through line of sight points in between the two points
+		float step = Math.max(Math.max(Math.abs(dx), Math.abs(dy)), Math.abs(dz));		
+		float xStep = (float)dx / step;
+		float yStep = (float)dy / step;
+		float zStep = (float)dz / step;
+		
+		//check spaces in between light source and test cell
+		//System.out.println();
+		//System.out.println("Light source: " + x1 + ", " + y1 + ", " + z1);
+		for (int n = 1; n < step; n ++)
+		{
+			int i = (int)(x1 + n * xStep + .5);
+			int j = (int)(y1 + n * yStep + .5);
+			int k = (int)(z1 + n * zStep + .5);
+			//System.out.println(i + ", " + j + ", " + k);
+			
+			if (isLightBlocking(i, j, k))
+				return true;
+		}
+		//System.out.println("Target cell: " + x2 + ", " + y2 + ", " + z2);
+		
+		return false;
 	}
 	
 	public boolean isCrossable(int x, int y, int z)
