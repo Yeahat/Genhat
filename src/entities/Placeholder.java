@@ -9,6 +9,8 @@ public class Placeholder extends Agent {
 		pos[0] = x;
 		pos[1] = y;
 		pos[2] = z;
+		
+		this.setTransparent(true);
 	}
 	
 	@Override

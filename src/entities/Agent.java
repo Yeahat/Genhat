@@ -33,6 +33,7 @@ public abstract class Agent {
 	private boolean rampAscending = false;	//true if the agent is currently taking a step up a ramp
 	private boolean rampDescending = false;	//true if the agent is currently taking a step down a ramp
 	private boolean onRamp = false;	//true if the agent is currently standing on top of a ramp
+	private boolean transparent = false; //true if the agent should not block light sources
 	private direction footstep = left; //whether the next step is the left or right foot
 	private direction stance = right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
@@ -466,5 +467,13 @@ public abstract class Agent {
 
 	public direction getStance() {
 		return stance;
+	}
+
+	public void setTransparent(boolean transparent) {
+		this.transparent = transparent;
+	}
+
+	public boolean isTransparent() {
+		return transparent;
 	}
 }

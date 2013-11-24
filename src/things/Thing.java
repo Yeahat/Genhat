@@ -9,6 +9,7 @@ public abstract class Thing {
 	boolean blocking = true;
 	boolean crossable = false;
 	boolean ramp = false;
+	boolean transparent = false; //true if thing should not block light sources
 	private boolean lightSource = false;
 	private int[] pos = new int[3]; //Position (x, y, z)
 	private direction dir;	//direction the thing is facing

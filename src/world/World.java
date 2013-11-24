@@ -803,9 +803,9 @@ public class World {
 	
 	public boolean isLightBlocking(int x, int y, int z)
 	{
-		if (isOccupied(x, y, z))
+		if (isOccupied(x, y, z) && !agentGrid[x][y][z].isTransparent())
 			return true;
-		else if (hasThing(x, y, z) && thingGrid[x][y][z].isBlocking())
+		else if (hasThing(x, y, z) && thingGrid[x][y][z].isBlocking() && thingGrid[x][y][z].isBlocking())
 			return true;
 		else
 			return !terrainGrid[x][y][z].isTransparent();
