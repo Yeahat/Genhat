@@ -238,8 +238,8 @@ public class GameMain {
 		//genTestWorld1();
 		//genTestWorldHeroTest();
 		//genTestWorldStairs();
-		//genTestWorldJump();
-		genLargeWorld();
+		genTestWorldJump();
+		//genLargeWorld();
 	}
 	
 	/**
@@ -500,22 +500,24 @@ public class GameMain {
 		t[2][3][1] = new Terrain(grass);
 		t[3][2][1] = new Terrain(grass);
 		t[3][3][1] = new Terrain(grass);
-		t[2][2][2] = new Terrain(dirt);
-		t[2][3][2] = new Terrain(dirt);
+		t[2][2][2] = new Terrain(grass);
+		t[2][3][2] = new Terrain(grass);
 		t[1][2][1] = new Terrain(grass);
 		t[0][2][1] = new Terrain(grass);
 		t[0][3][1] = new Terrain(grass);
-		t[0][3][2] = new Terrain(dirt);
+		t[0][3][2] = new Terrain(grass);
 		t[1][3][1] = new Terrain(grass);
-		t[1][3][2] = new Terrain(dirt);
+		t[1][3][2] = new Terrain(grass);
 		t[0][4][1] = new Terrain(grass);
-		t[0][4][2] = new Terrain(dirt);
+		t[0][4][2] = new Terrain(grass);
 		t[1][4][1] = new Terrain(grass);
-		t[1][4][2] = new Terrain(dirt);
+		t[1][4][2] = new Terrain(grass);
 		t[5][5][1] = new Terrain(grass);
 		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
+		
+		world.setTod(sunrise);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		

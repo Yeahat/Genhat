@@ -70,7 +70,7 @@ public class Terrain {
 	
 	public int getTexRowTop()
 	{
-		return texRowTop * 4;
+		return texRowTop * 5;
 	}
 	
 	public int getTexColTop()
