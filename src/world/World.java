@@ -346,7 +346,7 @@ public class World {
 						GL11.glPopMatrix();
 						//Edge overhang textures
 						if ((j == 0 || (j - 1 >= 0 && terrainGrid[i][j-1][k].getTerrainType() == air)) 
-								&& k + 1 < terrainGrid[0][0].length && terrainGrid[i][j][k+1].getTerrainType() == air)
+								&& k != kMax && terrainGrid[i][j][k+1].getTerrainType() == air)
 						{
 							t = terrainGrid[i][j][k];
 							//Determine position on screen
