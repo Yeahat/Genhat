@@ -60,12 +60,12 @@ public class Terrain {
 	
 	public int getTexRow()
 	{
-		return texRow * 2;
+		return texRow * 5;
 	}
 	
 	public int getTexCol()
 	{
-		return texCol * 2;
+		return texCol * 4;
 	}
 	
 	public int getTexRowTop()
