@@ -38,6 +38,11 @@ public class SimpleStep implements Action {
 				{
 					int[] pos = agent.getPos();
 					Placeholder h1 = new Placeholder(pos[0], pos[1] + 1, pos[2]);
+					if (!agent.isTransparent())	//shadow up step bug fix hack thing
+					{
+						agent.setTransparent(true);
+						h1.setTransparent(false);
+					}
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -54,6 +59,8 @@ public class SimpleStep implements Action {
 			{
 				swapFootstep(agent);
 				int[] pos = agent.getPos();
+				if (!world.getAgentAt(pos[0], pos[1] + 1, pos[2]).isTransparent()) //shadow up step bug fix hack thing
+					agent.setTransparent(false);
 				world.removeAgentAt(pos[0], pos[1] + 1, pos[2]);
 				world.moveAgent(agent, 0, 1, 0);
 				agent.setOffsetY(0);
