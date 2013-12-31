@@ -607,6 +607,17 @@ public class GameMain {
 		t[17][26][7] = new Terrain(dirt, grass);
 		t[17][25][7] = new Terrain(dirt, grass);
 		
+		//vertical transparency test
+		for (int i = 1; i < 4; i ++)
+		{
+			for (int j = 13; j <= 18; j ++)
+			{
+				t[j][13][i] = new Terrain(dirt, grass);
+				t[j][14][i] = new Terrain(dirt, grass);
+				t[j][15][i] = new Terrain(dirt, grass);
+			}
+		}
+		
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
 		
