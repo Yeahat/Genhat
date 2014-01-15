@@ -563,15 +563,15 @@ public class GameMain {
 		{
 			for (int j = 30; j <= 38; j ++)
 			{
-				t[30][j][k] = new Terrain(rock);	
-				t[42][j][k] = new Terrain(rock);
+				t[30][j][k] = new Terrain(rock, rock);	
+				t[42][j][k] = new Terrain(rock, rock);
 			}
 			
 			for (int i = 31; i <= 41; i ++)
 			{
-				t[i][38][k] = new Terrain(rock);
+				t[i][38][k] = new Terrain(rock, rock);
 				if (i < 36 || i > 37 || k > 2)
-					t[i][30][k] = new Terrain(rock);
+					t[i][30][k] = new Terrain(rock, rock);
 			}
 		}
 		for (int i = 30; i <= 42; i ++)
@@ -579,7 +579,26 @@ public class GameMain {
 			for (int j = 30; j <= 38; j ++)
 			{
 				t[i][j][0] = new Terrain(dirt);
-				t[i][j][5] = new Terrain(rock);
+				if (i == 30 || i == 42)
+				{
+					t[i][j][5] = new Terrain(air);
+					t[i][j][4] = new Terrain(air);
+					t[i][j][3] = new Terrain(rock, thatch);
+					t[i][j][2] = new Terrain(rock);
+				}
+				else if (i == 31 || i == 41)
+				{
+					t[i][j][5] = new Terrain(air);
+					t[i][j][4] = new Terrain(rock, thatch);
+					t[i][j][3] = new Terrain(rock);
+				}
+				else if (i == 32 || i == 40)
+				{
+					t[i][j][5] = new Terrain(rock, thatch);
+					t[i][j][4] = new Terrain(rock);
+				}
+				else
+					t[i][j][5] = new Terrain(rock, thatch);
 				if (i > 34 && j > 35)
 					t[i][j][1] = new Terrain(dirt);
 			}
