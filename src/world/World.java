@@ -267,7 +267,17 @@ public class World {
 		jMin = Math.max(0, (int)(displayCenter[1] - 10 - kMax));
 		jMax = Math.min(terrainGrid[0].length - 1, (int)(displayCenter[1] + 11 + kMax));
 		
-		updateLightModGrid(iMin, iMax, jMin, jMax, kMin, kMax);
+		//adjustment for off-screen lights, this may need experimentation depending on max light distances
+		int buffer = 4;
+		int lightXMin = Math.max(0, iMin - buffer);
+		int lightXMax = Math.min(terrainGrid.length, iMax + buffer);
+		int lightYMin = Math.max(0, jMin - buffer);
+		int lightYMax = Math.min(terrainGrid[0].length, jMax + buffer);
+		int lightZMin = Math.max(0, kMin - buffer);
+		int lightZMax = Math.min(terrainGrid[0][0].length, kMax + buffer);
+		
+		updateLightModGrid(lightXMin, lightXMax, lightYMin, lightYMax, lightZMin, lightZMax);
+		//updateLightModGrid(iMin, iMax, jMin, jMax, lightZMin, lightZMax);
 		
 		for (int k = kMin; k <= kMax; k ++)
 		{
