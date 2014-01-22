@@ -328,9 +328,9 @@ public class World {
 						    	}
 						    	else
 						    	{
-							    	topEmpty = k + 1 >= terrainGrid[0][0].length || terrainGrid[i][j][k+1].getTerrainType() == air;
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air;
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air;
+							    	topEmpty = k + 1 >= terrainGrid[0][0].length || terrainGrid[i][j][k+1].getTerrainType() == air || terrainGrid[i][j][k+1].isUnblendedVertical();
+					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air || terrainGrid[i+1][j][k].isUnblendedVertical();
+					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air || terrainGrid[i-1][j][k].isUnblendedVertical();
 	
 					    			bottomOnGround = false;
 					    			if (k - 1 < 0 || j - 1 < 0)
@@ -463,7 +463,7 @@ public class World {
 						}
 					}
 					//Display horizontal textures
-					else if (terrainGrid[i][j][k-1].getTerrainType() != air)
+					else if (k - 1 >= 0 && terrainGrid[i][j][k-1].getTerrainType() != air)
 					{
 						if (k - 1 >= 0)
 						{							
@@ -554,7 +554,9 @@ public class World {
 						}
 					}
 					//Display hanging bottom vertical textures
-					else if (k + 1 <= kMax && terrainGrid[i][j][k+1].getTerrainType() != air)
+					if (k + 1 <= kMax && terrainGrid[i][j][k+1].getTerrainType() != air && k - 1 >= 0
+							&& ((!terrainGrid[i][j][k+1].isUnblendedVertical() && (terrainGrid[i][j][k].getTerrainType() == air || terrainGrid[i][j][k].isUnblendedVertical()))
+									|| (terrainGrid[i][j][k+1].isUnblendedVertical() && (terrainGrid[i][j][k].getTerrainType() == air || terrainGrid[i][j][k].getTerrainType() != terrainGrid[i][j][k+1].getTerrainType()))))
 					{
 						t = terrainGrid[i][j][k+1];
 						//Determine position on screen
@@ -571,8 +573,18 @@ public class World {
 							int texX = t.getTexCol();
 					    	int texY = t.getTexRow();
 					    	
-					    	boolean rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k+1].getTerrainType() == air,
-			    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k+1].getTerrainType() == air;
+					    	boolean rightEmpty, leftEmpty;
+					    	
+					    	if (t.isUnblendedVertical())
+					    	{
+					    		rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k+1].getTerrainType() != t.getTerrainType();
+				    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k+1].getTerrainType() != t.getTerrainType();
+					    	}
+					    	else
+					    	{
+						    	rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k+1].getTerrainType() == air;
+				    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k+1].getTerrainType() == air;
+					    	}
 			    			
 				    		texY += 4;
 				    		
