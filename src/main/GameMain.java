@@ -603,7 +603,7 @@ public class GameMain {
 					t[i][j][1] = new Terrain(dirt);
 			}
 		}
-		
+		/*
 		t[31][30][5] = new Terrain(air);
 		t[32][30][5] = new Terrain(air);
 		t[32][30][4] = new Terrain(air);
@@ -614,6 +614,11 @@ public class GameMain {
 		t[34][30][4] = new Terrain(air);
 		t[34][30][3] = new Terrain(air);
 		t[34][30][2] = new Terrain(air);
+		*/
+		t[32][30][2] = new Terrain(glass, air);
+		t[33][30][2] = new Terrain(glass, air);
+		t[32][30][3] = new Terrain(glass, air);
+		t[33][30][3] = new Terrain(glass, air);
 		
 		//shadow tests
 		for (int i = 1; i < 8; i ++)
@@ -641,7 +646,7 @@ public class GameMain {
 		world.setTerrain(t);
 		
 		LightSource l1 = new LightSource();
-		world.addThing(l1, 33, 33, 1);
+		world.addThing(l1, 33, 33, 2);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		

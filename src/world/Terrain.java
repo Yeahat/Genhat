@@ -5,11 +5,13 @@ import static world.Terrain.terrainType.*;
 public class Terrain {
 	public enum terrainType
 	{
-		grass, dirt, air, rock, thatch
+		grass, dirt, air, rock, thatch, glass
 	}
 	
 	boolean blocking;
 	boolean transparent;
+	boolean unblendedVertical;
+	boolean unblendedHorizontal;
 	terrainType type;
 	terrainType top;
 	int texRow;
@@ -34,6 +36,15 @@ public class Terrain {
 	public terrainType getTerrainType()
 	{
 		return type;
+	}
+	
+	/**
+	 * Getter for the terrain type top
+	 * @return the terrain type top
+	 */
+	public terrainType getTerrainTop()
+	{
+		return top;
 	}
 	
 	/**
@@ -114,6 +125,24 @@ public class Terrain {
 	}
 	
 	/**
+	 * Getter for unblendedVertical
+	 * @return true if unblendedVertical
+	 */
+	public boolean isUnblendedVertical()
+	{
+		return unblendedVertical;
+	}
+	
+	/**
+	 * Getter for unblendedHorizontal
+	 * @return true if unblendedHorizontal
+	 */
+	public boolean isUnblendedHorizontal()
+	{
+		return unblendedHorizontal;
+	}
+	
+	/**
 	 * Updates the internal attributes of the terrain type.
 	 * This must be called any time the terrain type is set.
 	 */
@@ -121,6 +150,7 @@ public class Terrain {
 	{
 		setBlocking();
 		setTransparent();
+		setUnblended();
 		setTexPos();
 	}
 	
@@ -142,10 +172,28 @@ public class Terrain {
 	private void setTransparent()
 	{
 		//add the names of any new transparent terrain types here
-		if (type == air)
+		if (type == air || type == glass)
 			transparent = true;
 		else
 			transparent = false;
+	}
+	
+	/**
+	 * Determines whether or not a terrain type should be blended with surrounding terrain types and updates accordingly
+	 */
+	private void setUnblended()
+	{
+		//add the names of any new unblended vertical terrain types here
+		if (type == glass)
+			unblendedVertical = true;
+		else
+			unblendedVertical = false;
+		
+		//add the names of any new unblended horizontal terrain types here
+		if (type == glass)
+			unblendedHorizontal = true;
+		else
+			unblendedHorizontal = false;
 	}
 	
 	/**
@@ -162,6 +210,8 @@ public class Terrain {
 			texRow = 0; texCol = 1; break;
 		case rock:
 			texRow = 0; texCol = 2; break;
+		case glass:
+			texRow = 0; texCol = 3; break;
 			
 		//Unset
 		default:
