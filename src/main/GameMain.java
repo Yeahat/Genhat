@@ -578,7 +578,7 @@ public class GameMain {
 		{
 			for (int j = 30; j <= 38; j ++)
 			{
-				t[i][j][0] = new Terrain(dirt);
+				t[i][j][0] = new Terrain(dirt, woodFloor);
 				if (i == 30 || i == 42)
 				{
 					t[i][j][5] = new Terrain(air);

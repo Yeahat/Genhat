@@ -585,9 +585,9 @@ public class World {
 						    	rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k+1].getTerrainType() == air;
 				    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k+1].getTerrainType() == air;
 					    	}
-			    			
+							
 				    		texY += 4;
-				    		
+							
 				    		if (leftEmpty && rightEmpty)
 				    		{
 				    			texX += 3;
@@ -829,9 +829,41 @@ public class World {
 		t.setPos(pos);
 	}
 	
+	public void removeThingAt(int x, int y, int z)
+	{
+		thingGrid[x][y][z] = null;
+	}
+	
+	public void moveThing(Thing thing, int xChange, int yChange, int zChange)
+	{
+		int[] pos = thing.getPos();
+		int oldX = pos[0];
+		int oldY = pos[1];
+		int oldZ = pos[2];
+		int newX = oldX + xChange;
+		int newY = oldY + yChange;
+		int newZ = oldZ + zChange;
+		if (newX < 0 || newX >= thingGrid.length || newY < 0 || newY >= thingGrid[0].length || newZ < 0 || newZ >= thingGrid[0][0].length)
+		{
+			System.out.println("Could not move agent, position out of bounds");
+		}
+		else
+		{
+			int[] newPos = {newX, newY, newZ};
+			thing.setPos(newPos);
+			thingGrid[oldX][oldY][oldZ] = null;
+			thingGrid[newX][newY][newZ] = thing;
+		}
+	}
+	
 	public Thing getThingAt(int x, int y, int z)
 	{
 		return thingGrid[x][y][z];
+	}
+	
+	public Terrain getTerrainAt(int x, int y, int z)
+	{
+		return terrainGrid[x][y][z];
 	}
 	
 	public void moveAgent(Agent agent, int xChange, int yChange, int zChange)
