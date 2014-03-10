@@ -71,6 +71,7 @@ public class GameMain {
 			//Debugging stuff
 			if (Keyboard.getEventKeyState())
 			{
+				/*
 				if (Keyboard.getEventKey() == Keyboard.KEY_Q)
 				{
 					world.rotateCC();
@@ -79,6 +80,7 @@ public class GameMain {
 				{
 					world.rotateC();
 				}
+				*/
 				if (Keyboard.getEventKey() == Keyboard.KEY_T)
 				{
 					world.cycleTimeOfDay();
