@@ -601,10 +601,11 @@ public class GameMain {
 				}
 				else
 					t[i][j][5] = new Terrain(rock, thatch);
-				if (i > 34 && j > 35)
-					t[i][j][1] = new Terrain(dirt);
+				//if (i > 34 && j > 35)
+					//t[i][j][1] = new Terrain(dirt);
 			}
 		}
+		
 		/*
 		t[31][30][5] = new Terrain(air);
 		t[32][30][5] = new Terrain(air);
@@ -647,6 +648,12 @@ public class GameMain {
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
 		
+		Stairs s1 = new Stairs(left);
+		Stairs s2 = new Stairs(left);
+		Stairs s3 = new Stairs(left);
+		world.addThing(s1, 37, 37 ,1);
+		world.addThing(s2, 38, 37 ,2);
+		world.addThing(s3, 39, 37 ,3);
 		LightSource l1 = new LightSource();
 		world.addThing(l1, 33, 33, 2);
 		

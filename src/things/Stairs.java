@@ -16,7 +16,7 @@ public class Stairs extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 1;
+		texRow = 0;
 		texCol = 0;
 		setDir(down);
 		blocking = false;
@@ -28,7 +28,7 @@ public class Stairs extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 1;
+		texRow = 0;
 		texCol = 0;
 		setDir(d);
 		crossable = true;
