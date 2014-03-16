@@ -580,7 +580,7 @@ public class GameMain {
 		{
 			for (int j = 30; j <= 38; j ++)
 			{
-				t[i][j][0] = new Terrain(dirt, woodFloor);
+				t[i][j][0] = new Terrain(dirt, woodPlank);
 				if (i == 30 || i == 42)
 				{
 					t[i][j][5] = new Terrain(air);
@@ -606,18 +606,10 @@ public class GameMain {
 			}
 		}
 		
-		/*
-		t[31][30][5] = new Terrain(air);
-		t[32][30][5] = new Terrain(air);
-		t[32][30][4] = new Terrain(air);
-		t[33][30][5] = new Terrain(air);
-		t[33][30][4] = new Terrain(air);
-		t[33][30][3] = new Terrain(air);
-		t[34][30][5] = new Terrain(air);
-		t[34][30][4] = new Terrain(air);
-		t[34][30][3] = new Terrain(air);
-		t[34][30][2] = new Terrain(air);
-		*/
+		t[38][37][1] = new Terrain(woodPlank);
+		t[39][37][1] = new Terrain(woodPlank);
+		t[39][37][2] = new Terrain(woodPlank);
+		
 		t[32][30][2] = new Terrain(glass, air);
 		t[33][30][2] = new Terrain(glass, air);
 		t[32][30][3] = new Terrain(glass, air);
