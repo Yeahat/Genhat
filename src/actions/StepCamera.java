@@ -64,12 +64,16 @@ public class StepCamera implements Action {
 			return; //invalid arguments, do nothing
 		}
 		
-		world.incrementDisplayX(hInc);
-		world.incrementDisplayY(vInc);
-		if (steppingUpZ)
-			world.incrementDisplayZ((int)(agent.getSpeed() * 16.0f / 32.0f));
-		else if (steppingDownZ)
-			world.incrementDisplayZ((int)(-agent.getSpeed() * 16.0f / 32.0f));
+		if (!world.isCameraLockH())
+			world.incrementDisplayX(hInc);
+		if (!world.isCameraLockV())
+		{
+			world.incrementDisplayY(vInc);
+			if (steppingUpZ)
+				world.incrementDisplayZ((int)(agent.getSpeed() * 16.0f / 32.0f));
+			else if (steppingDownZ)
+				world.incrementDisplayZ((int)(-agent.getSpeed() * 16.0f / 32.0f));
+		}
 	}
 
 	@Override

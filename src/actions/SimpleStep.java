@@ -71,6 +71,8 @@ public class SimpleStep implements Action {
 			//Camera for Hero
 			if (agent.getClass().equals(Hero.class))
 			{
+				if (world.isCameraLockV())
+					world.updateCameraScrollLock();
 				ArrayList<String> cArgs = new ArrayList<String>();
 				cArgs.add(args.get(0));
 				stepCamera.execute(agent, world, cArgs);
@@ -113,6 +115,8 @@ public class SimpleStep implements Action {
 			//Camera for Hero
 			if (agent.getClass().equals(Hero.class))
 			{
+				if (world.isCameraLockV())
+					world.updateCameraScrollLock();
 				ArrayList<String> cArgs = new ArrayList<String>();
 				cArgs.add(args.get(0));
 				stepCamera.execute(agent, world, cArgs);
@@ -155,6 +159,8 @@ public class SimpleStep implements Action {
 			//Camera for Hero
 			if (agent.getClass().equals(Hero.class))
 			{
+				if (world.isCameraLockH())
+					world.updateCameraScrollLock();
 				ArrayList<String> cArgs = new ArrayList<String>();
 				cArgs.add(args.get(0));
 				stepCamera.execute(agent, world, cArgs);
@@ -197,6 +203,8 @@ public class SimpleStep implements Action {
 			//Camera for Hero
 			if (agent.getClass().equals(Hero.class))
 			{
+				if (world.isCameraLockH())
+					world.updateCameraScrollLock();
 				ArrayList<String> cArgs = new ArrayList<String>();
 				cArgs.add(args.get(0));
 				stepCamera.execute(agent, world, cArgs);

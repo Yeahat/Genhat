@@ -44,6 +44,7 @@ public class GameMain {
 		{
 			//update everything
 			world.updateAgents();
+			world.updateCameraScrollLock();
 			
 			//render everything
 			renderGL();
@@ -111,13 +112,13 @@ public class GameMain {
 		if (Keyboard.isKeyDown(Keyboard.KEY_C))
 		{
 			Hero player = world.getPlayer();
-			if (player != null)
+			if (player != null && player.isIdle())
 				player.setSpeed(4);
 		}
 		else
 		{
 			Hero player = world.getPlayer();
-			if (player != null)
+			if (player != null && player.isIdle())
 				player.setSpeed(2);
 		}
 		
@@ -136,7 +137,14 @@ public class GameMain {
 					if (arrowKeyInputCount < 3)
 						player.setCurrentAction(player.getTurnAction());
 					else
+					{
 						player.setCurrentAction(player.getStepAction());
+						//camera scroll lock check
+						if (!world.isCameraLockV())
+						{
+							//TODO: conditions for vertical camera lock
+						}
+					}
 				}
 			}
 		}
@@ -154,7 +162,14 @@ public class GameMain {
 					if (arrowKeyInputCount < 3)
 						player.setCurrentAction(player.getTurnAction());
 					else
+					{
 						player.setCurrentAction(player.getStepAction());
+						//camera scroll lock check
+						if (!world.isCameraLockV())
+						{
+							//TODO: conditions for vertical camera lock
+						}
+					}
 				}
 			}
 		}
@@ -172,7 +187,15 @@ public class GameMain {
 					if (arrowKeyInputCount < 3)
 						player.setCurrentAction(player.getTurnAction());
 					else
+					{
 						player.setCurrentAction(player.getStepAction());
+						//camera scroll lock check
+						if (!world.isCameraLockH())
+						{
+							if (player.getPos()[0] >= world.getWidth() - 8)
+								world.setCameraLockH(true);
+						}
+					}
 				}
 			}
 		}

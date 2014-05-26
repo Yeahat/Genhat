@@ -119,6 +119,8 @@ public class Jump implements Action {
 				//Camera for Hero
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockV())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("up");
 					cArgs.add("up");
@@ -159,6 +161,8 @@ public class Jump implements Action {
 				//Camera for Hero
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockV())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("down");
 					cArgs.add("up");
@@ -183,6 +187,8 @@ public class Jump implements Action {
 				//Camera for Hero
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockH())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("left");
 					cArgs.add("up");
@@ -206,6 +212,8 @@ public class Jump implements Action {
 				}
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockH())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("right");
 					cArgs.add("up");
@@ -250,6 +258,8 @@ public class Jump implements Action {
 				
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockV())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("up");
 					cArgs.add("down");
@@ -274,6 +284,8 @@ public class Jump implements Action {
 				
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockV())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("down");
 					cArgs.add("down");
@@ -299,6 +311,8 @@ public class Jump implements Action {
 				
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockH())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("left");
 					cArgs.add("down");
@@ -324,6 +338,8 @@ public class Jump implements Action {
 				
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockH())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add("right");
 					cArgs.add("down");

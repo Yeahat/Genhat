@@ -22,6 +22,9 @@ public class World {
 	Agent[][][] agentGrid;
 	float[][][] lightModGrid;
 	ArrayList<Agent> agents;
+	private float width;
+	private float depth;
+	private float height;
 	
 	//TODO: refactor this stuff to a new Game State class
 	Hero player;
@@ -41,6 +44,8 @@ public class World {
 	private Texture vTerrainTexture;
 	
 	float[] displayCenter = new float[3];
+	private boolean cameraLockV = false;
+	private boolean cameraLockH = false;
 	
 	/**
 	 * Constructor, initializes display center to the center of the world
@@ -55,6 +60,10 @@ public class World {
 		thingGrid = new Thing[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
 		lightModGrid = new float[xSize][ySize][zSize];
+		
+		setWidth(xSize);
+		depth = ySize;
+		height = zSize;
 		
 		agents = new ArrayList<Agent>();
 		
@@ -79,6 +88,10 @@ public class World {
 		thingGrid = new Thing[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
 		lightModGrid = new float[xSize][ySize][zSize];
+		
+		setWidth(xSize);
+		depth = ySize;
+		height = zSize;
 		
 		agents = new ArrayList<Agent>();
 		
@@ -145,6 +158,33 @@ public class World {
 		}
 		
 		return terrainGrid[0][0].length;
+	}
+	
+	public void updateCameraScrollLock()
+	{
+		Hero player = getPlayer();
+		int[] pos = player.getPos();
+		float screenPosX = pos[0] + player.getOffsetX()*(1.0f/16.0f);
+		float screenPosY = pos[1] + pos[2] + player.getOffsetY()*(1.0f/16.0f);
+		
+		if (screenPosY <= 10.0f || screenPosY >= depth - 9.0f)
+		{
+			setCameraLockV(true);
+			//TODO: round off display center correctly, may or may not be necessary depending on jump camera mechanics - test this
+			//setDisplayCenter(center);
+			System.out.println("(" + displayCenter[0] + "," + displayCenter[1] + "," + displayCenter[2] + ")");
+		}
+		else
+			setCameraLockV(false);
+		
+		if (screenPosX <= 12.0f || screenPosX >= width - 13.0f)
+		{
+			setCameraLockH(true);
+			//TODO: round off display center correctly, may or may not be necessary depending on jump camera mechanics - test this
+			//setDisplayCenter(center);
+		}
+		else
+			setCameraLockH(false);
 	}
 	
 	public boolean isShadowed(int x, int y, int z)
@@ -1233,5 +1273,29 @@ public class World {
 
 	public timeOfDay getTod() {
 		return tod;
+	}
+
+	public void setCameraLockV(boolean cameraLockV) {
+		this.cameraLockV = cameraLockV;
+	}
+
+	public boolean isCameraLockV() {
+		return cameraLockV;
+	}
+
+	public void setCameraLockH(boolean cameraLockH) {
+		this.cameraLockH = cameraLockH;
+	}
+
+	public boolean isCameraLockH() {
+		return cameraLockH;
+	}
+
+	public void setWidth(float width) {
+		this.width = width;
+	}
+
+	public float getWidth() {
+		return width;
 	}
 }

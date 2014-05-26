@@ -81,6 +81,8 @@ public class RampStep implements Action {
 				//Camera for Hero
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockV())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add(args.get(0));
 					if (agent.getOffsetY() > -24 && agent.getOffsetY() <= -8)
@@ -130,6 +132,8 @@ public class RampStep implements Action {
 				//Camera for Hero
 				if (agent.getClass().equals(Hero.class))
 				{
+					if (world.isCameraLockV())
+						world.updateCameraScrollLock();
 					ArrayList<String> cArgs = new ArrayList<String>();
 					cArgs.add(args.get(0));
 					if (agent.getOffsetY() > -24 && agent.getOffsetY() <= -8)
@@ -247,6 +251,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetY() > -15)
@@ -277,6 +283,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetX() >= 8)
@@ -306,6 +314,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						cArgs.add("up");
@@ -416,6 +426,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetY() < -1)
@@ -446,6 +458,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetX() >= 8)
@@ -475,6 +489,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						cArgs.add("down");
@@ -589,6 +605,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetY() > -15)
@@ -619,6 +637,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetX() <= -8)
@@ -648,6 +668,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						cArgs.add("up");
@@ -758,6 +780,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetY() < -1)
@@ -788,6 +812,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						if (agent.getOffsetX() <= -8)
@@ -817,6 +843,8 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
+						if (world.isCameraLockH())
+							world.updateCameraScrollLock();
 						ArrayList<String> cArgs = new ArrayList<String>();
 						cArgs.add(args.get(0));
 						cArgs.add("down");
@@ -860,6 +888,8 @@ public class RampStep implements Action {
 		int y = pos[1];
 		int z = pos[2];
 		
+		System.out.println(x + ", " + y + ", " + z);
+		
 		switch (dir)
 		{
 		case up:	y += 1;	break;
@@ -880,8 +910,11 @@ public class RampStep implements Action {
 			else
 				z -= 1;
 		}
-		
-		for (int k = z; k < pos[2] + agent.getHeight(); k ++)
+
+		int kMax = pos[2] + agent.getHeight();
+		if (specialCase)
+			kMax -= 1;
+		for (int k = z; k < kMax; k ++)
 		{
 			//grid bounds check
 			if (!world.isInBounds(x, y, k))
