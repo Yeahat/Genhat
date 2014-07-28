@@ -260,12 +260,10 @@ public class GameMain {
 	 */
 	public void initWorld()
 	{
-		//genTestWorld0();
-		//genTestWorld1();
-		//genTestWorldHeroTest();
+		genTestWorldHeroTest();
 		//genTestWorldStairs();
 		//genTestWorldJump();
-		genLargeWorld();
+		//genLargeWorld();
 	}
 	
 	/**
@@ -585,7 +583,7 @@ public class GameMain {
 		}
 		
 		//screen edge tests top
-		for (int n = 35; n < 50; n ++)
+		for (int n = 40; n < 50; n ++)
 		{
 			for (int i = 1; i < 10; i ++)
 			{

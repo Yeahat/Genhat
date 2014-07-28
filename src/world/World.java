@@ -164,15 +164,53 @@ public class World {
 		int[] pos = player.getPos();
 		float screenPosX = pos[0] + player.getOffsetX()*(1.0f/16.0f);
 		float screenPosY = pos[1] + pos[2] + player.getOffsetY()*(1.0f/16.0f);
-		if (screenPosY <= 10.0f || screenPosY >= depth - 9.0f)
-			setCameraLockV(true);
+		if (!cameraLockV)
+		{
+			if (screenPosY <= (9.0f + (height - 1.0f)) && screenPosY >= depth - 9.0f)
+			{
+				setCameraLockV(true);
+				displayCenter[1] = (int)((((9.0f + (height - 1.0f)) + (depth - 9.0f))/2.0f));
+			}
+			else if (screenPosY <= 9.0f + (height - 1.0f))
+			{
+				setCameraLockV(true);
+				displayCenter[1] = 9.0f + (height - 1.0f);
+			}
+			else if (screenPosY >= depth - 9.0f)
+			{
+				setCameraLockV(true);
+				displayCenter[1] = depth - 9.0f;
+			}
+		}
 		else
-			setCameraLockV(false);
+		{
+			if (!(screenPosY <= (9.0f + (height - 1.0f)) || screenPosY >= depth - 9.0f))
+				setCameraLockV(false);
+		}
 		
-		if (screenPosX <= 12.0f || screenPosX >= width - 13.0f)
-			setCameraLockH(true);
+		if (!cameraLockH)
+		{
+			if (screenPosX <= 12.0f && screenPosX >= width - 13.0f)
+			{
+				setCameraLockH(true);
+				displayCenter[0] = (int)((12.0f + width - 13.0f)/2.0f);
+			}
+			else if (screenPosX <= 12.0f)
+			{
+				setCameraLockH(true);
+				displayCenter[0] = 12.0f;
+			}
+			else if (screenPosX >= width - 13.0f)
+			{
+				setCameraLockH(true);
+				displayCenter[0] = width - 13.0f;
+			}
+		}
 		else
-			setCameraLockH(false);
+		{
+			if (!(screenPosX <= 12.0f || screenPosX >= width - 13.0f))
+				setCameraLockH(false);
+		}
 	}
 	
 	public void updateCamera()
@@ -1040,15 +1078,20 @@ public class World {
 	 */
 	public boolean isBlocked(int x, int y, int z)
 	{
-		if (this.isOccupied(x, y, z))
+		if (this.isOccupied(x, y, z)) //other agents
 		{
 			return true;
 		}
-		else if (this.hasThing(x, y, z))
+		else if (this.hasThing(x, y, z)) //things
 		{
 			return this.thingGrid[x][y][z].isBlocking();
 		}
-		else
+		//NOTE: 19 is the minimum map size to do camera locked top/bottom edge blocking
+		else if (depth > 19 && (y < height - 1 - z || y > depth - (z - 1))) //screen edge
+		{
+			return true;
+		}
+		else //terrain
 		{
 			return terrainGrid[x][y][z].isBlocking();
 		}
@@ -1184,55 +1227,7 @@ public class World {
 			}
 		}
 	}
-	
-	public void rotateC()
-	{
-		//TODO: Rotate display center as well
-		Terrain[][][] tempTerrain = new Terrain[terrainGrid.length][terrainGrid[0].length][terrainGrid[0][0].length];
-		Thing[][][] tempThing = new Thing[thingGrid.length][thingGrid[0].length][thingGrid[0][0].length];
-		Agent[][][] tempAgent = new Agent[agentGrid.length][agentGrid[0].length][agentGrid[0][0].length];
-		for (int i = 0; i < terrainGrid.length; i ++)
-		{
-			for (int j = 0; j < terrainGrid.length; j ++)
-			{
-				for (int k = 0; k < terrainGrid.length; k ++)
-				{
-					tempTerrain[j][terrainGrid.length - 1 - i][k] = terrainGrid[i][j][k];
-					tempThing[j][terrainGrid.length - 1 - i][k] = thingGrid[i][j][k];
-					tempAgent[j][terrainGrid.length - 1 - i][k] = agentGrid[i][j][k];
-				}
-			}
-		}
 		
-		terrainGrid = tempTerrain;
-		thingGrid = tempThing;
-		agentGrid = tempAgent;
-	}
-	
-	public void rotateCC()
-	{
-		//TODO: Rotate display center as well
-		Terrain[][][] tempTerrain = new Terrain[terrainGrid.length][terrainGrid[0].length][terrainGrid[0][0].length];
-		Thing[][][] tempThing = new Thing[thingGrid.length][thingGrid[0].length][thingGrid[0][0].length];
-		Agent[][][] tempAgent = new Agent[agentGrid.length][agentGrid[0].length][agentGrid[0][0].length];
-		for (int i = 0; i < terrainGrid.length; i ++)
-		{
-			for (int j = 0; j < terrainGrid.length; j ++)
-			{
-				for (int k = 0; k < terrainGrid.length; k ++)
-				{
-					tempTerrain[terrainGrid[0].length - 1 - j][i][k] = terrainGrid[i][j][k];
-					tempThing[thingGrid[0].length - 1 - j][i][k] = thingGrid[i][j][k];
-					tempAgent[agentGrid[0].length - 1 - j][i][k] = agentGrid[i][j][k];
-				}
-			}
-		}
-		
-		terrainGrid = tempTerrain;
-		thingGrid = tempThing;
-		agentGrid = tempAgent;
-	}
-	
 	/**
 	 * Getter for the player-controlled agent
 	 * @return the current player-controlled agent, null if there isn't one
