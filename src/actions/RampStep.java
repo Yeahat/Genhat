@@ -18,8 +18,6 @@ public class RampStep implements Action {
 	boolean steppingContinue = false;
 	boolean ascending = true;
 	
-	StepCamera stepCamera = new StepCamera();
-	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)
 	{		
@@ -83,14 +81,7 @@ public class RampStep implements Action {
 				{
 					if (world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add(args.get(0));
-					if (agent.getOffsetY() > -24 && agent.getOffsetY() <= -8)
-					{
-						cArgs.add("none");
-						cArgs.add("up");
-					}
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			}
 		}
@@ -134,14 +125,7 @@ public class RampStep implements Action {
 				{
 					if (world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add(args.get(0));
-					if (agent.getOffsetY() > -24 && agent.getOffsetY() <= -8)
-					{
-						cArgs.add("none");
-						cArgs.add("down");
-					}
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			}
 		}
@@ -251,15 +235,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetY() > -15)
-						{
-							cArgs.add("up");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 2: stepping off of a ramp
@@ -283,15 +261,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetX() >= 8)
-						{
-							cArgs.add("up");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 3: stepping off of a ramp onto another ramp
@@ -314,12 +286,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						cArgs.add("up");
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 			}
@@ -426,15 +395,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetY() < -1)
-						{
-							cArgs.add("down");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 2: stepping off of a ramp
@@ -458,15 +421,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetX() >= 8)
-						{
-							cArgs.add("down");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 3: stepping off of a ramp onto another ramp
@@ -489,12 +446,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						cArgs.add("down");
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 			}
@@ -605,15 +559,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetY() > -15)
-						{
-							cArgs.add("up");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 2: stepping off of a ramp
@@ -637,15 +585,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetX() <= -8)
-						{
-							cArgs.add("up");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 3: stepping off of a ramp onto another ramp
@@ -668,12 +610,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						cArgs.add("up");
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 			}
@@ -780,15 +719,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetY() < -1)
-						{
-							cArgs.add("down");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 2: stepping off of a ramp
@@ -812,15 +745,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						if (agent.getOffsetX() <= -8)
-						{
-							cArgs.add("down");
-						}
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 				//Case 3: stepping off of a ramp onto another ramp
@@ -843,12 +770,9 @@ public class RampStep implements Action {
 					//Camera for Hero
 					if (agent.getClass().equals(Hero.class))
 					{
-						if (world.isCameraLockH())
+						if (world.isCameraLockH() || world.isCameraLockV())
 							world.updateCameraScrollLock();
-						ArrayList<String> cArgs = new ArrayList<String>();
-						cArgs.add(args.get(0));
-						cArgs.add("down");
-						stepCamera.execute(agent, world, cArgs);
+						world.updateCamera();
 					}
 				}
 			}

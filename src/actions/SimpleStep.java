@@ -13,7 +13,6 @@ import static entities.Agent.direction.*;
 public class SimpleStep implements Action {
 
 	boolean finishedStep = true;
-	StepCamera stepCamera = new StepCamera();
 	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)
@@ -73,9 +72,7 @@ public class SimpleStep implements Action {
 			{
 				if (world.isCameraLockV())
 					world.updateCameraScrollLock();
-				ArrayList<String> cArgs = new ArrayList<String>();
-				cArgs.add(args.get(0));
-				stepCamera.execute(agent, world, cArgs);
+				world.updateCamera();
 			}
 		}
 		else if (arg1.equals("down"))
@@ -117,9 +114,7 @@ public class SimpleStep implements Action {
 			{
 				if (world.isCameraLockV())
 					world.updateCameraScrollLock();
-				ArrayList<String> cArgs = new ArrayList<String>();
-				cArgs.add(args.get(0));
-				stepCamera.execute(agent, world, cArgs);
+				world.updateCamera();
 			}
 		}
 		else if (arg1.equals("left"))
@@ -161,9 +156,7 @@ public class SimpleStep implements Action {
 			{
 				if (world.isCameraLockH())
 					world.updateCameraScrollLock();
-				ArrayList<String> cArgs = new ArrayList<String>();
-				cArgs.add(args.get(0));
-				stepCamera.execute(agent, world, cArgs);
+				world.updateCamera();
 			}
 		}
 		else if (arg1.equals("right"))
@@ -205,9 +198,7 @@ public class SimpleStep implements Action {
 			{
 				if (world.isCameraLockH())
 					world.updateCameraScrollLock();
-				ArrayList<String> cArgs = new ArrayList<String>();
-				cArgs.add(args.get(0));
-				stepCamera.execute(agent, world, cArgs);
+				world.updateCamera();
 			}
 		}
 		else

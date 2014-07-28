@@ -43,7 +43,7 @@ public class World {
 	private Texture hTerrainTexture;
 	private Texture vTerrainTexture;
 	
-	float[] displayCenter = new float[3];
+	float[] displayCenter = new float[2];
 	private boolean cameraLockV = false;
 	private boolean cameraLockH = false;
 	
@@ -68,8 +68,7 @@ public class World {
 		agents = new ArrayList<Agent>();
 		
 		displayCenter[0] = (float)xSize/2;
-		displayCenter[1] = (float)ySize/2;
-		displayCenter[2] = (float)zSize/2;
+		displayCenter[1] = (float)ySize/2 + (float)zSize/2;
 		
 		setTod(midday);
 	}
@@ -96,8 +95,7 @@ public class World {
 		agents = new ArrayList<Agent>();
 		
 		displayCenter[0] = center[0];
-		displayCenter[1] = center[1];
-		displayCenter[2] = center[2];
+		displayCenter[1] = center[1] + center[2];
 		
 		setTod(midday);
 	}
@@ -166,25 +164,41 @@ public class World {
 		int[] pos = player.getPos();
 		float screenPosX = pos[0] + player.getOffsetX()*(1.0f/16.0f);
 		float screenPosY = pos[1] + pos[2] + player.getOffsetY()*(1.0f/16.0f);
-		
 		if (screenPosY <= 10.0f || screenPosY >= depth - 9.0f)
-		{
 			setCameraLockV(true);
-			//TODO: round off display center correctly, may or may not be necessary depending on jump camera mechanics - test this
-			//setDisplayCenter(center);
-			System.out.println("(" + displayCenter[0] + "," + displayCenter[1] + "," + displayCenter[2] + ")");
-		}
 		else
 			setCameraLockV(false);
 		
 		if (screenPosX <= 12.0f || screenPosX >= width - 13.0f)
-		{
 			setCameraLockH(true);
-			//TODO: round off display center correctly, may or may not be necessary depending on jump camera mechanics - test this
-			//setDisplayCenter(center);
-		}
 		else
 			setCameraLockH(false);
+	}
+	
+	public void updateCamera()
+	{
+		Hero player = getPlayer();
+		int[] pos = player.getPos();
+		float screenPosX = pos[0] + player.getOffsetX()*(1.0f/16.0f);
+		float screenPosY = pos[1] + pos[2] + player.getOffsetY()*(1.0f/16.0f);
+		float[] newDisplayCenter = new float[2];
+		if (isCameraLockH())
+		{
+			newDisplayCenter[0] = displayCenter[0];
+		}
+		else
+		{
+			newDisplayCenter[0] = screenPosX;
+		}
+		if (isCameraLockV())
+		{
+			newDisplayCenter[1] = displayCenter[1];
+		}
+		else
+		{
+			newDisplayCenter[1] = screenPosY;
+		}
+		setDisplayCenter(newDisplayCenter);
 	}
 	
 	public boolean isShadowed(int x, int y, int z)
@@ -335,7 +349,7 @@ public class World {
 					{
 						//Determine position on screen
 						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
 						GL11.glPushMatrix();
 						
@@ -448,7 +462,7 @@ public class World {
 							t = terrainGrid[i][j][k];
 							//Determine position on screen
 							x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							GL11.glPushMatrix();
 							
 							//Translate to screen position and bind appropriate texture
@@ -510,7 +524,7 @@ public class World {
 							t = terrainGrid[i][j][k-1];
 							//Determine position on screen
 							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
 								
@@ -601,7 +615,7 @@ public class World {
 						t = terrainGrid[i][j][k+1];
 						//Determine position on screen
 						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
 						GL11.glPushMatrix();
 							GL11.glColor3f(1.0f, 1.0f, 1.0f);
@@ -671,7 +685,7 @@ public class World {
 					if (this.hasThing(i, j, k))
 					{
 						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
 						GL11.glPushMatrix();
 							setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
@@ -688,7 +702,7 @@ public class World {
 					if (agent != null)
 					{
 						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) - PIXEL_SIZE*((int)(displayCenter[2]*TEXTURE_SIZE) - TEXTURE_SIZE*k) - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
 						GL11.glPushMatrix();
 							setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
@@ -933,41 +947,21 @@ public class World {
 	 * 
 	 * @param center the new display center
 	 */
+	public void setDisplayCenter(float[] center)
+	{
+		displayCenter[0] = center[0];
+		displayCenter[1] = center[1];
+	}
+	
+	/**
+	 * Setter for the display center
+	 * 
+	 * @param center the new display center
+	 */
 	public void setDisplayCenter(int[] center)
 	{
 		displayCenter[0] = center[0];
 		displayCenter[1] = center[1];
-		displayCenter[2] = center[2];
-	}
-	
-	/**
-	 * Incrementer for the display x
-	 * 
-	 * @param x the amount to increment the display x center, in pixels
-	 */
-	public void incrementDisplayX(int x)
-	{
-		displayCenter[0] += (float)x/TEXTURE_SIZE;
-	}
-	
-	/**
-	 * Incrementer for the display y
-	 * 
-	 * @param y the amount to increment the display y center, in pixels
-	 */
-	public void incrementDisplayY(int y)
-	{
-		displayCenter[1] += (float)y/TEXTURE_SIZE;
-	}
-	
-	/**
-	 * Incrementer for the display z
-	 * 
-	 * @param z the amount to increment the display z center, in pixels
-	 */
-	public void incrementDisplayZ(int z)
-	{
-		displayCenter[2] += (float)z/TEXTURE_SIZE;
 	}
 	
 	public void cycleTimeOfDay()
@@ -1001,16 +995,6 @@ public class World {
 	public float getDisplayY()
 	{
 		return displayCenter[1];
-	}
-	
-	/**
-	 * Getter for the display z
-	 * 
-	 * @return z display pixel coordinate
-	 */
-	public float getDisplayZ()
-	{
-		return displayCenter[2];
 	}
 	
 	/**

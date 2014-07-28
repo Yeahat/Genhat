@@ -16,8 +16,6 @@ public class Jump implements Action {
 	int stepSize;
 	float dstJumped = 0;	//measures the distance jumped
 	
-	StepCamera stepCamera = new StepCamera();
-	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)
 	{
@@ -121,10 +119,7 @@ public class Jump implements Action {
 				{
 					if (world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("up");
-					cArgs.add("up");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			
@@ -163,10 +158,7 @@ public class Jump implements Action {
 				{
 					if (world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("down");
-					cArgs.add("up");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			case left:
@@ -187,12 +179,9 @@ public class Jump implements Action {
 				//Camera for Hero
 				if (agent.getClass().equals(Hero.class))
 				{
-					if (world.isCameraLockH())
+					if (world.isCameraLockH() || world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("left");
-					cArgs.add("up");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			case right:
@@ -212,12 +201,9 @@ public class Jump implements Action {
 				}
 				if (agent.getClass().equals(Hero.class))
 				{
-					if (world.isCameraLockH())
+					if (world.isCameraLockH() || world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("right");
-					cArgs.add("up");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			}
@@ -260,10 +246,7 @@ public class Jump implements Action {
 				{
 					if (world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("up");
-					cArgs.add("down");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			case down:
@@ -286,10 +269,7 @@ public class Jump implements Action {
 				{
 					if (world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("down");
-					cArgs.add("down");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			case left:
@@ -311,12 +291,9 @@ public class Jump implements Action {
 				
 				if (agent.getClass().equals(Hero.class))
 				{
-					if (world.isCameraLockH())
+					if (world.isCameraLockH() || world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("left");
-					cArgs.add("down");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			case right:
@@ -338,12 +315,9 @@ public class Jump implements Action {
 				
 				if (agent.getClass().equals(Hero.class))
 				{
-					if (world.isCameraLockH())
+					if (world.isCameraLockH() || world.isCameraLockV())
 						world.updateCameraScrollLock();
-					ArrayList<String> cArgs = new ArrayList<String>();
-					cArgs.add("right");
-					cArgs.add("down");
-					stepCamera.execute(agent, world, cArgs);
+					world.updateCamera();
 				}
 			break;
 			}

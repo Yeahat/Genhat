@@ -45,6 +45,7 @@ public class GameMain {
 			//update everything
 			world.updateAgents();
 			world.updateCameraScrollLock();
+			world.updateCamera();
 			
 			//render everything
 			renderGL();
@@ -192,8 +193,8 @@ public class GameMain {
 						//camera scroll lock check
 						if (!world.isCameraLockH())
 						{
-							if (player.getPos()[0] >= world.getWidth() - 8)
-								world.setCameraLockH(true);
+							//if (player.getPos()[0] >= world.getWidth() - 8)
+								//world.setCameraLockH(true);
 						}
 					}
 				}
@@ -582,6 +583,30 @@ public class GameMain {
 					t[i][j][0] = new Terrain(dirt);
 			}
 		}
+		
+		//screen edge tests top
+		for (int n = 35; n < 50; n ++)
+		{
+			for (int i = 1; i < 10; i ++)
+			{
+				for (int j = 0; j < i; j ++)
+				{
+					t[20+i][n][j] = new Terrain(grass, dirt);
+				}
+			}
+		}
+		//screen edge tests bottom
+		for (int n = 0; n < 15; n ++)
+		{
+			for (int i = 1; i < 10; i ++)
+			{
+				for (int j = 0; j < i; j ++)
+				{
+					t[20+i][n][j] = new Terrain(grass, dirt);
+				}
+			}
+		}
+		
 		
 		//house test
 		for (int k = 1; k < 5; k ++)
