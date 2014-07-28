@@ -260,10 +260,10 @@ public class GameMain {
 	 */
 	public void initWorld()
 	{
-		genTestWorldHeroTest();
+		//genTestWorldHeroTest();
 		//genTestWorldStairs();
 		//genTestWorldJump();
-		//genLargeWorld();
+		genLargeWorld();
 	}
 	
 	/**
