@@ -13,8 +13,10 @@ import entities.Agent;
 import entities.Hero;
 import entities.Wanderer;
 
+import things.HorizontalBar;
 import things.LightSource;
 import things.Stairs;
+import things.VerticalBar;
 import world.Terrain;
 import world.World;
 
@@ -558,6 +560,9 @@ public class GameMain {
 	private void genLargeWorld()
 	{
 		int xs = 50, ys = 50, zs = 10;
+		
+		world = new World(xs, ys, zs);
+		
 		Terrain[][][] t = new Terrain[xs][ys][zs];
 		for (int i = 0; i < xs; i ++)
 		{
@@ -582,6 +587,7 @@ public class GameMain {
 			}
 		}
 		
+		/*
 		//screen edge tests top
 		for (int n = 40; n < 50; n ++)
 		{
@@ -604,62 +610,69 @@ public class GameMain {
 				}
 			}
 		}
-		
+		*/
 		
 		//house test
-		for (int k = 1; k < 5; k ++)
+		//floor
+		for (int i = 25; i < 45; i ++)
 		{
-			for (int j = 30; j <= 38; j ++)
-			{
-				t[30][j][k] = new Terrain(rock, rock);	
-				t[42][j][k] = new Terrain(rock, rock);
-			}
-			
-			for (int i = 31; i <= 41; i ++)
-			{
-				t[i][38][k] = new Terrain(rock, rock);
-				if (i < 36 || i > 37 || k > 2)
-					t[i][30][k] = new Terrain(rock, rock);
-			}
-		}
-		for (int i = 30; i <= 42; i ++)
-		{
-			for (int j = 30; j <= 38; j ++)
+			for (int j = 30; j < 38; j ++)
 			{
 				t[i][j][0] = new Terrain(dirt, woodPlank);
-				if (i == 30 || i == 42)
-				{
-					t[i][j][5] = new Terrain(air);
-					t[i][j][4] = new Terrain(air);
-					t[i][j][3] = new Terrain(rock, thatch);
-					t[i][j][2] = new Terrain(rock);
-				}
-				else if (i == 31 || i == 41)
-				{
-					t[i][j][5] = new Terrain(air);
-					t[i][j][4] = new Terrain(rock, thatch);
-					t[i][j][3] = new Terrain(rock);
-				}
-				else if (i == 32 || i == 40)
-				{
-					t[i][j][5] = new Terrain(rock, thatch);
-					t[i][j][4] = new Terrain(rock);
-				}
-				else
-					t[i][j][5] = new Terrain(rock, thatch);
-				//if (i > 34 && j > 35)
-					//t[i][j][1] = new Terrain(dirt);
+			}
+		}
+		//walls
+		for (int i = 25; i < 45; i ++)
+		{
+			for (int k = 0; k < 4; k ++)
+			{
+				t[i][37][k] = new Terrain(rock);
+				if (i < 34 || i > 35)
+					t[i][30][k] = new Terrain(rock);
+			}
+		}
+		for (int j = 30; j < 38; j ++)
+		{
+			for (int k = 1; k < 4; k ++)
+			{
+				t[25][j][k] = new Terrain(rock);
+				t[44][j][k] = new Terrain(rock);
 			}
 		}
 		
-		t[38][37][1] = new Terrain(woodPlank);
-		t[39][37][1] = new Terrain(woodPlank);
-		t[39][37][2] = new Terrain(woodPlank);
+		//windows
+		t[28][30][2] = new Terrain(glass, air);
+		t[29][30][2] = new Terrain(glass, air);
+		t[30][30][2] = new Terrain(glass, air);
 		
-		t[32][30][2] = new Terrain(glass, air);
-		t[33][30][2] = new Terrain(glass, air);
-		t[32][30][3] = new Terrain(glass, air);
-		t[33][30][3] = new Terrain(glass, air);
+		//house objects
+		HorizontalBar b1 = new HorizontalBar(left);
+		world.addThing(b1, 27, 35, 1);
+		for (int i = 0; i < 3; i ++)
+		{
+			HorizontalBar bar = new HorizontalBar(down);
+			world.addThing(bar, 28+i, 35, 1);
+		}
+		HorizontalBar b2 = new HorizontalBar(right);
+		world.addThing(b2, 31, 35, 1);
+		HorizontalBar b3 = new HorizontalBar(left);
+		world.addThing(b3, 33, 35, 1);
+		HorizontalBar b4 = new HorizontalBar(right);
+		world.addThing(b4, 34, 35, 1);
+		VerticalBar b5 = new VerticalBar(left);
+		world.addThing(b5, 27, 36, 1);
+		VerticalBar b6 = new VerticalBar(up);
+		world.addThing(b6, 34, 36, 1);
+		
+		Stairs s1 = new Stairs(left);
+		Stairs s2 = new Stairs(left);
+		Stairs s3 = new Stairs(left);
+		world.addThing(s1, 40, 36, 1);
+		world.addThing(s2, 41, 36, 2);
+		world.addThing(s3, 42, 36, 3);
+		
+		LightSource l1 = new LightSource();
+		world.addThing(l1, 33, 33, 2);
 		
 		//shadow tests
 		for (int i = 1; i < 8; i ++)
@@ -683,17 +696,7 @@ public class GameMain {
 			}
 		}
 		
-		world = new World(xs, ys, zs);
 		world.setTerrain(t);
-		
-		Stairs s1 = new Stairs(left);
-		Stairs s2 = new Stairs(left);
-		Stairs s3 = new Stairs(left);
-		world.addThing(s1, 37, 37 ,1);
-		world.addThing(s2, 38, 37 ,2);
-		world.addThing(s3, 39, 37 ,3);
-		LightSource l1 = new LightSource();
-		world.addThing(l1, 33, 33, 2);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		

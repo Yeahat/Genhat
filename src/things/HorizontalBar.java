@@ -14,6 +14,8 @@ public class HorizontalBar extends Thing {
 
 	public HorizontalBar()
 	{
+		loadTextures();
+		
 		texRow = 2;
 		texCol = 0;
 		blocking = true;
@@ -22,6 +24,8 @@ public class HorizontalBar extends Thing {
 	
 	public HorizontalBar(direction d)
 	{
+		loadTextures();
+		
 		texRow = 2;
 		texCol = 0;
 		blocking = true;

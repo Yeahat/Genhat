@@ -398,7 +398,7 @@ public class World {
 							vTerrainTexture.bind();
 							GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 					    	
-							if (k != kMax)
+							if (k != kMax || (k == kMax && t.isTransparent()))
 							{
 						    	//Determine which part of the texture to use based on how many neighbors are air
 						    	int texX = t.getTexCol();
@@ -469,7 +469,10 @@ public class World {
 						    	
 					    		
 						    	GL11.glBegin(GL11.GL_QUADS);
-						    		setLighting(false, lightModGrid[i][j][k]);
+						    		if (t.isTransparent() && k == kMax)
+						    			setLighting(false, lightModGrid[i][j][k], .5f);
+						    		else
+						    			setLighting(false, lightModGrid[i][j][k]);
 									GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 									GL11.glVertex2f(0, 0);
 									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
@@ -754,10 +757,21 @@ public class World {
 	}
 	
 	/**
-	 * Determine the lighting for rendering something depending on shadows,
-	 * light sources, and time of day
+	 * Overload without transparency
 	 */
 	private void setLighting(boolean shadowed, float lightMod)
+	{
+		setLighting(shadowed, lightMod, 1.0f);
+	}
+	
+	/**
+	 * Determine the lighting for rendering something depending on shadows,
+	 * light sources, and time of day
+	 * @param shadowed true if in shadow
+	 * @param lightMod contributing amount from light sources
+	 * @param transparency how transparent the rendering is
+	 */
+	private void setLighting(boolean shadowed, float lightMod, float transparency)
 	{
 		float r, g, b;
 		switch (tod)
@@ -874,7 +888,7 @@ public class World {
 			b = Math.min(1, b + .8f * lightMod);
 		}
 		
-		GL11.glColor3f(r, g, b);
+		GL11.glColor4f(r, g, b, transparency);
 	}
 	
 	/**

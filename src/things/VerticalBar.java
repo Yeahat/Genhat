@@ -14,14 +14,18 @@ public class VerticalBar extends Thing {
 
 	public VerticalBar()
 	{
+		loadTextures();
+		
 		texRow = 3;
 		texCol = 0;
 		blocking = true;
-		setDir(up);
+		setDir(right);
 	}
 	
 	public VerticalBar(direction d)
 	{
+		loadTextures();
+		
 		texRow = 3;
 		texCol = 0;
 		blocking = true;
@@ -50,16 +54,16 @@ public class VerticalBar extends Thing {
 			switch (getDir())
 			{
 			case left:
-				texX += 0;
-				break;
-			case down:
 				texX += 1;
 				break;
+			case down:
+				texX += 0;
+				break;
 			case right:
-				texX += 2;
+				texX += 3;
 				break;
 			case up:
-				texX += 3;				
+				texX += 2;				
 				break;
 			}
 			
