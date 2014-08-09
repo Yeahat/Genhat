@@ -16,6 +16,8 @@ import entities.Wanderer;
 import things.HorizontalBar;
 import things.LightSource;
 import things.Stairs;
+import things.StairsIndoor;
+import things.StairsIndoorBottom;
 import things.VerticalBar;
 import world.Terrain;
 import world.World;
@@ -659,17 +661,21 @@ public class GameMain {
 		world.addThing(b3, 33, 35, 1);
 		HorizontalBar b4 = new HorizontalBar(right);
 		world.addThing(b4, 34, 35, 1);
-		VerticalBar b5 = new VerticalBar(left);
+		VerticalBar b5 = new VerticalBar(up);
 		world.addThing(b5, 27, 36, 1);
 		VerticalBar b6 = new VerticalBar(up);
 		world.addThing(b6, 34, 36, 1);
 		
-		Stairs s1 = new Stairs(left);
-		Stairs s2 = new Stairs(left);
-		Stairs s3 = new Stairs(left);
+		StairsIndoor s1 = new StairsIndoor(right, down);
+		StairsIndoor s2 = new StairsIndoor(right, left);
+		StairsIndoor s3 = new StairsIndoor(right, up);
+		StairsIndoorBottom sb1 = new StairsIndoorBottom(right);
+		StairsIndoorBottom sb2 = new StairsIndoorBottom(right);
 		world.addThing(s1, 40, 36, 1);
 		world.addThing(s2, 41, 36, 2);
 		world.addThing(s3, 42, 36, 3);
+		world.addThing(sb1, 41, 36, 1);
+		world.addThing(sb2, 42, 36, 2);
 		
 		LightSource l1 = new LightSource();
 		world.addThing(l1, 33, 33, 2);

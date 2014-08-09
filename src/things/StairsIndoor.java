@@ -10,42 +10,52 @@ import entities.Agent.direction;
 
 import static entities.Agent.direction.*;
 
-public class Stairs extends Thing {
-
-	public Stairs()
+public class StairsIndoor extends Thing {
+	direction renderDir;
+	
+	public StairsIndoor()
 	{
 		loadTextures();
 		
-		texRow = 0;
+		texRow = 4;
 		texCol = 0;
-		setDir(down);
-		blocking = false;
+		setDir(right);
+		renderDir = right;
+		blocking = true;
 		crossable = true;
 		ramp = true;
 	}
 	
-	public Stairs(direction d)
+	public StairsIndoor(direction d)
 	{
 		loadTextures();
 		
-		texRow = 0;
+		if (d == left)
+			texRow = 5;
+		else
+			texRow = 4;
 		texCol = 0;
 		setDir(d);
+		renderDir = d;
 		crossable = true;
 		ramp = true;
+		blocking = true;
+	}
+	
+	public StairsIndoor(direction d, direction d2)
+	{
+		loadTextures();
 		
-		if (d == down)
-		{
-			blocking = false;
-		}
-		else if (d == right)
-		{
-			blocking = true;
-		}
-		else if (d == left)
-		{
-			blocking = true;
-		}
+		if (d == left)
+			texRow = 5;
+		else
+			texRow = 4;
+		texCol = 0;
+		setDir(d);
+		renderDir = d2;
+		crossable = true;
+		ramp = true;
+		blocking = true;
 	}
 	
 	@Override
@@ -69,19 +79,25 @@ public class Stairs extends Thing {
 		
 		int texX = texCol * 4;
 		int texY = texRow;
-		switch (getDir())
+		switch (renderDir)
 		{
-		case down:
-			texX += 0;
-			break;
 		case right:
+			if (getDir() == left)
+				texX += 0;
+			else
+				texX += 3;
+			break;
+		case down:
 			texX += 1;
 			break;
 		case up:
 			texX += 2;
 			break;
 		case left:
-			texX += 3;				
+			if (getDir() == left)
+				texX += 3;
+			else
+				texX += 0;				
 			break;
 		}
 		

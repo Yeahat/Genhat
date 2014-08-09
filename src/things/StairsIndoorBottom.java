@@ -10,42 +10,30 @@ import entities.Agent.direction;
 
 import static entities.Agent.direction.*;
 
-public class Stairs extends Thing {
+public class StairsIndoorBottom extends Thing {
 
-	public Stairs()
+	public StairsIndoorBottom()
 	{
 		loadTextures();
 		
-		texRow = 0;
+		texRow = 6;
 		texCol = 0;
-		setDir(down);
+		setDir(left);
 		blocking = false;
 		crossable = true;
-		ramp = true;
+		ramp = false;
 	}
 	
-	public Stairs(direction d)
+	public StairsIndoorBottom(direction d)
 	{
 		loadTextures();
 		
-		texRow = 0;
+		texRow = 6;
 		texCol = 0;
 		setDir(d);
+		blocking = false;
 		crossable = true;
-		ramp = true;
-		
-		if (d == down)
-		{
-			blocking = false;
-		}
-		else if (d == right)
-		{
-			blocking = true;
-		}
-		else if (d == left)
-		{
-			blocking = true;
-		}
+		ramp = false;
 	}
 	
 	@Override
@@ -69,21 +57,9 @@ public class Stairs extends Thing {
 		
 		int texX = texCol * 4;
 		int texY = texRow;
-		switch (getDir())
-		{
-		case down:
-			texX += 0;
-			break;
-		case right:
+		
+		if (getDir() == left)
 			texX += 1;
-			break;
-		case up:
-			texX += 2;
-			break;
-		case left:
-			texX += 3;				
-			break;
-		}
 		
 		int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2);
 		int xMax = xMin + pixelSize * (TEXTURE_SIZE_X);
