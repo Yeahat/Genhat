@@ -123,6 +123,11 @@ public abstract class Agent {
 	}
 	
 	/**
+	 * What to do when the agent is interacted with by another agent; empty by default but can be overriden.
+	 */
+	public void interact(){}
+	
+	/**
 	 * Incrementer for the x offset value
 	 * @param value the value by which to increment x
 	 */

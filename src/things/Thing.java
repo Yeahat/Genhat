@@ -42,6 +42,11 @@ public abstract class Thing {
 	public abstract void renderThing(int pixelSize, int terrainTextureSize);
 	
 	/**
+	 * Action taken when the thing is interacted with; empty by default but can be overriden.
+	 */
+	public void interact(){}
+	
+	/**
 	 * Define at what point gravity affects the thing.  This defaults to determining if a blocking thing, agent, or
 	 * terrain is below the thing by one space in the z direction.  This can be overriden.
 	 * 
@@ -80,7 +85,7 @@ public abstract class Thing {
 	/**
 	 * Determine if a thing is blocked by the z-axis space under it
 	 * @param world the world in which the thing exists
-	 * @return
+	 * @return true if blocked
 	 */
 	private boolean blockedBelow(World world)
 	{
@@ -93,6 +98,11 @@ public abstract class Thing {
 		return false;
 	}
 	
+	/**
+	 * Determine if a thing is blocked by the z-axis space above it
+	 * @param world the world in which the thing exists
+	 * @return true if blocked
+	 */
 	private boolean blockedAbove(World world)
 	{
 		if (!world.isInBounds(pos[0], pos[1], pos[2] + 1)
@@ -102,7 +112,13 @@ public abstract class Thing {
 			return true;
 		return false;
 	}
-	
+
+	/**
+	 * Determine if a thing is blocked in a specified direction within its x-y plane
+	 * @param world the world in which the thing exists
+	 * @param d the direction to check for blocking
+	 * @return true if blocked
+	 */
 	private boolean blockedInDirection(World world, direction d)
 	{
 		int x = pos[0], y = pos[1], z = pos[2];

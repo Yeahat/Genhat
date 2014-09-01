@@ -12,12 +12,16 @@ import org.lwjgl.opengl.GL11;
 import entities.Agent;
 import entities.Hero;
 import entities.Wanderer;
+import entities.Agent.direction;
 
+import things.Chair;
 import things.HorizontalBar;
 import things.LightSource;
 import things.Stairs;
 import things.StairsIndoor;
 import things.StairsIndoorBottom;
+import things.Stool;
+import things.Table;
 import things.VerticalBar;
 import world.Terrain;
 import world.World;
@@ -95,7 +99,23 @@ public class GameMain {
 				//Pressed Action Keys
 				if (Keyboard.getEventKey() == Keyboard.KEY_Z)
 				{
-					
+					Hero player = world.getPlayer();
+					direction d = player.getDir();
+					int[] pos = player.getPos();
+					int x = pos[0];
+					int y = pos[1];
+					int z = pos[2];
+					switch (d)
+					{
+					case up: y++; break;
+					case down: y--; break;
+					case left: x--; break;
+					case right: x++; break;
+					}
+					if (world.getAgentAt(x, y, z) != null)
+						world.getAgentAt(x, y, z).interact();
+					else if (world.hasThing(x, y, z))
+						world.getThingAt(x, y, z).interact();
 				}
 				else if (Keyboard.getEventKey() == Keyboard.KEY_X)
 				{
@@ -665,6 +685,21 @@ public class GameMain {
 		world.addThing(b5, 27, 36, 1);
 		VerticalBar b6 = new VerticalBar(up);
 		world.addThing(b6, 34, 36, 1);
+		
+		Stool stool1 = new Stool();
+		Stool stool2 = new Stool();
+		Stool stool3 = new Stool();
+		world.addThing(stool1, 28, 34, 1);
+		world.addThing(stool2, 29, 34, 1);
+		world.addThing(stool3, 30, 34, 1);
+		
+		Table t1 = new Table();
+		world.addThing(t1, 38, 33, 1);
+		Chair c1 = new Chair(left);
+		Chair c2 = new Chair(right);
+		world.addThing(c1, 39, 33, 1);
+		world.addThing(c2, 37, 33, 1);
+		
 		
 		StairsIndoor s1 = new StairsIndoor(right, down);
 		StairsIndoor s2 = new StairsIndoor(right, left);
