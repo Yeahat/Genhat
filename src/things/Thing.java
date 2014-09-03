@@ -13,6 +13,8 @@ public abstract class Thing {
 	boolean ramp = false;
 	boolean transparent = false; //true if thing should not block light sources
 	private boolean lightSource = false;
+	private boolean antiLightSource = false;
+	private float lightPower = 0.6f; //strength of light emission if the Thing is a light source, light absorption if the thing is an anti light source
 	private int[] pos = new int[3]; //Position (x, y, z)
 	private float[] realOffset = new float[3]; //sub-grid offset from the current position (x, y, z) measured in pixels (default is 16 pixels per grid space)
 	private float[] pixelOffset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
@@ -42,13 +44,18 @@ public abstract class Thing {
 	public abstract void renderThing(int pixelSize, int terrainTextureSize);
 	
 	/**
-	 * Action taken when the thing is interacted with; empty by default but can be overriden.
+	 * Time update for a thing, empty by default but can be overridden.
+	 */
+	public void update(){}
+	
+	/**
+	 * Action taken when the thing is interacted with; empty by default but can be overridden.
 	 */
 	public void interact(){}
 	
 	/**
 	 * Define at what point gravity affects the thing.  This defaults to determining if a blocking thing, agent, or
-	 * terrain is below the thing by one space in the z direction.  This can be overriden.
+	 * terrain is below the thing by one space in the z direction.  This can be overridden.
 	 * 
 	 * @param world the world in which the thing exists
 	 * @return true if the object should not be at rest with regards to gravity
@@ -204,6 +211,15 @@ public abstract class Thing {
 	}
 	
 	/**
+	 * Getter for transparent
+	 * @return true if transparent
+	 */
+	public boolean isTransparent()
+	{
+		return transparent;
+	}
+	
+	/**
 	 * Getter for whether or not something is a ramp (i.e. an agent walking on it will change
 	 * the (x,y) position and the z position)
 	 * @return true if it is a ramp
@@ -235,5 +251,13 @@ public abstract class Thing {
 
 	public boolean isLightSource() {
 		return lightSource;
+	}
+
+	public void setLightPower(float lightPower) {
+		this.lightPower = lightPower;
+	}
+
+	public float getLightPower() {
+		return lightPower;
 	}
 }

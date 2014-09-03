@@ -1,90 +1,81 @@
 package things;
 
 import java.io.IOException;
+import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
+public class Candle extends Thing {
 
-public class Stool extends Thing {
-
-	boolean pushedIn;
+	float baseLightPower;
+	float updateFrequency;
+	int minRate;
+	int updateCounter = 0;
+	int animationFrame;
+	boolean lit;
+	Random rand;
 	
-	public Stool()
+	public Candle()
 	{
 		loadTextures();
 		
-		texRow = 2;
+		texRow = 4;
 		texCol = 0;
-		transparent = true;
-		setDir(up);
-		
-		pushedIn = true;
-		blocking = true;
-	}
-	
-	public Stool(direction d)
-	{
-		loadTextures();
-		
-		texRow = 2;
-		texCol = 0;
-		transparent = true;
-		setDir(d);
-		
-		pushedIn = true;
-		blocking = true;
-	}
-	
-	/**
-	 * Overloaded constructor
-	 * @param d direction
-	 * @param p pushed in flag
-	 */
-	public Stool(direction d, boolean p)
-	{
-		loadTextures();
-		
-		texRow = 2;
-		texCol = 0;
-		transparent = true;
-		setDir(d);
-		
-		pushedIn = p;
-		if (pushedIn)
-			blocking = true;
-		else
-			blocking = false;
-	}
+		blocking = false;
+		crossable = true;
+		setLightSource(true);
 
-	@Override
-	public void interact()
+		lit = true;
+		baseLightPower = .6f;
+		updateFrequency = 5;
+		minRate = 3;
+		setLightPower(baseLightPower);
+		animationFrame = 0;
+		
+		rand = new Random();
+	}
+	
+	public Candle(boolean isLit)
 	{
-		if (pushedIn)
+		loadTextures();
+		
+		texRow = 4;
+		texCol = 0;
+		blocking = false;
+		crossable = true;
+		
+		if (isLit)
 		{
-			pushedIn = false;
-			blocking = false;
+			lit = true;
+			setLightSource(true);
 		}
 		else
 		{
-			pushedIn = true;
-			blocking = true;
+			lit = false;
+			setLightSource(false);
 		}
+		baseLightPower = .6f;
+		updateFrequency = 5;
+		minRate = 3;
+		setLightPower(baseLightPower);
+		animationFrame = 0;
+		
+		rand = new Random();
 	}
 	
 	@Override
-	public void loadTextures() {
+	public void loadTextures() 
+	{
 		try {
 			texture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/objects/thing2.png"));
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
 	@Override
-	public void renderThing(int pixelSize, int terrainTextureSize) {
+	public void renderThing(int pixelSize, int terrainTextureSize) 
+	{
 		GL11.glPushMatrix();
 		
 			texture.bind();
@@ -95,34 +86,16 @@ public class Stool extends Thing {
 			
 			int texX = texCol * 4;
 			int texY = texRow;
-			switch (getDir())
+			if (lit)
 			{
-			case up:
-				if (pushedIn)
+				if (animationFrame < 5)
 					texX += 1;
-				else
-					texX += 0;
-				break;
-			case down:
-				if (pushedIn)
-					texX += 3;
-				else
+				else if (animationFrame < 10)
 					texX += 2;
-				break;
-			case right:
-				texY += 1;
-				if (pushedIn)
-					texX += 1;
-				else
-					texX += 0;
-				break;
-			case left:
-				texY += 1;
-				if (pushedIn)
+				else if (animationFrame < 15)
 					texX += 3;
-				else
+				else if (animationFrame < 20)
 					texX += 2;
-				break;
 			}
 			
 			int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2);
@@ -144,4 +117,28 @@ public class Stool extends Thing {
 		GL11.glPopMatrix();
 	}
 
+	@Override
+	public void update()
+	{
+		if (lit)
+		{
+			updateCounter ++;
+			if (updateCounter >= minRate)
+			{
+				if (rand.nextFloat() < 1.0f/updateFrequency)
+				{
+					float change = (rand.nextFloat() - .5f) * .025f;
+					setLightPower(baseLightPower + change);
+					updateCounter = 0;
+				}
+			}
+		
+			animationFrame ++;
+			if (animationFrame >= 20)
+			{
+				animationFrame = 0;
+			}
+		}
+	}
+	
 }

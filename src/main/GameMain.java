@@ -14,6 +14,7 @@ import entities.Hero;
 import entities.Wanderer;
 import entities.Agent.direction;
 
+import things.Candle;
 import things.Chair;
 import things.HorizontalBar;
 import things.LightSource;
@@ -23,6 +24,7 @@ import things.StairsIndoorBottom;
 import things.Stool;
 import things.Table;
 import things.VerticalBar;
+import things.WallCandle;
 import world.Terrain;
 import world.World;
 
@@ -51,6 +53,7 @@ public class GameMain {
 		while(!Display.isCloseRequested())	//exits when window is closed
 		{
 			//update everything
+			world.updateThings();
 			world.updateAgents();
 			world.updateCameraScrollLock();
 			world.updateCamera();
@@ -712,8 +715,8 @@ public class GameMain {
 		world.addThing(sb1, 41, 36, 1);
 		world.addThing(sb2, 42, 36, 2);
 		
-		LightSource l1 = new LightSource();
-		world.addThing(l1, 33, 33, 2);
+		Candle candle1 = new Candle();
+		world.addThing(candle1, 33, 33, 1);
 		
 		//shadow tests
 		for (int i = 1; i < 8; i ++)

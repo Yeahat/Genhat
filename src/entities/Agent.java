@@ -29,6 +29,7 @@ public abstract class Agent {
 	private direction dir = down;	//direction the agent is facing
 	private int speed = 2;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
 	boolean stepping = false;	//true if the agent is currently taking a step
+	private boolean steppingUp = false;	//flag signifying when the agent is currently stepping up, used to fix a lighting bug
 	private boolean jumping = false;	//true if the agent is currently jumping
 	private boolean rampAscending = false;	//true if the agent is currently taking a step up a ramp
 	private boolean rampDescending = false;	//true if the agent is currently taking a step down a ramp
@@ -480,5 +481,13 @@ public abstract class Agent {
 
 	public boolean isTransparent() {
 		return transparent;
+	}
+
+	public void setSteppingUp(boolean steppingUp) {
+		this.steppingUp = steppingUp;
+	}
+
+	public boolean isSteppingUp() {
+		return steppingUp;
 	}
 }

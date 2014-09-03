@@ -22,6 +22,9 @@ public class World {
 	Agent[][][] agentGrid;
 	float[][][] lightModGrid;
 	ArrayList<Agent> agents;
+	ArrayList<Thing> things;
+	ArrayList<Thing> lightSources;
+	ArrayList<Thing> antiLightSources;
 	private float width;
 	private float depth;
 	private float height;
@@ -66,6 +69,9 @@ public class World {
 		height = zSize;
 		
 		agents = new ArrayList<Agent>();
+		things = new ArrayList<Thing>();
+		lightSources = new ArrayList<Thing>();
+		antiLightSources = new ArrayList<Thing>();
 		
 		displayCenter[0] = (float)xSize/2;
 		displayCenter[1] = (float)ySize/2 + (float)zSize/2;
@@ -93,6 +99,9 @@ public class World {
 		height = zSize;
 		
 		agents = new ArrayList<Agent>();
+		things = new ArrayList<Thing>();
+		lightSources = new ArrayList<Thing>();
+		antiLightSources = new ArrayList<Thing>();
 		
 		displayCenter[0] = center[0];
 		displayCenter[1] = center[1] + center[2];
@@ -108,6 +117,20 @@ public class World {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	
+	/**
+	 * Run an update on all things active in the world
+	 */
+	public void updateThings()
+	{
+		for (int i = 0; i < things.size(); i ++)
+		{
+			things.get(i).update();
+		}
+	}
+	
+	/**
+	 * Run an update on all agents active in the world
+	 */
 	public void updateAgents()
 	{
 		for (int i = 0; i < agents.size(); i ++)
@@ -305,39 +328,75 @@ public class World {
 		float[][][] clearFloatGrid = new float[terrainGrid.length][terrainGrid[0].length][terrainGrid[0][0].length];
 		lightModGrid = clearFloatGrid;
 		
-		for (int i = xMin; i <= xMax; i ++)
+		for (int n = 0; n < lightSources.size(); n ++)
 		{
-			for (int j = yMin; j <= yMax; j ++)
+			int[] lightPos = lightSources.get(n).getPos();
+			int i = lightPos[0];
+			int j = lightPos[1];
+			int k = lightPos[2];
+			if ((i >= xMin && i <= xMax) || (j >= yMin && j <= yMax) || (k >= zMin && k <= zMax))
 			{
-				for (int k = zMin; k <= zMax; k ++)
+				//TODO: Update this to distinguish between point and directed lights
+				//point light update
+				float lightPower = lightSources.get(n).getLightPower();
+				int lightDst = (int)(lightPower * 10);
+				int iMin = Math.max(i - lightDst, 0);
+				int jMin = Math.max(j - lightDst, 0);
+				int kMin = Math.max(k - lightDst, 0);
+				int iMax = Math.min(i + lightDst, terrainGrid.length - 1);
+				int jMax = Math.min(j + lightDst, terrainGrid[0].length - 1);
+				int kMax = Math.min(k + lightDst, terrainGrid[0][0].length - 1);
+				for (int i2 = iMin; i2 <= iMax; i2 ++)
 				{
-					if (producesLight(i, j, k))
+					for (int j2 = jMin; j2 <= jMax; j2 ++)
 					{
-						//TODO: Update this to distinguish between point and directed lights
-						//point light update
-						int lightDst = 6;
-						int iMin = Math.max(i - lightDst, 0);
-						int jMin = Math.max(j - lightDst, 0);
-						int kMin = Math.max(k - lightDst, 0);
-						int iMax = Math.min(i + lightDst, terrainGrid.length - 1);
-						int jMax = Math.min(j + lightDst, terrainGrid[0].length - 1);
-						int kMax = Math.min(k + lightDst, terrainGrid[0][0].length - 1);
-						for (int i2 = iMin; i2 <= iMax; i2 ++)
+						for (int k2 = kMin; k2 <= kMax; k2 ++)
 						{
-							for (int j2 = jMin; j2 <= jMax; j2 ++)
+							if (!checkLightBlockingLineOfSight(i, j, k, i2, j2, k2))
 							{
-								for (int k2 = kMin; k2 <= kMax; k2 ++)
-								{
-									if (!checkLightBlockingLineOfSight(i, j, k, i2, j2, k2))
-									{
-										//increase light modification based on distance to light source
-										float lightPower = .7f;
-										float dst = (float)Math.sqrt(Math.pow(i - i2, 2) + Math.pow(j - j2, 2) + Math.pow(k - k2, 2));
-										float updateVal = Math.max(lightPower - dst/10.0f, 0);
-										if (updateVal > lightModGrid[i2][j2][k2])
-											lightModGrid[i2][j2][k2] = updateVal;
-									}
-								}
+								//increase light modification based on distance to light source
+								float dst = (float)Math.sqrt(Math.pow(i - i2, 2) + Math.pow(j - j2, 2) + Math.pow(k - k2, 2));
+								float updateVal = Math.max(lightPower - dst/10.0f, 0);
+								if (updateVal > lightModGrid[i2][j2][k2])
+									lightModGrid[i2][j2][k2] = updateVal;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		for (int n = 0; n < antiLightSources.size(); n ++)
+		{
+			int[] lightPos = antiLightSources.get(n).getPos();
+			int i = lightPos[0];
+			int j = lightPos[1];
+			int k = lightPos[2];
+			if ((i >= xMin && i <= xMax) || (j >= yMin && j <= yMax) || (k >= zMin && k <= zMax))
+			{
+				//TODO: Update this to distinguish between point and directed lights
+				//point light update
+				float lightPower = antiLightSources.get(n).getLightPower();
+				int lightDst = (int)(lightPower * 10);
+				int iMin = Math.max(i - lightDst, 0);
+				int jMin = Math.max(j - lightDst, 0);
+				int kMin = Math.max(k - lightDst, 0);
+				int iMax = Math.min(i + lightDst, terrainGrid.length - 1);
+				int jMax = Math.min(j + lightDst, terrainGrid[0].length - 1);
+				int kMax = Math.min(k + lightDst, terrainGrid[0][0].length - 1);
+				for (int i2 = iMin; i2 <= iMax; i2 ++)
+				{
+					for (int j2 = jMin; j2 <= jMax; j2 ++)
+					{
+						for (int k2 = kMin; k2 <= kMax; k2 ++)
+						{
+							if (!checkLightBlockingLineOfSight(i, j, k, i2, j2, k2))
+							{
+								//increase light modification based on distance to light source
+								float dst = (float)Math.sqrt(Math.pow(i - i2, 2) + Math.pow(j - j2, 2) + Math.pow(k - k2, 2));
+								float updateVal = Math.min(lightPower + dst/10.0f, 0);
+								if (updateVal < lightModGrid[i2][j2][k2])
+									lightModGrid[i2][j2][k2] = updateVal;
 							}
 						}
 					}
@@ -746,7 +805,10 @@ public class World {
 						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 						
 						GL11.glPushMatrix();
-							setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+							if (agent.isSteppingUp())
+								setLighting(isShadowed(i, j + 1, k), lightModGrid[i][j + 1][k]);
+							else
+								setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
 							GL11.glTranslatef(x, y, 0);
 							agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
 						GL11.glPopMatrix();
@@ -933,10 +995,16 @@ public class World {
 		thingGrid[x][y][z] = t;
 		int[] pos = {x, y, z};
 		t.setPos(pos);
+		things.add(t);
+		if (t.isLightSource())
+			lightSources.add(t);
 	}
 	
 	public void removeThingAt(int x, int y, int z)
 	{
+		if (thingGrid[x][y][z].isLightSource())
+			lightSources.remove(thingGrid[x][y][z]);
+		things.remove(thingGrid[x][y][z]);
 		thingGrid[x][y][z] = null;
 	}
 	
@@ -1096,37 +1164,30 @@ public class World {
 		{
 			return true;
 		}
-		else if (this.hasThing(x, y, z)) //things
+		else if (terrainGrid[x][y][z].isBlocking())
 		{
-			return this.thingGrid[x][y][z].isBlocking();
+			return true;
+		}
+		else if (this.hasThing(x, y, z) && thingGrid[x][y][z].isBlocking()) //things
+		{
+			return true;
 		}
 		//NOTE: 19 is the minimum map size to do camera locked top/bottom edge blocking
 		else if (depth > 19 && (y < height - 1 - z || y > depth - (z - 1))) //screen edge
 		{
 			return true;
 		}
-		else //terrain
-		{
-			return terrainGrid[x][y][z].isBlocking();
-		}
+		return false;
 	}
 	
 	public boolean isLightBlocking(int x, int y, int z)
 	{
 		if (isOccupied(x, y, z) && !agentGrid[x][y][z].isTransparent())
 			return true;
-		else if (hasThing(x, y, z) && thingGrid[x][y][z].isBlocking() && thingGrid[x][y][z].isBlocking())
+		else if (hasThing(x, y, z) && !thingGrid[x][y][z].isTransparent())
 			return true;
 		else
 			return !terrainGrid[x][y][z].isTransparent();
-	}
-	
-	public boolean producesLight(int x, int y, int z)
-	{
-		if (hasThing(x, y, z) && thingGrid[x][y][z].isLightSource())
-			return true;
-		else
-			return false;
 	}
 	
 	/**
@@ -1149,10 +1210,13 @@ public class World {
 		//handle special cases of light-blocking test cells
 		if (isLightBlocking(x2, y2, z2))
 		{
-			if (dy < 0)
-				return true;
-			else if (dy == 0 && dz > 0)
-				return true;
+			if (terrainGrid[x2][y2][z2].isBlocking())
+			{
+				if (dy < 0)
+					return true;
+				else if (dy == 0 && dz > 0)
+					return true;
+			}
 		}
 		
 		//calculate steps for iterating through line of sight points in between the two points
@@ -1181,20 +1245,23 @@ public class World {
 	
 	public boolean isCrossable(int x, int y, int z)
 	{
-		if (this.hasThing(x, y, z))
+		if (!this.isInBounds(x, y, z - 1))
 		{
-			return this.thingGrid[x][y][z].isCrossable();
+			if (this.hasThing(x, y, z))
+				return this.thingGrid[x][y][z].isCrossable();
+			return false;
 		}
+		
+		
+		if (this.terrainGrid[x][y][z-1].isBlocking())
+			return true;
 		else
 		{
-			if (!this.isInBounds(x, y, z - 1))
+			if (this.hasThing(x, y, z))
 			{
-				return false;
+				return this.thingGrid[x][y][z].isCrossable();
 			}
-			else
-			{
-				return this.terrainGrid[x][y][z-1].isBlocking();
-			}
+			return false;
 		}
 	}
 	

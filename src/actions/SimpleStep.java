@@ -35,6 +35,7 @@ public class SimpleStep implements Action {
 				
 				if(canStep(agent, world, up))
 				{
+					agent.setSteppingUp(true);
 					int[] pos = agent.getPos();
 					Placeholder h1 = new Placeholder(pos[0], pos[1] + 1, pos[2]);
 					if (!agent.isTransparent())	//shadow up step bug fix hack thing
@@ -64,6 +65,7 @@ public class SimpleStep implements Action {
 				world.moveAgent(agent, 0, 1, 0);
 				agent.setOffsetY(0);
 				agent.setStepping(false);
+				agent.setSteppingUp(false);
 				finishedStep = true;
 			}
 			

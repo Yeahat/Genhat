@@ -20,11 +20,12 @@ public class Chair extends Thing {
 		
 		texRow = 1;
 		texCol = 0;
-		blocking = false;
+		transparent = true;
 		setDir(left);
 		
 		pushedIn = true;
-		crossable = false;
+		blocking = true;
+		
 	}
 	
 	public Chair(direction d)
@@ -33,11 +34,11 @@ public class Chair extends Thing {
 		
 		texRow = 1;
 		texCol = 0;
-		blocking = false;
+		transparent = true;
 		setDir(d);
 		
 		pushedIn = true;
-		crossable = false;
+		blocking = true;
 	}
 	
 	/**
@@ -51,15 +52,14 @@ public class Chair extends Thing {
 		
 		texRow = 1;
 		texCol = 0;
-		//transparent	= true;	//small enough object to not block light
-		blocking = false;
+		transparent = true;
 		setDir(d);
 		
 		pushedIn = p;
 		if (pushedIn)
-			crossable = false;
+			blocking = true;
 		else
-			crossable = true;
+			blocking = false;
 	}
 
 	@Override
@@ -68,12 +68,12 @@ public class Chair extends Thing {
 		if (pushedIn)
 		{
 			pushedIn = false;
-			crossable = true;
+			blocking = false;
 		}
 		else
 		{
 			pushedIn = true;
-			crossable = false;
+			blocking = true;
 		}
 	}
 	
