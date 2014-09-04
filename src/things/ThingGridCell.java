@@ -2,6 +2,8 @@ package things;
 
 import java.util.ArrayList;
 
+import entities.Agent.direction;
+
 public class ThingGridCell {
 	private ArrayList<Thing> thingList;
 	
@@ -37,6 +39,30 @@ public class ThingGridCell {
 		return false;
 	}
 	
+	public boolean hasRamp()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).isRamp())
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Get the direction of a ramp (assuming there is a ramp in this cell)
+	 * @return the direction of the ramp in this cell
+	 */
+	public direction getRampDir()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).isRamp())
+				return thingList.get(i).getDir();
+		}
+		return direction.left;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+	}
+	
 	public boolean isTransparent()
 	{
 		for (int i = 0; i < thingList.size(); i ++)
@@ -58,6 +84,14 @@ public class ThingGridCell {
 	}
 	
 	/**
+	 * Interact with the things in this cell, currently interacts only with the thing on top.
+	 */
+	public void interact()
+	{
+		thingList.get(thingList.size() - 1).interact();
+	}
+	
+	/**
 	 * Add a new thing to the thing cell, always gets added on top (i.e. the back of the list)
 	 * @param t the thing to be added
 	 */
@@ -68,9 +102,19 @@ public class ThingGridCell {
 	
 	/**
 	 * Remove a thing from the thing cell
+	 * @param t the thing to be removed
 	 */
 	public void removeThing(Thing t)
 	{
 		thingList.remove(t);
+	}
+	
+	/**
+	 * Getter for the thing list
+	 * @return the list of things in this cell
+	 */
+	public ArrayList<Thing> getThings()
+	{
+		return thingList;
 	}
 }

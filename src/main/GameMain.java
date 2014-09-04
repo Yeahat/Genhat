@@ -118,7 +118,7 @@ public class GameMain {
 					if (world.getAgentAt(x, y, z) != null)
 						world.getAgentAt(x, y, z).interact();
 					else if (world.hasThing(x, y, z))
-						world.getThingAt(x, y, z).interact();
+						world.getThingsAt(x, y, z).interact();
 				}
 				else if (Keyboard.getEventKey() == Keyboard.KEY_X)
 				{
@@ -697,12 +697,17 @@ public class GameMain {
 		world.addThing(stool3, 30, 34, 1);
 		
 		Table t1 = new Table();
+		Table t2 = new Table();
 		world.addThing(t1, 38, 33, 1);
+		world.addThing(t2, 42, 33, 1);
 		Chair c1 = new Chair(left);
 		Chair c2 = new Chair(right);
+		Chair c3 = new Chair(left);
+		Chair c4 = new Chair(right);
 		world.addThing(c1, 39, 33, 1);
 		world.addThing(c2, 37, 33, 1);
-		
+		world.addThing(c3, 43, 33, 1);
+		world.addThing(c4, 41, 33, 1);
 		
 		StairsIndoor s1 = new StairsIndoor(right, down);
 		StairsIndoor s2 = new StairsIndoor(right, left);
@@ -716,7 +721,18 @@ public class GameMain {
 		world.addThing(sb2, 42, 36, 2);
 		
 		WallCandle candle1 = new WallCandle();
-		world.addThing(candle1, 37, 36, 2);
+		WallCandle candle2 = new WallCandle();
+		WallCandle candle3 = new WallCandle();
+		world.addThing(candle1, 38, 36, 2);
+		world.addThing(candle2, 33, 36, 2);
+		world.addThing(candle3, 28, 36, 2);
+		
+		Candle candle4 = new Candle();
+		Candle candle5 = new Candle();
+		Candle candle6 = new Candle();
+		world.addThing(candle4, 38, 33, 1);
+		world.addThing(candle5, 27, 35, 1);
+		world.addThing(candle6, 34, 35, 1);
 		
 		//shadow tests
 		for (int i = 1; i < 8; i ++)

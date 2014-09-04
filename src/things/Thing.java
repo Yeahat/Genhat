@@ -99,7 +99,7 @@ public abstract class Thing {
 		if (pos[2] - 1 < 0)
 			return true;
 		if ((world.getTerrainAt(pos[0], pos[1], pos[2] - 1) != null && world.getTerrainAt(pos[0], pos[1], pos[2] - 1).isBlocking())
-				|| (world.getThingAt(pos[0], pos[1], pos[2] - 1) != null && world.getThingAt(pos[0], pos[1], pos[2] - 1).isBlocking())
+				|| (world.getThingsAt(pos[0], pos[1], pos[2] - 1) != null && world.getThingsAt(pos[0], pos[1], pos[2] - 1).isBlocking())
 				|| world.getAgentAt(pos[0], pos[1], pos[2] - 1) != null)
 			return true;
 		return false;
@@ -114,7 +114,7 @@ public abstract class Thing {
 	{
 		if (!world.isInBounds(pos[0], pos[1], pos[2] + 1)
 				|| (world.getTerrainAt(pos[0], pos[1], pos[2] + 1) != null && world.getTerrainAt(pos[0], pos[1], pos[2] + 1).isBlocking())
-				|| (world.getThingAt(pos[0], pos[1], pos[2] + 1) != null && world.getThingAt(pos[0], pos[1], pos[2] + 1).isBlocking())
+				|| (world.getThingsAt(pos[0], pos[1], pos[2] + 1) != null && world.getThingsAt(pos[0], pos[1], pos[2] + 1).isBlocking())
 				|| world.getAgentAt(pos[0], pos[1], pos[2] + 1) != null)
 			return true;
 		return false;

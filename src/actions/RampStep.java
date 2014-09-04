@@ -2,6 +2,8 @@ package actions;
 
 import java.util.ArrayList;
 
+import things.Thing;
+import things.ThingGridCell;
 import world.World;
 import entities.Agent;
 import entities.Hero;
@@ -141,7 +143,7 @@ public class RampStep implements Action {
 					int[] pos = agent.getPos();
 					
 					//Case 1: stepping onto a ramp
-					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp())
 					{
 						if (canStepRamp(agent, world, left, true, false))
 						{
@@ -165,7 +167,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 2: stepping off of a ramp
-					else if (!world.hasThing(pos[0] - 1, pos[1], pos[2]) || !world.getThingAt(pos[0] - 1, pos[1], pos[2]).isRamp())
+					else if (!world.hasThing(pos[0] - 1, pos[1], pos[2]) || !world.getThingsAt(pos[0] - 1, pos[1], pos[2]).hasRamp())
 					{
 						if (canStepRamp(agent, world, left, true, false))
 						{
@@ -187,7 +189,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 3: stepping off of a ramp onto another ramp
-					else if (world.hasThing(pos[0] - 1, pos[1], pos[2]) && world.getThingAt(pos[0] - 1, pos[1], pos[2]).isRamp())
+					else if (world.hasThing(pos[0] - 1, pos[1], pos[2]) && world.getThingsAt(pos[0] - 1, pos[1], pos[2]).hasRamp())
 					{
 						if (canStepRamp(agent, world, left, true, false))
 						{
@@ -301,7 +303,7 @@ public class RampStep implements Action {
 					int[] pos = agent.getPos();
 					
 					//Case 1: stepping onto a ramp
-					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp())
 					{
 						if (canStepRamp(agent, world, left, false, false))
 						{
@@ -324,7 +326,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 2: stepping off of a ramp
-					else if (!world.hasThing(pos[0] - 1, pos[1], pos[2] - 2) || !world.getThingAt(pos[0] - 1, pos[1], pos[2] - 2).isRamp())
+					else if (!world.hasThing(pos[0] - 1, pos[1], pos[2] - 2) || !world.getThingsAt(pos[0] - 1, pos[1], pos[2] - 2).hasRamp())
 					{
 						if (canStepRamp(agent, world, left, false, false))
 						{
@@ -347,7 +349,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 3: stepping off of a ramp onto another ramp
-					else if (world.hasThing(pos[0] - 1, pos[1], pos[2] - 2) && world.getThingAt(pos[0] - 1, pos[1], pos[2] - 2).isRamp())
+					else if (world.hasThing(pos[0] - 1, pos[1], pos[2] - 2) && world.getThingsAt(pos[0] - 1, pos[1], pos[2] - 2).hasRamp())
 					{
 						if (canStepRamp(agent, world, left, false, true))
 						{
@@ -465,7 +467,7 @@ public class RampStep implements Action {
 					int[] pos = agent.getPos();
 					
 					//Case 1: stepping onto a ramp
-					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp())
 					{
 						if (canStepRamp(agent, world, right, true, false))
 						{
@@ -489,7 +491,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 2: stepping off of a ramp
-					else if (!world.hasThing(pos[0] + 1, pos[1], pos[2]) || !world.getThingAt(pos[0] + 1, pos[1], pos[2]).isRamp())
+					else if (!world.hasThing(pos[0] + 1, pos[1], pos[2]) || !world.getThingsAt(pos[0] + 1, pos[1], pos[2]).hasRamp())
 					{
 						if (canStepRamp(agent, world, right, true, false))
 						{
@@ -511,7 +513,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 3: stepping off of a ramp onto another ramp
-					else if (world.hasThing(pos[0] + 1, pos[1], pos[2]) && world.getThingAt(pos[0] + 1, pos[1], pos[2]).isRamp())
+					else if (world.hasThing(pos[0] + 1, pos[1], pos[2]) && world.getThingsAt(pos[0] + 1, pos[1], pos[2]).hasRamp())
 					{
 						if (canStepRamp(agent, world, right, true, false))
 						{
@@ -625,7 +627,7 @@ public class RampStep implements Action {
 					int[] pos = agent.getPos();
 					
 					//Case 1: stepping onto a ramp
-					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp())
+					if (!world.hasThing(pos[0], pos[1], pos[2] - 1) || !world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp())
 					{
 						if (canStepRamp(agent, world, right, false, false))
 						{
@@ -648,7 +650,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 2: stepping off of a ramp
-					else if (!world.hasThing(pos[0] + 1, pos[1], pos[2] - 2) || !world.getThingAt(pos[0] + 1, pos[1], pos[2] - 2).isRamp())
+					else if (!world.hasThing(pos[0] + 1, pos[1], pos[2] - 2) || !world.getThingsAt(pos[0] + 1, pos[1], pos[2] - 2).hasRamp())
 					{
 						if (canStepRamp(agent, world, right, false, false))
 						{
@@ -671,7 +673,7 @@ public class RampStep implements Action {
 						}
 					}
 					//Case 3: stepping off of a ramp onto another ramp
-					else if (world.hasThing(pos[0] + 1, pos[1], pos[2] - 2) && world.getThingAt(pos[0] + 1, pos[1], pos[2] - 2).isRamp())
+					else if (world.hasThing(pos[0] + 1, pos[1], pos[2] - 2) && world.getThingsAt(pos[0] + 1, pos[1], pos[2] - 2).hasRamp())
 					{
 						if (canStepRamp(agent, world, right, false, true))
 						{
@@ -849,7 +851,7 @@ public class RampStep implements Action {
 			//collision check
 			if (dir == left || dir == right)
 			{
-				if (world.hasThing(x, y, k) && (world.getThingAt(x, y, k).isRamp() && (world.getThingAt(x, y, k).getDir() == left || world.getThingAt(x, y, k).getDir() == right)))
+				if (world.hasThing(x, y, k) && (world.getThingsAt(x, y, k).hasRamp() && (world.getThingsAt(x, y, k).getRampDir() == left || world.getThingsAt(x, y, k).getRampDir() == right)))
 				{
 					if (world.getAgentAt(x, y, k) != null)
 					{

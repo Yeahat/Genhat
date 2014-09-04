@@ -36,8 +36,8 @@ public class Step implements Action {
 				finishedStep = false;
 				//check for ramps
 				int[] pos = agent.getPos();
-				if (world.hasThing(pos[0], pos[1], pos[2]) && world.getThingAt(pos[0], pos[1], pos[2]).isRamp()
-						&& world.getThingAt(pos[0], pos[1], pos[2]).getDir() == down)
+				if (world.hasThing(pos[0], pos[1], pos[2]) && world.getThingsAt(pos[0], pos[1], pos[2]).hasRamp()
+						&& world.getThingsAt(pos[0], pos[1], pos[2]).getRampDir() == down)
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
@@ -67,8 +67,8 @@ public class Step implements Action {
 				finishedStep = false;
 				//check for ramps
 				int[] pos = agent.getPos();
-				if (world.hasThing(pos[0], pos[1] - 1, pos[2] - 1) && world.getThingAt(pos[0], pos[1] - 1, pos[2] - 1).isRamp()
-						&& world.getThingAt(pos[0], pos[1] - 1, pos[2] - 1).getDir() == down)
+				if (world.hasThing(pos[0], pos[1] - 1, pos[2] - 1) && world.getThingsAt(pos[0], pos[1] - 1, pos[2] - 1).hasRamp()
+						&& world.getThingsAt(pos[0], pos[1] - 1, pos[2] - 1).getRampDir() == down)
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
@@ -100,10 +100,10 @@ public class Step implements Action {
 				//check for ramps
 				int[] pos = agent.getPos();
 				//Ascend ramp
-				if ((world.hasThing(pos[0] - 1, pos[1], pos[2]) && world.getThingAt(pos[0] - 1, pos[1], pos[2]).isRamp()
-						&& world.getThingAt(pos[0] - 1, pos[1], pos[2]).getDir() == left)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
-								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == left))
+				if ((world.hasThing(pos[0] - 1, pos[1], pos[2]) && world.getThingsAt(pos[0] - 1, pos[1], pos[2]).hasRamp()
+						&& world.getThingsAt(pos[0] - 1, pos[1], pos[2]).getRampDir() == left)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
+								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == left))
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
@@ -111,10 +111,10 @@ public class Step implements Action {
 					rampStep.execute(agent, world, tempArgs);
 				}
 				//Descend ramp
-				else if ((world.hasThing(pos[0] - 1, pos[1], pos[2] - 1) && world.getThingAt(pos[0] - 1, pos[1], pos[2] - 1).isRamp()
-						&& world.getThingAt(pos[0] - 1, pos[1], pos[2] - 1).getDir() == right)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
-								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == right))
+				else if ((world.hasThing(pos[0] - 1, pos[1], pos[2] - 1) && world.getThingsAt(pos[0] - 1, pos[1], pos[2] - 1).hasRamp()
+						&& world.getThingsAt(pos[0] - 1, pos[1], pos[2] - 1).getRampDir() == right)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
+								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == right))
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
@@ -144,10 +144,10 @@ public class Step implements Action {
 				//check for ramps
 				int[] pos = agent.getPos();
 				//Ascend ramp
-				if ((world.hasThing(pos[0] + 1, pos[1], pos[2]) && world.getThingAt(pos[0] + 1, pos[1], pos[2]).isRamp()
-						&& world.getThingAt(pos[0] + 1, pos[1], pos[2]).getDir() == right)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
-								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == right))
+				if ((world.hasThing(pos[0] + 1, pos[1], pos[2]) && world.getThingsAt(pos[0] + 1, pos[1], pos[2]).hasRamp()
+						&& world.getThingsAt(pos[0] + 1, pos[1], pos[2]).getRampDir() == right)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
+								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == right))
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
@@ -155,10 +155,10 @@ public class Step implements Action {
 					rampStep.execute(agent, world, tempArgs);
 				}
 				//Descend ramp
-				else if ((world.hasThing(pos[0] + 1, pos[1], pos[2] - 1) && world.getThingAt(pos[0] + 1, pos[1], pos[2] - 1).isRamp()
-						&& world.getThingAt(pos[0] + 1, pos[1], pos[2] - 1).getDir() == left)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingAt(pos[0], pos[1], pos[2] - 1).isRamp()
-								&& world.getThingAt(pos[0], pos[1], pos[2] - 1).getDir() == left))
+				else if ((world.hasThing(pos[0] + 1, pos[1], pos[2] - 1) && world.getThingsAt(pos[0] + 1, pos[1], pos[2] - 1).hasRamp()
+						&& world.getThingsAt(pos[0] + 1, pos[1], pos[2] - 1).getRampDir() == left)
+						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
+								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == left))
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);

@@ -9,6 +9,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import things.Thing;
+import things.ThingGridCell;
 import entities.Agent;
 import entities.Hero;
 
@@ -18,7 +19,7 @@ import static world.World.timeOfDay.*;
 
 public class World {
 	Terrain[][][] terrainGrid;
-	Thing[][][] thingGrid;
+	ThingGridCell[][][] thingGrid;
 	Agent[][][] agentGrid;
 	float[][][] lightModGrid;
 	ArrayList<Agent> agents;
@@ -60,9 +61,23 @@ public class World {
 	public World(int xSize, int ySize, int zSize)
 	{
 		terrainGrid = new Terrain[xSize][ySize][zSize];
-		thingGrid = new Thing[xSize][ySize][zSize];
+		thingGrid = new ThingGridCell[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
 		lightModGrid = new float[xSize][ySize][zSize];
+		
+		//initialize thing cells
+		/*
+		for (int i = 0; i < xSize; i ++)
+		{
+			for (int j = 0; j < ySize; j ++)
+			{
+				for (int k = 0; k < zSize; k ++)
+				{
+					thingGrid[i][j][k] = new ThingGridCell();
+				}
+			}
+		}
+		*/
 		
 		setWidth(xSize);
 		depth = ySize;
@@ -90,7 +105,7 @@ public class World {
 	public World(int xSize, int ySize, int zSize, int[] center)
 	{
 		terrainGrid = new Terrain[xSize][ySize][zSize];
-		thingGrid = new Thing[xSize][ySize][zSize];
+		thingGrid = new ThingGridCell[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
 		lightModGrid = new float[xSize][ySize][zSize];
 		
@@ -790,7 +805,7 @@ public class World {
 						GL11.glPushMatrix();
 							setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
 							GL11.glTranslatef(x, y, 0);
-							thingGrid[i][j][k].renderThing(PIXEL_SIZE, TEXTURE_SIZE);
+							thingGrid[i][j][k].renderThings(PIXEL_SIZE, TEXTURE_SIZE);
 						GL11.glPopMatrix();
 					}
 				}
@@ -992,7 +1007,9 @@ public class World {
 	
 	public void addThing(Thing t, int x, int y, int z)
 	{
-		thingGrid[x][y][z] = t;
+		if (thingGrid[x][y][z] == null)
+			thingGrid[x][y][z] = new ThingGridCell();
+		thingGrid[x][y][z].addThing(t);
 		int[] pos = {x, y, z};
 		t.setPos(pos);
 		things.add(t);
@@ -1000,12 +1017,18 @@ public class World {
 			lightSources.add(t);
 	}
 	
-	public void removeThingAt(int x, int y, int z)
+	public void removeThingsAt(int x, int y, int z)
 	{
-		if (thingGrid[x][y][z].isLightSource())
-			lightSources.remove(thingGrid[x][y][z]);
-		things.remove(thingGrid[x][y][z]);
-		thingGrid[x][y][z] = null;
+		if (thingGrid[x][y][z] != null)
+		{
+			ArrayList<Thing> thingList = thingGrid[x][y][z].getThings();
+			for (int i = 0; i < thingList.size(); i ++)
+			{
+				if (thingList.get(i).isLightSource())
+					lightSources.remove(thingList.get(i));
+				things.remove(thingList.get(i));
+			}
+		}
 	}
 	
 	public void moveThing(Thing thing, int xChange, int yChange, int zChange)
@@ -1025,12 +1048,14 @@ public class World {
 		{
 			int[] newPos = {newX, newY, newZ};
 			thing.setPos(newPos);
-			thingGrid[oldX][oldY][oldZ] = null;
-			thingGrid[newX][newY][newZ] = thing;
+			thingGrid[oldX][oldY][oldZ].removeThing(thing);
+			if (thingGrid[newX][newY][newZ] == null)
+				thingGrid[newX][newY][newZ] = new ThingGridCell();
+			thingGrid[newX][newY][newZ].addThing(thing);
 		}
 	}
 	
-	public Thing getThingAt(int x, int y, int z)
+	public ThingGridCell getThingsAt(int x, int y, int z)
 	{
 		return thingGrid[x][y][z];
 	}
@@ -1144,7 +1169,7 @@ public class World {
 	public boolean hasThing(int x, int y, int z)
 	{
 		if (this.isInBounds(x, y, z))
-			return thingGrid[x][y][z] != null;
+			return thingGrid[x][y][z] != null && !thingGrid[x][y][z].isEmpty();
 		else
 			return false;
 	}
@@ -1268,7 +1293,7 @@ public class World {
 	public boolean isLandable(int x, int y, int z)
 	{
 		//Add things that can't be landed on here
-		if (this.hasThing(x, y, z) && (this.thingGrid[x][y][z].isRamp() && this.thingGrid[x][y][z].getDir() != down))
+		if (this.hasThing(x, y, z) && this.thingGrid[x][y][z].hasRamp())
 			return false;
 		else
 			return isCrossable(x, y, z);
