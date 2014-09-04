@@ -715,8 +715,8 @@ public class GameMain {
 		world.addThing(sb1, 41, 36, 1);
 		world.addThing(sb2, 42, 36, 2);
 		
-		Candle candle1 = new Candle();
-		world.addThing(candle1, 33, 33, 1);
+		WallCandle candle1 = new WallCandle();
+		world.addThing(candle1, 37, 36, 2);
 		
 		//shadow tests
 		for (int i = 1; i < 8; i ++)
