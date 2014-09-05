@@ -7,79 +7,29 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import world.World;
-
-import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
 
-public class Stool extends Thing {
+public class FireplaceChimney extends Thing {
 
-	boolean pushedIn;
-	
-	public Stool()
+	public FireplaceChimney()
 	{
 		loadTextures();
 		
 		texRow = 3;
-		texCol = 0;
-		transparent = true;
-		setDir(up);
-		
-		pushedIn = true;
+		texCol = 1;
 		blocking = true;
+		setDir(left);
 	}
 	
-	public Stool(direction d)
+	public FireplaceChimney(direction d)
 	{
 		loadTextures();
 		
-		texRow = 2;
-		texCol = 0;
-		transparent = true;
-		setDir(d);
-		
-		pushedIn = true;
+		texRow = 3;
+		texCol = 1;
 		blocking = true;
-	}
-	
-	/**
-	 * Overloaded constructor
-	 * @param d direction
-	 * @param p pushed in flag
-	 */
-	public Stool(direction d, boolean p)
-	{
-		loadTextures();
-		
-		texRow = 2;
-		texCol = 0;
-		transparent = true;
 		setDir(d);
-		
-		pushedIn = p;
-		if (pushedIn)
-			blocking = true;
-		else
-			blocking = false;
-	}
-
-	@Override
-	public void interact(Agent agent, World world)
-	{
-		if (!world.isOccupied(this.getPos()[0], this.getPos()[1], this.getPos()[2]))
-		{
-			if (pushedIn)
-			{
-				pushedIn = false;
-				blocking = false;
-			}
-			else
-			{
-				pushedIn = true;
-				blocking = true;
-			}
-		}
 	}
 	
 	@Override
@@ -103,31 +53,17 @@ public class Stool extends Thing {
 			int texY = texRow;
 			switch (getDir())
 			{
-			case up:
-				if (pushedIn)
-					texX += 1;
-				else
-					texX += 0;
+			case left:
+				texX += 0;
 				break;
 			case down:
-				if (pushedIn)
-					texX += 3;
-				else
-					texX += 2;
+				texX += 1;
 				break;
 			case right:
-				texY += 1;
-				if (pushedIn)
-					texX += 1;
-				else
-					texX += 0;
+				texX += 2;
 				break;
-			case left:
-				texY += 1;
-				if (pushedIn)
-					texX += 3;
-				else
-					texX += 2;
+			case up:
+				texX += 3;				
 				break;
 			}
 			

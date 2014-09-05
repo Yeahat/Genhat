@@ -2,6 +2,9 @@ package things;
 
 import java.util.ArrayList;
 
+import world.World;
+
+import entities.Agent;
 import entities.Agent.direction;
 
 public class ThingGridCell {
@@ -86,9 +89,9 @@ public class ThingGridCell {
 	/**
 	 * Interact with the things in this cell, currently interacts only with the thing on top.
 	 */
-	public void interact()
+	public void interact(Agent agent, World world)
 	{
-		thingList.get(thingList.size() - 1).interact();
+		thingList.get(thingList.size() - 1).interact(agent, world);
 	}
 	
 	/**

@@ -4,6 +4,7 @@ import org.newdawn.slick.opengl.Texture;
 
 import world.World;
 
+import entities.Agent;
 import entities.Agent.direction;
 
 public abstract class Thing {
@@ -50,8 +51,10 @@ public abstract class Thing {
 	
 	/**
 	 * Action taken when the thing is interacted with; empty by default but can be overridden.
+	 * @param agent the agent interacting with the thing
+	 * @param world the world in which the thing exists
 	 */
-	public void interact(){}
+	public void interact(Agent agent, World world){}
 	
 	/**
 	 * Define at what point gravity affects the thing.  This defaults to determining if a blocking thing, agent, or

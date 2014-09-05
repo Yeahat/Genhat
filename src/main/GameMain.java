@@ -16,6 +16,10 @@ import entities.Agent.direction;
 
 import things.Candle;
 import things.Chair;
+import things.Fireplace;
+import things.FireplaceChimney;
+import things.FireplaceSide;
+import things.Firewood;
 import things.HorizontalBar;
 import things.LightSource;
 import things.Stairs;
@@ -118,7 +122,7 @@ public class GameMain {
 					if (world.getAgentAt(x, y, z) != null)
 						world.getAgentAt(x, y, z).interact();
 					else if (world.hasThing(x, y, z))
-						world.getThingsAt(x, y, z).interact();
+						world.getThingsAt(x, y, z).interact(player, world);
 				}
 				else if (Keyboard.getEventKey() == Keyboard.KEY_X)
 				{
@@ -704,10 +708,14 @@ public class GameMain {
 		Chair c2 = new Chair(right);
 		Chair c3 = new Chair(left);
 		Chair c4 = new Chair(right);
+		Chair c5 = new Chair(up);
+		Chair c6 = new Chair(down);
 		world.addThing(c1, 39, 33, 1);
 		world.addThing(c2, 37, 33, 1);
 		world.addThing(c3, 43, 33, 1);
 		world.addThing(c4, 41, 33, 1);
+		world.addThing(c5, 42, 32, 1);
+		world.addThing(c6, 42, 34, 1);
 		
 		StairsIndoor s1 = new StairsIndoor(right, down);
 		StairsIndoor s2 = new StairsIndoor(right, left);
@@ -723,7 +731,7 @@ public class GameMain {
 		WallCandle candle1 = new WallCandle();
 		WallCandle candle2 = new WallCandle();
 		WallCandle candle3 = new WallCandle();
-		world.addThing(candle1, 38, 36, 2);
+		//world.addThing(candle1, 38, 36, 2);
 		world.addThing(candle2, 33, 36, 2);
 		world.addThing(candle3, 28, 36, 2);
 		
@@ -733,6 +741,28 @@ public class GameMain {
 		world.addThing(candle4, 38, 33, 1);
 		world.addThing(candle5, 27, 35, 1);
 		world.addThing(candle6, 34, 35, 1);
+		
+		Fireplace fp = new Fireplace(true, 3);
+		FireplaceSide fpside1 = new FireplaceSide(left);
+		FireplaceSide fpside2 = new FireplaceSide(right);
+		FireplaceChimney chimney1 = new FireplaceChimney(down);
+		FireplaceChimney chimney2 = new FireplaceChimney(down);
+		FireplaceChimney chimney3 = new FireplaceChimney(down);
+		FireplaceChimney chimneytop = new FireplaceChimney(up);
+		world.addThing(fp, 37, 36, 1);
+		world.addThing(fpside1, 36, 36, 1);
+		world.addThing(fpside2, 38, 36, 1);
+		world.addThing(chimney1, 37, 36, 3);
+		world.addThing(chimney2, 37, 36, 4);
+		world.addThing(chimney3, 37, 36, 5);
+		world.addThing(chimneytop, 37, 36, 6);
+		
+		Firewood fw1 = new Firewood();
+		Firewood fw2 = new Firewood();
+		Firewood fw3 = new Firewood();
+		world.addThing(fw1, 41, 36, 1);
+		world.addThing(fw2, 42, 36, 1);
+		world.addThing(fw3, 43, 36, 1);
 		
 		//shadow tests
 		for (int i = 1; i < 8; i ++)

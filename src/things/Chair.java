@@ -7,6 +7,9 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import world.World;
+
+import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
 
@@ -63,17 +66,20 @@ public class Chair extends Thing {
 	}
 
 	@Override
-	public void interact()
+	public void interact(Agent agent, World world)
 	{
-		if (pushedIn)
+		if (!world.isOccupied(this.getPos()[0], this.getPos()[1], this.getPos()[2]))
 		{
-			pushedIn = false;
-			blocking = false;
-		}
-		else
-		{
-			pushedIn = true;
-			blocking = true;
+			if (pushedIn)
+			{
+				pushedIn = false;
+				blocking = false;
+			}
+			else
+			{
+				pushedIn = true;
+				blocking = true;
+			}
 		}
 	}
 	
@@ -84,7 +90,6 @@ public class Chair extends Thing {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
-	@Override
 	public void renderThing(int pixelSize, int terrainTextureSize) {
 		GL11.glPushMatrix();
 		
@@ -98,13 +103,27 @@ public class Chair extends Thing {
 			int texY = texRow;
 			switch (getDir())
 			{
+			case up:
+				if (pushedIn)
+					texX += 1;
+				else
+					texX += 0;
+				break;
+			case down:
+				if (pushedIn)
+					texX += 3;
+				else
+					texX += 2;
+				break;
 			case right:
+				texY += 1;
 				if (pushedIn)
 					texX += 1;
 				else
 					texX += 0;
 				break;
 			case left:
+				texY += 1;
 				if (pushedIn)
 					texX += 3;
 				else

@@ -21,10 +21,10 @@ public class WallCandle extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 5;
+		texRow = 6;
 		texCol = 0;
 		blocking = false;
-		crossable = true;
+		crossable = false;
 		setLightSource(true);
 
 		lit = true;
@@ -44,7 +44,7 @@ public class WallCandle extends Thing {
 		texRow = 4;
 		texCol = 0;
 		blocking = false;
-		crossable = true;
+		crossable = false;
 		
 		if (isLit)
 		{

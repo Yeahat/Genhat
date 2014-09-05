@@ -21,10 +21,10 @@ public class Candle extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 4;
+		texRow = 5;
 		texCol = 0;
 		blocking = false;
-		crossable = true;
+		crossable = false;
 		setLightSource(true);
 
 		lit = true;
@@ -44,7 +44,7 @@ public class Candle extends Thing {
 		texRow = 4;
 		texCol = 0;
 		blocking = false;
-		crossable = true;
+		crossable = false;
 		
 		if (isLit)
 		{

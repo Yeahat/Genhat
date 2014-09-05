@@ -13,73 +13,29 @@ import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
 
-public class Stool extends Thing {
+public class Firewood extends Thing {
 
-	boolean pushedIn;
+	int quantity;
+	int quantityUnit;	//amount of quantity to be added/removed to warrant a change in appearance (max quantity is quantityUnit * 3)
 	
-	public Stool()
+	public Firewood()
 	{
 		loadTextures();
 		
-		texRow = 3;
-		texCol = 0;
-		transparent = true;
-		setDir(up);
-		
-		pushedIn = true;
-		blocking = true;
+		texRow = 7;
+		texCol = 0;		
+		quantityUnit = 5;
+		setQuantity(quantityUnit*3);
 	}
 	
-	public Stool(direction d)
+	public Firewood(int q)
 	{
 		loadTextures();
 		
-		texRow = 2;
+		texRow = 7;
 		texCol = 0;
-		transparent = true;
-		setDir(d);
-		
-		pushedIn = true;
-		blocking = true;
-	}
-	
-	/**
-	 * Overloaded constructor
-	 * @param d direction
-	 * @param p pushed in flag
-	 */
-	public Stool(direction d, boolean p)
-	{
-		loadTextures();
-		
-		texRow = 2;
-		texCol = 0;
-		transparent = true;
-		setDir(d);
-		
-		pushedIn = p;
-		if (pushedIn)
-			blocking = true;
-		else
-			blocking = false;
-	}
-
-	@Override
-	public void interact(Agent agent, World world)
-	{
-		if (!world.isOccupied(this.getPos()[0], this.getPos()[1], this.getPos()[2]))
-		{
-			if (pushedIn)
-			{
-				pushedIn = false;
-				blocking = false;
-			}
-			else
-			{
-				pushedIn = true;
-				blocking = true;
-			}
-		}
+		quantityUnit = 5;
+		setQuantity(q);
 	}
 	
 	@Override
@@ -101,35 +57,8 @@ public class Stool extends Thing {
 			
 			int texX = texCol * 4;
 			int texY = texRow;
-			switch (getDir())
-			{
-			case up:
-				if (pushedIn)
-					texX += 1;
-				else
-					texX += 0;
-				break;
-			case down:
-				if (pushedIn)
-					texX += 3;
-				else
-					texX += 2;
-				break;
-			case right:
-				texY += 1;
-				if (pushedIn)
-					texX += 1;
-				else
-					texX += 0;
-				break;
-			case left:
-				texY += 1;
-				if (pushedIn)
-					texX += 3;
-				else
-					texX += 2;
-				break;
-			}
+			int displayFrame = (int)(Math.ceil((double)quantity / (double)quantityUnit));
+			texX += (3 - displayFrame);
 			
 			int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2);
 			int xMax = xMin + pixelSize * (TEXTURE_SIZE_X);
@@ -150,4 +79,24 @@ public class Stool extends Thing {
 		GL11.glPopMatrix();
 	}
 
+	@Override
+	public void interact(Agent agent, World world)
+	{
+		if (quantity > 0)
+			setQuantity(quantity - 1);
+	}
+	
+	public void setQuantity(int q)
+	{
+		if (q > quantityUnit * 3)
+		{
+			System.out.println("Amount given is greater than the set quantity this thing can have, value reset to the maximum quantity");
+			q = quantityUnit * 3;
+		}
+		quantity = q;
+		if (q <= 0)
+			blocking = false;
+		else
+			blocking = true;
+	}
 }
