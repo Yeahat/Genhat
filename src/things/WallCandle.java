@@ -41,7 +41,7 @@ public class WallCandle extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 4;
+		texRow = 6;
 		texCol = 0;
 		blocking = false;
 		crossable = false;

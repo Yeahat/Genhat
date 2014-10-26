@@ -41,7 +41,7 @@ public class Candle extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 4;
+		texRow = 5;
 		texCol = 0;
 		blocking = false;
 		crossable = false;
