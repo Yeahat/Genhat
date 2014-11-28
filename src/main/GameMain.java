@@ -88,16 +88,6 @@ public class GameMain {
 			//Debugging stuff
 			if (Keyboard.getEventKeyState())
 			{
-				/*
-				if (Keyboard.getEventKey() == Keyboard.KEY_Q)
-				{
-					world.rotateCC();
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_E)
-				{
-					world.rotateC();
-				}
-				*/
 				if (Keyboard.getEventKey() == Keyboard.KEY_T)
 				{
 					world.cycleTimeOfDay();
@@ -106,34 +96,54 @@ public class GameMain {
 				//Pressed Action Keys
 				if (Keyboard.getEventKey() == Keyboard.KEY_Z)
 				{
-					Hero player = world.getPlayer();
-					direction d = player.getDir();
-					int[] pos = player.getPos();
-					int x = pos[0];
-					int y = pos[1];
-					int z = pos[2];
-					switch (d)
+					if (world.isTextBoxActive())
 					{
-					case up: y++; break;
-					case down: y--; break;
-					case left: x--; break;
-					case right: x++; break;
+						if (world.getTextDisplay().sendInput(Keyboard.KEY_Z))
+						{
+							world.setTextBoxActive(false);
+						}
 					}
-					if (world.getAgentAt(x, y, z) != null)
-						world.getAgentAt(x, y, z).interact();
-					else if (world.hasThing(x, y, z))
-						world.getThingsAt(x, y, z).interact(player, world);
+					else
+					{
+						Hero player = world.getPlayer();
+						direction d = player.getDir();
+						int[] pos = player.getPos();
+						int x = pos[0];
+						int y = pos[1];
+						int z = pos[2];
+						switch (d)
+						{
+						case up: y++; break;
+						case down: y--; break;
+						case left: x--; break;
+						case right: x++; break;
+						}
+						if (world.getAgentAt(x, y, z) != null)
+							world.getAgentAt(x, y, z).interact();
+						else if (world.hasThing(x, y, z))
+							world.getThingsAt(x, y, z).interact(player, world);
+					}
 				}
 				else if (Keyboard.getEventKey() == Keyboard.KEY_X)
 				{
-					Hero player = world.getPlayer();
-					if (player != null)
+					if (world.isTextBoxActive())
 					{
-						if (player.isIdle())
+						if (world.getTextDisplay().sendInput(Keyboard.KEY_X))
 						{
-							ArrayList<String> newArgs = new ArrayList<String>();
-							player.setArgs(newArgs);
-							player.setCurrentAction(player.getJumpAction());
+							world.setTextBoxActive(false);
+						}
+					}
+					else
+					{
+						Hero player = world.getPlayer();
+						if (player != null)
+						{
+							if (player.isIdle())
+							{
+								ArrayList<String> newArgs = new ArrayList<String>();
+								player.setArgs(newArgs);
+								player.setCurrentAction(player.getJumpAction());
+							}
 						}
 					}
 				}
@@ -143,15 +153,29 @@ public class GameMain {
 		//Held Action Keys	
 		if (Keyboard.isKeyDown(Keyboard.KEY_C))
 		{
-			Hero player = world.getPlayer();
-			if (player != null && player.isIdle())
-				player.setSpeed(4);
+			if (world.isTextBoxActive())
+			{
+				world.getTextDisplay().setSpeed(8);
+			}
+			else
+			{
+				Hero player = world.getPlayer();
+				if (player != null && player.isIdle())
+					player.setSpeed(4);
+			}
 		}
 		else
 		{
-			Hero player = world.getPlayer();
-			if (player != null && player.isIdle())
-				player.setSpeed(2);
+			if (world.isTextBoxActive())
+			{
+				world.getTextDisplay().setSpeed(1);
+			}
+			else
+			{
+				Hero player = world.getPlayer();
+				if (player != null && player.isIdle())
+					player.setSpeed(2);
+			}
 		}
 		
 		//Arrow Keys
@@ -314,6 +338,9 @@ public class GameMain {
 		
 		GL11.glPushMatrix();
 			world.renderWorld();
+		GL11.glPopMatrix();
+		GL11.glPushMatrix();
+			world.renderOverlay();
 		GL11.glPopMatrix();
 	}
 	

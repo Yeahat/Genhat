@@ -2,8 +2,281 @@ package utils;
 
 import java.util.ArrayList;
 
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
+
 public class DisplayText
 {
+	boolean waitingForInput = false;
+	boolean textBoxActive = false;
+	float[] textureCoordX = new float[64];
+	ArrayList<ArrayList<String>> text;
+	int currentRow = 0;
+	int currentPos = 0;
+	private int speed = 1;
+	boolean pause = false;
+	int pauseCount = 0;
+	
+	/**
+	 * Constructor, initializes texture coordinates
+	 */
+	public DisplayText()
+	{
+		text = new ArrayList<ArrayList<String>>();
+		this.calculateTextureCoords();
+	}
+	
+	/**
+	 * Set the text that will be displayed in a series of textboxes
+	 * @param str the full string that should be displayed in the textboxes
+	 */
+	public void setText(String str)
+	{
+		text = splitText(str);
+		textBoxActive = true;
+		currentRow = 0;
+		currentPos = 0;
+	}
+	
+	/**
+	 * Get input from the main game loop
+	 * @param key key input
+	 * @return true if the text box should be closed
+	 */
+	public boolean sendInput(int key)
+	{
+		if (waitingForInput)
+		{
+			if (textBoxActive)
+			{
+				if (key == Keyboard.KEY_Z || key == Keyboard.KEY_X)
+				{
+					return this.advanceTextBox();
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Render the background textbox and any text over it
+	 */
+	public void renderText()
+	{
+		GL11.glTranslatef(64, 28, 0);
+		GL11.glBegin(GL11.GL_QUADS);
+			GL11.glTexCoord2f(0, 192f/1024f);
+			GL11.glVertex2f(0, 0);
+			GL11.glTexCoord2f(672f/1024f, 192f/1024f);
+			GL11.glVertex2f(672, 0);
+			GL11.glTexCoord2f(672f/1024f, 0);
+			GL11.glVertex2f(672, 192);
+			GL11.glTexCoord2f(0, 0);
+			GL11.glVertex2f(0, 192);
+		GL11.glEnd();
+		
+		for (int i = 0; i <= currentRow; i ++)
+		{
+			String renderStr;
+			if (i < currentRow)
+			{
+				renderStr = text.get(0).get(i);
+				GL11.glPushMatrix();
+					renderString(renderStr, i);
+				GL11.glPopMatrix();
+			}
+			else
+			{
+				if (speed == 1)
+				{
+					if (!pause)
+					{
+						char currentChar = text.get(0).get(i).charAt(currentPos);
+						checkForPause(currentChar);
+					}
+					else if (pauseCount <= 0)
+					{
+						pause = false;
+						pauseCount = 0;
+					}
+				}
+				renderStr = text.get(0).get(i).substring(0, currentPos + 1);
+				GL11.glPushMatrix();
+					renderString(renderStr, i);
+				GL11.glPopMatrix();
+				if (speed == 1 && pause)
+				{
+					pauseCount --;
+				}
+				else
+				{
+					if (currentPos == text.get(0).get(i).length() - 1)
+					{
+						if (currentRow == text.get(0).size() - 1)
+						{
+							//reached end of text box
+							waitingForInput = true;
+							return;
+						}
+						currentRow ++;
+						currentPos = 0;
+					}
+					else
+					{
+						currentPos += getSpeed();
+						if (currentPos >= text.get(0).get(i).length())
+							currentPos = text.get(0).get(i).length() - 1;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Advance to the next text box, or close the text box if it is finished
+	 * @return true if the text box should be closed
+	 */
+	private boolean advanceTextBox()
+	{
+		if (text.size() <= 1)
+		{
+			text.clear();
+			waitingForInput = false;
+			textBoxActive = false;
+			return true;
+		}
+		else
+		{
+			text.remove(0);
+			waitingForInput = false;
+			currentPos = 0;
+			currentRow = 0;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Determine whether the currently displayed character should cause the text display to pause.
+	 * This check only happens if the text is being advanced one character at a time (speed == 1).
+	 * @param c the character to check for initiating a pause
+	 */
+	private void checkForPause(char c)
+	{
+		//long pause
+		if (c == '.' || c == '!' || c == '?')
+		{
+			pause = true;
+			pauseCount = 20;
+			return;
+		}
+		
+		//short pause
+		if (c == ',' | c == ';' || c == ':')
+		{
+			pause = true;
+			pauseCount = 10;
+		}
+	}
+
+	/**
+	 * Render a string representing one line of text
+	 * @param str the string to be rendered
+	 * @param row the row to render it on
+	 */
+	private void renderString(String str, int row)
+	{
+		GL11.glTranslatef(25, 141 - 22*row, 0);
+		for (int i = 0; i < str.length() - 1; i ++)
+		{
+			char c = str.charAt(i);
+			renderChar(c);
+			GL11.glTranslatef(getPixelCount(c), 0, 0);
+		}
+		renderChar(str.charAt(str.length() - 1));
+	}
+
+	/**
+	 * Render a single character; assumes the rendering window has already been moved to the
+	 * appropriate spot for the rendered character.
+	 * @param c the character to render
+	 */
+	private void renderChar(char c)
+	{
+		float texXBegin = textureCoordX[getTextureIndex(c)];
+		float texXEnd = texXBegin + (getPixelCount(c) - 1)/1024f;
+		float texYBegin;
+		if (c >= 65 && c <= 90)
+		{
+			texYBegin = 192/1024f;
+		}
+		else if (c >= 97 && c <= 122)
+		{
+			texYBegin = 212/1024f;
+		}
+		else
+		{
+			texYBegin = 232/1024f;
+		}
+		float texYEnd = texYBegin + 19/1024f;
+		
+		GL11.glBegin(GL11.GL_QUADS);
+			GL11.glTexCoord2f(texXBegin, texYEnd);
+			GL11.glVertex2f(0, 0);
+			GL11.glTexCoord2f(texXEnd, texYEnd);
+			GL11.glVertex2f(getPixelCount(c) - 1, 0);
+			GL11.glTexCoord2f(texXEnd, texYBegin);
+			GL11.glVertex2f(getPixelCount(c) - 1, 19);
+			GL11.glTexCoord2f(texXBegin, texYBegin);
+			GL11.glVertex2f(0, 19);
+		GL11.glEnd();
+	}
+
+	/**
+	 * Convert a character into its associated index in the texture coordinate list
+	 * @param c the character in question
+	 * @return the associated index for use with the textureCoordX list
+	 */
+	private int getTextureIndex(char c)
+	{
+		//capital letters
+		if (c >= 65 && c <= 90)
+			return c - 65;
+		
+		//lower case letters
+		if (c >= 97 && c <= 122)
+			return c - 97 + 26;
+		
+		//punctuation
+		switch (c)
+		{
+		case ('.'): return 52;
+		case (','): return 53;
+		case ('?'): return 54;
+		case ('!'): return 55;
+		case ('-'): return 56;
+		case (':'): return 57;
+		case (';'): return 58;
+		case ('‘'): return 59;
+		case ('\''): return 60;
+		case ('’'): return 60;
+		case ('“'): return 61;
+		case ('”'): return 62;
+		case ('\"'): return 62;
+		case (' '): return 63;
+		}
+		
+		//if unrecognized, return the index for ' '
+		return 63;
+	}
+	
+	/**
+	 * Split text up into lines and textboxes, accounting for the maximum pixel length of each lines and maximum
+	 * lines of each text box.
+	 * @param text a single String of input text to be split up
+	 * @return the split text within size constraints
+	 */
 	public static ArrayList<ArrayList<String>> splitText(String text)
 	{
 		//Split text into lines
@@ -70,6 +343,78 @@ public class DisplayText
 		return boxes;
 	}
 	
+	/**
+	 * Calculate the beginning x coordinates for each character
+	 */
+	private void calculateTextureCoords()
+	{
+		//upper case letters
+		char c = 'A';
+		for (int i = 0; i < 26; i ++)
+		{
+			int offset = (18 - getPixelCount(c)) / 2;
+			textureCoordX[i] = (i*18 + offset) / 1024f;
+		}
+		
+		//lower case letters
+		c = 'a';
+		for (int i = 26; i < 52; i ++)
+		{
+			int offset = (18 - getPixelCount(c)) / 2;
+			textureCoordX[i] = ((i - 26)*18 + offset) / 1024f;
+		}
+		
+		//punctuation/other
+		int offset;
+		c = '.';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[52] = (18*0 + offset)/1024f;
+		c = ',';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[53] = (18*1 + offset)/1024f;
+		c = '?';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[54] = (18*2 + offset)/1024f;
+		c = '!';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[55] = (18*3 + offset)/1024f;
+		c = '-';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[56] = (18*4 + offset)/1024f;
+		c = ':';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[57] = (18*5 + offset)/1024f;
+		c = ';';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[58] = (18*6 + offset)/1024f;
+		c = '‘';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[59] = (18*7 + offset)/1024f;
+		c = '’';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[60] = (18*8 + offset)/1024f;
+		c = '\'';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[60] = (18*8 + offset)/1024f;
+		c = '“';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[61] = (18*9 + offset)/1024f;
+		c = '”';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[62] = (18*10 + offset)/1024f;
+		c = '"';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[62] = (18*10 + offset)/1024f;
+		c = ' ';
+		offset = (18 - getPixelCount(c)) / 2;
+		textureCoordX[63] = (18*11 + offset)/1024f;
+	}
+
+	/**
+	 * Calculate the length in pixels of a string
+	 * @param str the string for which to determine the pixel length
+	 * @return the pixel length of the given string
+	 */
 	private static int getPixelCount(String str)
 	{
 		int pixelCount = 0;
@@ -79,7 +424,12 @@ public class DisplayText
 		}
 		return pixelCount;
 	}
-	
+
+	/**
+	 * Get the pixel length of a single character
+	 * @param c the character for which to get the pixel length
+	 * @return the pixel length of the given character
+	 */
 	private static int getPixelCount(char c)
 	{
 		//capital letters
@@ -110,6 +460,22 @@ public class DisplayText
 		case '-':	return 10;
 		default:	return 8;
 		}
+	}
+
+	/**
+	 * Setter for text speed
+	 * @param speed value to which speed should be set
+	 */
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+
+	/**
+	 * Getter for text speed
+	 * @return speed member
+	 */
+	public int getSpeed() {
+		return speed;
 	}
 	
 	public static void main(String[] args)
