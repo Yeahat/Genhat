@@ -34,7 +34,7 @@ public class Stool extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 2;
+		texRow = 3;
 		texCol = 0;
 		transparent = true;
 		setDir(d);
@@ -52,7 +52,7 @@ public class Stool extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 2;
+		texRow = 3;
 		texCol = 0;
 		transparent = true;
 		setDir(d);

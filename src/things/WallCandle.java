@@ -86,6 +86,7 @@ public class WallCandle extends Thing {
 			
 			int texX = texCol * 4;
 			int texY = texRow;
+			
 			if (lit)
 			{
 				if (animationFrame < 5)

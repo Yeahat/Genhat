@@ -184,7 +184,7 @@ public class World {
 		{
 			if (terrainGrid[x][y][k].getTerrainType() != air)
 			{
-				return z + 1;
+				return z + 2;
 			}
 		}
 		
@@ -199,7 +199,7 @@ public class World {
 				if (k + i >= terrainGrid[0][0].length)
 					break;
 				if (terrainGrid[x][j][k + i].getTerrainType() != air)
-					return z + 1;
+					return z + 2;
 			}
 		}
 		
@@ -434,7 +434,7 @@ public class World {
 	 * Render terrain, things, and agents by layers
 	 */
 	public void renderWorld()
-	{
+	{		
 		int iMin, iMax, jMin, jMax, kMin, kMax;
 		kMin = 0;
 		kMax = Math.min(terrainGrid[0][0].length - 1, updateHeightMax());
@@ -482,7 +482,8 @@ public class World {
 							vTerrainTexture.bind();
 							GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 					    	
-							if (k != kMax || (k == kMax && t.isTransparent()))
+							
+							if (k < kMax || (k == kMax && t.isTransparent()))
 							{
 						    	//Determine which part of the texture to use based on how many neighbors are air
 						    	int texX = t.getTexCol();
@@ -551,10 +552,9 @@ public class World {
 						    	
 					    		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
 						    	
-					    		
 						    	GL11.glBegin(GL11.GL_QUADS);
-						    		if (t.isTransparent() && k == kMax)
-						    			setLighting(false, lightModGrid[i][j][k], .5f);
+						    		if (k == kMax && t.isTransparent())
+						    			setLighting(false, lightModGrid[i][j][k], .75f);
 						    		else
 						    			setLighting(false, lightModGrid[i][j][k]);
 									GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
@@ -805,38 +805,41 @@ public class World {
 				}
 				
 				// Render Things
-				for (int i = iMin; i <= iMax; i ++)
-				{					
-					if (this.hasThing(i, j, k))
-					{
-						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						
-						GL11.glPushMatrix();
-							setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
-							GL11.glTranslatef(x, y, 0);
-							thingGrid[i][j][k].renderThings(PIXEL_SIZE, TEXTURE_SIZE);
-						GL11.glPopMatrix();
-					}
-				}
-				
-				//Render Agents
-				for (int i = iMin; i <= iMax; i ++)
+				if (k < kMax)
 				{
-					Agent agent = agentGrid[i][j][k];
-					if (agent != null)
+					for (int i = iMin; i <= iMax; i ++)
 					{
-						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						
-						GL11.glPushMatrix();
-							if (agent.isSteppingUp())
-								setLighting(isShadowed(i, j + 1, k), lightModGrid[i][j + 1][k]);
-							else
+						if (this.hasThing(i, j, k))
+						{
+							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							
+							GL11.glPushMatrix();
 								setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
-							GL11.glTranslatef(x, y, 0);
-							agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
-						GL11.glPopMatrix();
+								GL11.glTranslatef(x, y, 0);
+								thingGrid[i][j][k].renderThings(PIXEL_SIZE, TEXTURE_SIZE);
+							GL11.glPopMatrix();
+						}
+					}
+					
+					//Render Agents
+					for (int i = iMin; i <= iMax; i ++)
+					{
+						Agent agent = agentGrid[i][j][k];
+						if (agent != null)
+						{
+							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							
+							GL11.glPushMatrix();
+								if (agent.isSteppingUp())
+									setLighting(isShadowed(i, j + 1, k), lightModGrid[i][j + 1][k]);
+								else
+									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+								GL11.glTranslatef(x, y, 0);
+								agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
+							GL11.glPopMatrix();
+						}
 					}
 				}
 			}
