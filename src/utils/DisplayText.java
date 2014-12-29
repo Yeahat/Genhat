@@ -11,6 +11,7 @@ public class DisplayText
 	boolean textBoxActive = false;
 	float[] textureCoordX = new float[64];
 	ArrayList<ArrayList<String>> text;
+	private String name; //name of speaking character
 	int currentRow = 0;
 	int currentPos = 0;
 	private int speed = 1;
@@ -18,12 +19,24 @@ public class DisplayText
 	int pauseCount = 0;
 	
 	/**
-	 * Constructor, initializes texture coordinates
+	 * Constructor
 	 */
 	public DisplayText()
 	{
 		text = new ArrayList<ArrayList<String>>();
 		this.calculateTextureCoords();
+		setName("...");
+	}
+	
+	/**
+	 * Constructor, initializes name
+	 * @param n name of speaking character to display in text box
+	 */
+	public DisplayText(String n)
+	{
+		text = new ArrayList<ArrayList<String>>();
+		this.calculateTextureCoords();
+		setName(n);
 	}
 	
 	/**
@@ -64,73 +77,121 @@ public class DisplayText
 	 */
 	public void renderText()
 	{
-		GL11.glTranslatef(64, 28, 0);
-		GL11.glBegin(GL11.GL_QUADS);
-			GL11.glTexCoord2f(0, 192f/1024f);
-			GL11.glVertex2f(0, 0);
-			GL11.glTexCoord2f(672f/1024f, 192f/1024f);
-			GL11.glVertex2f(672, 0);
-			GL11.glTexCoord2f(672f/1024f, 0);
-			GL11.glVertex2f(672, 192);
-			GL11.glTexCoord2f(0, 0);
-			GL11.glVertex2f(0, 192);
-		GL11.glEnd();
-		
-		for (int i = 0; i <= currentRow; i ++)
-		{
-			String renderStr;
-			if (i < currentRow)
+		//render text box
+		GL11.glPushMatrix();
+			GL11.glTranslatef(64, 28, 0);
+			GL11.glBegin(GL11.GL_QUADS);
+				GL11.glTexCoord2f(0, 192f/1024f);
+				GL11.glVertex2f(0, 0);
+				GL11.glTexCoord2f(672f/1024f, 192f/1024f);
+				GL11.glVertex2f(672, 0);
+				GL11.glTexCoord2f(672f/1024f, 0);
+				GL11.glVertex2f(672, 192);
+				GL11.glTexCoord2f(0, 0);
+				GL11.glVertex2f(0, 192);
+			GL11.glEnd();
+			
+			for (int i = 0; i <= currentRow; i ++)
 			{
-				renderStr = text.get(0).get(i);
-				GL11.glPushMatrix();
-					renderString(renderStr, i);
-				GL11.glPopMatrix();
-			}
-			else
-			{
-				if (speed == 1)
+				String renderStr;
+				if (i < currentRow)
 				{
-					if (!pause)
-					{
-						char currentChar = text.get(0).get(i).charAt(currentPos);
-						checkForPause(currentChar);
-					}
-					else if (pauseCount <= 0)
-					{
-						pause = false;
-						pauseCount = 0;
-					}
-				}
-				renderStr = text.get(0).get(i).substring(0, currentPos + 1);
-				GL11.glPushMatrix();
-					renderString(renderStr, i);
-				GL11.glPopMatrix();
-				if (speed == 1 && pause)
-				{
-					pauseCount --;
+					renderStr = text.get(0).get(i);
+					GL11.glPushMatrix();
+						renderString(renderStr, i);
+					GL11.glPopMatrix();
 				}
 				else
 				{
-					if (currentPos == text.get(0).get(i).length() - 1)
+					if (speed == 1)
 					{
-						if (currentRow == text.get(0).size() - 1)
+						if (!pause)
 						{
-							//reached end of text box
-							waitingForInput = true;
-							return;
+							char currentChar = text.get(0).get(i).charAt(currentPos);
+							checkForPause(currentChar);
 						}
-						currentRow ++;
-						currentPos = 0;
+						else if (pauseCount <= 0)
+						{
+							pause = false;
+							pauseCount = 0;
+						}
+					}
+					renderStr = text.get(0).get(i).substring(0, currentPos + 1);
+					GL11.glPushMatrix();
+						renderString(renderStr, i);
+					GL11.glPopMatrix();
+					if (speed == 1 && pause)
+					{
+						pauseCount --;
 					}
 					else
 					{
-						currentPos += getSpeed();
-						if (currentPos >= text.get(0).get(i).length())
-							currentPos = text.get(0).get(i).length() - 1;
+						if (currentPos == text.get(0).get(i).length() - 1)
+						{
+							if (currentRow == text.get(0).size() - 1)
+							{
+								//reached end of text box
+								waitingForInput = true;
+								break;
+							}
+							currentRow ++;
+							currentPos = 0;
+						}
+						else
+						{
+							currentPos += getSpeed();
+							if (currentPos >= text.get(0).get(i).length())
+								currentPos = text.get(0).get(i).length() - 1;
+						}
 					}
 				}
 			}
-		}
+		GL11.glPopMatrix();
+		
+		//render name box
+		GL11.glPushMatrix();
+			GL11.glTranslatef(64+40, 192, 0);
+			GL11.glBegin(GL11.GL_QUADS);
+				GL11.glTexCoord2f(672f/1024f, 36f/1024f);
+				GL11.glVertex2f(0, 0);
+				GL11.glTexCoord2f(684f/1024f, 36f/1024f);
+				GL11.glVertex2f(12, 0);
+				GL11.glTexCoord2f(684f/1024f, 0);
+				GL11.glVertex2f(12, 36);
+				GL11.glTexCoord2f(672f/1024f, 0);
+				GL11.glVertex2f(0, 36);
+			GL11.glEnd();
+			
+			int length = getPixelCount(getName());
+			GL11.glTranslatef(12, 0, 0);
+			GL11.glBegin(GL11.GL_QUADS);
+				GL11.glTexCoord2f(684f/1024f, 36f/1024f);
+				GL11.glVertex2f(0, 0);
+				GL11.glTexCoord2f(714f/1024f, 36f/1024f);
+				GL11.glVertex2f(length, 0);
+				GL11.glTexCoord2f(714f/1024f, 0);
+				GL11.glVertex2f(length, 36);
+				GL11.glTexCoord2f(684f/1024f, 0);
+				GL11.glVertex2f(0, 36);
+			GL11.glEnd();
+			
+			GL11.glTranslatef(length, 0, 0);
+			GL11.glBegin(GL11.GL_QUADS);
+				GL11.glTexCoord2f(714f/1024f, 36f/1024f);
+				GL11.glVertex2f(0, 0);
+				GL11.glTexCoord2f(726f/1024f, 36f/1024f);
+				GL11.glVertex2f(12, 0);
+				GL11.glTexCoord2f(726f/1024f, 0);
+				GL11.glVertex2f(12, 36);
+				GL11.glTexCoord2f(714f/1024f, 0);
+				GL11.glVertex2f(0, 36);
+			GL11.glEnd();
+		GL11.glEnd();
+		
+		GL11.glTranslatef(-length, 8, 0);
+		this.renderString(getName());
+		GL11.glPopMatrix();
+		
 	}
 
 	/**
@@ -179,7 +240,7 @@ public class DisplayText
 			pauseCount = 10;
 		}
 	}
-
+	
 	/**
 	 * Render a string representing one line of text
 	 * @param str the string to be rendered
@@ -188,6 +249,14 @@ public class DisplayText
 	private void renderString(String str, int row)
 	{
 		GL11.glTranslatef(25, 141 - 22*row, 0);
+		renderString(str);
+	}
+	
+	/**
+	 * Render a string at the current location
+	 */
+	private void renderString(String str)
+	{
 		for (int i = 0; i < str.length() - 1; i ++)
 		{
 			char c = str.charAt(i);
@@ -492,5 +561,13 @@ public class DisplayText
 				System.out.println("\t" + output.get(i).get(j));
 			}
 		}
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
 	}
 }
