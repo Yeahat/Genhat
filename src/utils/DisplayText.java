@@ -288,7 +288,7 @@ public class DisplayText
 		{
 			texYBegin = 232/1024f;
 		}
-		float texYEnd = texYBegin + 19/1024f;
+		float texYEnd = texYBegin + 20/1024f;
 		
 		GL11.glBegin(GL11.GL_QUADS);
 			GL11.glTexCoord2f(texXBegin, texYEnd);
@@ -296,9 +296,9 @@ public class DisplayText
 			GL11.glTexCoord2f(texXEnd, texYEnd);
 			GL11.glVertex2f(getPixelCount(c) - 1, 0);
 			GL11.glTexCoord2f(texXEnd, texYBegin);
-			GL11.glVertex2f(getPixelCount(c) - 1, 19);
+			GL11.glVertex2f(getPixelCount(c) - 1, 20);
 			GL11.glTexCoord2f(texXBegin, texYBegin);
-			GL11.glVertex2f(0, 19);
+			GL11.glVertex2f(0, 20);
 		GL11.glEnd();
 	}
 
@@ -527,6 +527,9 @@ public class DisplayText
 		case ' ':	return 8;
 		case '?':	return 14;
 		case '-':	return 10;
+		case '\"':	return 14;
+		case '“':	return 14;
+		case '”':	return 14;
 		default:	return 8;
 		}
 	}

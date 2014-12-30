@@ -190,7 +190,7 @@ public class Terrain {
 			unblendedVertical = false;
 		
 		//add the names of any new unblended horizontal terrain types here
-		if (type == glass)
+		if (top == glass || top == woodPlank)
 			unblendedHorizontal = true;
 		else
 			unblendedHorizontal = false;

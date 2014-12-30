@@ -814,8 +814,6 @@ public class RampStep implements Action {
 		int y = pos[1];
 		int z = pos[2];
 		
-		System.out.println(x + ", " + y + ", " + z);
-		
 		switch (dir)
 		{
 		case up:	y += 1;	break;

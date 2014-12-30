@@ -680,7 +680,7 @@ public class GameMain {
 		//walls
 		for (int i = 25; i < 45; i ++)
 		{
-			for (int k = 0; k < 4; k ++)
+			for (int k = 1; k < 4; k ++)
 			{
 				t[i][37][k] = new Terrain(rock);
 				if (i < 34 || i > 35)

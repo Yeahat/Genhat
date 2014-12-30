@@ -669,10 +669,10 @@ public class World {
 						    	boolean topEmpty, bottomEmpty, rightEmpty, leftEmpty;
 						    	if (t.isUnblendedHorizontal())
 						    	{
-									topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainType() != t.getTerrainTop();
-					    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainType() != t.getTerrainTop();
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainType() != t.getTerrainTop();
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainType() != t.getTerrainTop();
+									topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainTop() != t.getTerrainTop();
+					    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainTop() != t.getTerrainTop();
+					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainTop() != t.getTerrainTop();
+					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainTop() != t.getTerrainTop();
 						    	}
 						    	else
 						    	{
