@@ -17,6 +17,7 @@ import entities.Hero;
 import static world.Terrain.terrainType.*;
 import static entities.Agent.direction.*;
 import static world.World.timeOfDay.*;
+import static world.World.controlState.*;
 
 public class World {
 	Terrain[][][] terrainGrid;
@@ -54,8 +55,15 @@ public class World {
 	private boolean cameraLockH = false;
 	
 	//Text box
-	private boolean textBoxActive = true;
-	private DisplayText textDisplay = new DisplayText();
+	private boolean textBoxActive;
+	private DisplayText textDisplay;
+	
+	//control state
+	public enum controlState
+	{
+		walking, talking;
+	}
+	private controlState cs;
 	
 	/**
 	 * Constructor, initializes display center to the center of the world
@@ -65,43 +73,11 @@ public class World {
 	 * @param zSize world height
 	 */
 	public World(int xSize, int ySize, int zSize)
-	{
-		//TODO: Temporary!
-		//textDisplay.setText("There were plotters, there was no doubt about it. Some had been ordinary people who'd had enough. Some were young people with no money who objected to the fact that the world was run by old people who were rich. Some were in it to get girls. And some had been idiots as mad as Swing, with a view of the world just as rigid and unreal, who were on the side of what they called 'the people'. Vimes had spent his life on the streets, and had met decent men and fools and people who'd steal a penny from a blind beggar and people who performed silent miracles or desperate crimes every day behind the grubby windows of little houses, but he'd never met The People.\n\nPeople on the side of The People always ended up dissapointed, in any case. They found that The People tended not to be grateful or appreciative or forward-thinking or obedient. The People tended to be small-minded and conservative and not very clever and were even distrustful of cleverness. And so the children of the revolution were faced with the age-old problem: it wasn't that you had the wrong kind of government, which was obvious, but that you had the wrong kind of people.\n\nAs soon as you saw people as things to be measured, they didn't measure up. What would run through the streets soon enough wouldn't be a revolution or a riot. It'd be people who were frightened and panicking. It was what happened when the machinery of city life faltered, the wheels stopped turning and all the little rules broke down. And when that happened, humans were worse than sheep. Sheep just ran; they didn't try to bite the sheep next to them.");
-		textDisplay.setText("That was always the dream, wasn’t it?  ‘I wish I’d known then what I know now’?  But when you got older you found out that you now wasn’t the you then.  You then was a twerp.  You then was what you had to be to start out on the rocky road of becoming you now, and one of the rocky patches on that road was being a twerp.\n\nA much better dream, one that’d ensure sounder sleep, was not to know now what you didn’t know then.");
-		textDisplay.setName("Sam Vimes");
-		terrainGrid = new Terrain[xSize][ySize][zSize];
-		thingGrid = new ThingGridCell[xSize][ySize][zSize];
-		agentGrid = new Agent[xSize][ySize][zSize];
-		lightModGrid = new float[xSize][ySize][zSize];
-		
-		//initialize thing cells
-		/*
-		for (int i = 0; i < xSize; i ++)
-		{
-			for (int j = 0; j < ySize; j ++)
-			{
-				for (int k = 0; k < zSize; k ++)
-				{
-					thingGrid[i][j][k] = new ThingGridCell();
-				}
-			}
-		}
-		*/
-		
-		setWidth(xSize);
-		depth = ySize;
-		height = zSize;
-		
-		agents = new ArrayList<Agent>();
-		things = new ArrayList<Thing>();
-		lightSources = new ArrayList<Thing>();
-		antiLightSources = new ArrayList<Thing>();
+	{		
+		this.init(xSize, ySize, zSize);
 		
 		displayCenter[0] = (float)xSize/2;
 		displayCenter[1] = (float)ySize/2 + (float)zSize/2;
-		
-		setTod(midday);
 	}
 	
 	/**
@@ -114,6 +90,14 @@ public class World {
 	 */
 	public World(int xSize, int ySize, int zSize, int[] center)
 	{
+		this.init(xSize, ySize, zSize);
+		
+		displayCenter[0] = center[0];
+		displayCenter[1] = center[1] + center[2];
+	}
+	
+	private void init(int xSize, int ySize, int zSize)
+	{
 		terrainGrid = new Terrain[xSize][ySize][zSize];
 		thingGrid = new ThingGridCell[xSize][ySize][zSize];
 		agentGrid = new Agent[xSize][ySize][zSize];
@@ -128,10 +112,11 @@ public class World {
 		lightSources = new ArrayList<Thing>();
 		antiLightSources = new ArrayList<Thing>();
 		
-		displayCenter[0] = center[0];
-		displayCenter[1] = center[1] + center[2];
+		textBoxActive = false;
+		textDisplay = new DisplayText();
 		
 		setTod(midday);
+		setCs(walking);
 	}
 	
 	public void loadTextures()
@@ -1427,5 +1412,13 @@ public class World {
 
 	public DisplayText getTextDisplay() {
 		return textDisplay;
+	}
+
+	public controlState getCs() {
+		return cs;
+	}
+
+	public void setCs(controlState cs) {
+		this.cs = cs;
 	}
 }

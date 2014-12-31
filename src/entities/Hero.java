@@ -13,10 +13,7 @@ import world.World;
 
 import static entities.Agent.direction.*;
 
-public class Hero extends Agent {
-	int row;
-	int column;
-	
+public class Hero extends Agent {	
 	//Actions
 	Step step;
 	Turn turn;
@@ -28,6 +25,8 @@ public class Hero extends Agent {
 	public Hero()
 	{
 		super();
+		setTexRow(0);
+		setTexCol(0);
 	}
 	
 	@Override

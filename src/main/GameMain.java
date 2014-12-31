@@ -11,9 +11,9 @@ import org.lwjgl.opengl.GL11;
 
 import entities.Agent;
 import entities.Hero;
+import entities.Innkeeper;
 import entities.Wanderer;
 import entities.Agent.direction;
-
 import things.Candle;
 import things.Chair;
 import things.Fireplace;
@@ -31,7 +31,6 @@ import things.VerticalBar;
 import things.WallCandle;
 import world.Terrain;
 import world.World;
-
 import static world.Terrain.terrainType.*;
 import static entities.Agent.direction.*;
 import static world.World.timeOfDay.*;
@@ -83,27 +82,22 @@ public class GameMain {
 	public void pollKeyboardInput()
 	{
 		//Check for key state changes
+		//(Pressed Action Keys)
 		while (Keyboard.next())
 		{
-			//Debugging stuff
 			if (Keyboard.getEventKeyState())
 			{
+				//Debugging stuff
 				if (Keyboard.getEventKey() == Keyboard.KEY_T)
 				{
 					world.cycleTimeOfDay();
 				}
 				
-				//Pressed Action Keys
-				if (Keyboard.getEventKey() == Keyboard.KEY_Z)
+				switch (world.getCs())
 				{
-					if (world.isTextBoxActive())
-					{
-						if (world.getTextDisplay().sendInput(Keyboard.KEY_Z))
-						{
-							world.setTextBoxActive(false);
-						}
-					}
-					else
+				case walking:
+					//Pressed Action Keys
+					if (Keyboard.getEventKey() == Keyboard.KEY_Z)
 					{
 						Hero player = world.getPlayer();
 						direction d = player.getDir();
@@ -119,21 +113,11 @@ public class GameMain {
 						case right: x++; break;
 						}
 						if (world.getAgentAt(x, y, z) != null)
-							world.getAgentAt(x, y, z).interact();
+							world.getAgentAt(x, y, z).interact(player, world);
 						else if (world.hasThing(x, y, z))
 							world.getThingsAt(x, y, z).interact(player, world);
 					}
-				}
-				else if (Keyboard.getEventKey() == Keyboard.KEY_X)
-				{
-					if (world.isTextBoxActive())
-					{
-						if (world.getTextDisplay().sendInput(Keyboard.KEY_X))
-						{
-							world.setTextBoxActive(false);
-						}
-					}
-					else
+					else if (Keyboard.getEventKey() == Keyboard.KEY_X)
 					{
 						Hero player = world.getPlayer();
 						if (player != null)
@@ -146,29 +130,44 @@ public class GameMain {
 							}
 						}
 					}
+				break;
+				case talking:
+					if (Keyboard.getEventKey() == Keyboard.KEY_Z)
+					{
+						if (world.isTextBoxActive())
+						{
+							if (world.getTextDisplay().sendInput(Keyboard.KEY_Z))
+							{
+								world.setTextBoxActive(false);
+							}
+						}
+					}
+					else if (Keyboard.getEventKey() == Keyboard.KEY_X)
+					{
+						if (world.isTextBoxActive())
+						{
+							if (world.getTextDisplay().sendInput(Keyboard.KEY_X))
+							{
+								world.setTextBoxActive(false);
+							}
+						}
+					}
+				break;
 				}
 			}
 		}
 		
-		//Held Action Keys	
-		if (Keyboard.isKeyDown(Keyboard.KEY_C))
+		//Held Action Keys
+		switch (world.getCs())
 		{
-			if (world.isTextBoxActive())
-			{
-				world.getTextDisplay().setSpeed(8);
-			}
-			else
+		case walking:
+			//TODO: clean this up to not repeatedly set speed (reading is faster than writing!)
+			//TODO: also, speed up on button press if not currently jumping, for a more responsive feel
+			if (Keyboard.isKeyDown(Keyboard.KEY_C))
 			{
 				Hero player = world.getPlayer();
 				if (player != null && player.isIdle())
 					player.setSpeed(4);
-			}
-		}
-		else
-		{
-			if (world.isTextBoxActive())
-			{
-				world.getTextDisplay().setSpeed(1);
 			}
 			else
 			{
@@ -176,106 +175,102 @@ public class GameMain {
 				if (player != null && player.isIdle())
 					player.setSpeed(2);
 			}
-		}
-		
-		//Arrow Keys
-		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
-		{
-			Hero player = world.getPlayer();
-			if (player != null)
+			
+			//Arrow Keys
+			if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 			{
-				arrowKeyInputCount ++;
-				if (player.isIdle())
+				Hero player = world.getPlayer();
+				if (player != null)
 				{
-					ArrayList<String> newArgs = new ArrayList<String>();
-					newArgs.add("down");
-					player.setArgs(newArgs);
-					if (arrowKeyInputCount < 3)
-						player.setCurrentAction(player.getTurnAction());
-					else
+					arrowKeyInputCount ++;
+					if (player.isIdle())
 					{
-						player.setCurrentAction(player.getStepAction());
-						//camera scroll lock check
-						if (!world.isCameraLockV())
-						{
-							//TODO: conditions for vertical camera lock
-						}
+						ArrayList<String> newArgs = new ArrayList<String>();
+						newArgs.add("down");
+						player.setArgs(newArgs);
+						if (arrowKeyInputCount < 3)
+							player.setCurrentAction(player.getTurnAction());
+						else
+							player.setCurrentAction(player.getStepAction());
 					}
 				}
 			}
-		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_UP))
-		{
-			Hero player = world.getPlayer();
-			if (player != null)
+			else if (Keyboard.isKeyDown(Keyboard.KEY_UP))
 			{
-				arrowKeyInputCount ++;
-				if (player.isIdle())
+				Hero player = world.getPlayer();
+				if (player != null)
 				{
-					ArrayList<String> newArgs = new ArrayList<String>();
-					newArgs.add("up");
-					player.setArgs(newArgs);
-					if (arrowKeyInputCount < 3)
-						player.setCurrentAction(player.getTurnAction());
-					else
+					arrowKeyInputCount ++;
+					if (player.isIdle())
 					{
-						player.setCurrentAction(player.getStepAction());
-						//camera scroll lock check
-						if (!world.isCameraLockV())
-						{
-							//TODO: conditions for vertical camera lock
-						}
+						ArrayList<String> newArgs = new ArrayList<String>();
+						newArgs.add("up");
+						player.setArgs(newArgs);
+						if (arrowKeyInputCount < 3)
+							player.setCurrentAction(player.getTurnAction());
+						else
+							player.setCurrentAction(player.getStepAction());
 					}
 				}
 			}
-		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
-		{
-			Hero player = world.getPlayer();
-			if (player != null)
+			else if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 			{
-				arrowKeyInputCount ++;
-				if (player.isIdle())
+				Hero player = world.getPlayer();
+				if (player != null)
 				{
-					ArrayList<String> newArgs = new ArrayList<String>();
-					newArgs.add("right");
-					player.setArgs(newArgs);
-					if (arrowKeyInputCount < 3)
-						player.setCurrentAction(player.getTurnAction());
-					else
+					arrowKeyInputCount ++;
+					if (player.isIdle())
 					{
-						player.setCurrentAction(player.getStepAction());
-						//camera scroll lock check
-						if (!world.isCameraLockH())
-						{
-							//if (player.getPos()[0] >= world.getWidth() - 8)
-								//world.setCameraLockH(true);
-						}
+						ArrayList<String> newArgs = new ArrayList<String>();
+						newArgs.add("right");
+						player.setArgs(newArgs);
+						if (arrowKeyInputCount < 3)
+							player.setCurrentAction(player.getTurnAction());
+						else
+							player.setCurrentAction(player.getStepAction());
 					}
 				}
 			}
-		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
-		{
-			Hero player = world.getPlayer();
-			if (player != null)
+			else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 			{
-				arrowKeyInputCount ++;
-				if (player.isIdle())
+				Hero player = world.getPlayer();
+				if (player != null)
 				{
-					ArrayList<String> newArgs = new ArrayList<String>();
-					newArgs.add("left");
-					player.setArgs(newArgs);
-					if (arrowKeyInputCount < 3)
-						player.setCurrentAction(player.getTurnAction());
-					else
-						player.setCurrentAction(player.getStepAction());
+					arrowKeyInputCount ++;
+					if (player.isIdle())
+					{
+						ArrayList<String> newArgs = new ArrayList<String>();
+						newArgs.add("left");
+						player.setArgs(newArgs);
+						if (arrowKeyInputCount < 3)
+							player.setCurrentAction(player.getTurnAction());
+						else
+							player.setCurrentAction(player.getStepAction());
+					}
 				}
 			}
-		}
-		else
-		{
-			arrowKeyInputCount = 0;
+			else
+			{
+				arrowKeyInputCount = 0;
+			}
+		break;
+		case talking:
+			//TODO: only set the speed if it's not already set (reading is faster than writing!)
+			if (Keyboard.isKeyDown(Keyboard.KEY_C))
+			{
+				if (world.isTextBoxActive())
+				{
+					world.getTextDisplay().setSpeed(8);
+				}
+			}
+			else
+			{
+				if (world.isTextBoxActive())
+				{
+					world.getTextDisplay().setSpeed(1);
+				}
+			}
+		break;
 		}
 	}
 	
@@ -815,6 +810,8 @@ public class GameMain {
 		
 		world.setTerrain(t);
 		
+		
+		//agents
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
@@ -822,6 +819,11 @@ public class GameMain {
 		world.setDisplayCenter(pos);
 		hero.setPos(pos);
 		agents.add(hero);
+		
+		Innkeeper innkeeper = new Innkeeper("char1", 0, 1);
+		int[] posInnkeeper = {35, 34, 1};
+		innkeeper.setPos(posInnkeeper);
+		agents.add(innkeeper);
 		
 		world.setTod(sunrise);
 		

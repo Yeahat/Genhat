@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
-import static entities.Agent.direction.*;
 
+import static entities.Agent.direction.*;
 import world.World;
 import actions.Action;
 import actions.Idle;
@@ -26,6 +26,8 @@ public abstract class Agent {
 	float[] offset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
 	Action currentAction;
 	ArrayList<String> args;	//extra arguments for executing actions
+	private int texCol = 0; //texture row
+	private int texRow = 0; //texture column
 	private direction dir = down;	//direction the agent is facing
 	private int speed = 2;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
 	boolean stepping = false;	//true if the agent is currently taking a step
@@ -87,6 +89,21 @@ public abstract class Agent {
 	}
 	
 	/**
+	 * Constructor that may or may not initialize state, load textures, and set actions
+	 * @param initState true if state should be initialized, false otherwise
+	 * @param setActions true if actions should be set, false otherwise
+	 */
+	public Agent(boolean initState, boolean setActions, boolean loadTextures)
+	{
+		if (setActions)
+			setActions();
+		if (loadTextures)
+			loadTextures();
+		if (initState)
+			initState();
+	}
+	
+	/**
 	 * Add the agent's actions to the action list, override this method to
 	 * set the correct actions for each agent implementation
 	 */
@@ -125,8 +142,10 @@ public abstract class Agent {
 	
 	/**
 	 * What to do when the agent is interacted with by another agent; empty by default but can be overriden.
+	 * @param agent the agent doing the interacting
+	 * @param world the world in which the interacting agents exist
 	 */
-	public void interact(){}
+	public void interact(Agent agent, World world){}
 	
 	/**
 	 * Incrementer for the x offset value
@@ -178,20 +197,21 @@ public abstract class Agent {
 			float tConvX = ((float)TEXTURE_SIZE_X)/((float)TEXTURE_SHEET_WIDTH);
 			float tConvY = ((float)TEXTURE_SIZE_Y)/((float)TEXTURE_SHEET_HEIGHT);
 			
-			int texX = 0, texY = 0;
+			int texX = getTexCol() * 3;
+			int texY = getTexRow();
 			switch (getDir())
 			{
 			case down:
-				texY = 0;
+				texY += 0;
 				break;
 			case right:
-				texY = 1;
+				texY += 1;
 				break;
 			case left:
-				texY = 2;
+				texY += 2;
 				break;
 			case up:
-				texY = 3;				
+				texY += 3;				
 				break;
 			}
 			
@@ -203,30 +223,30 @@ public abstract class Agent {
 					|| (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7))
 				{
 					if (getFootstep() == right)
-						texX = 0;
+						texX += 0;
 					else
-						texX = 2;
+						texX += 2;
 				}
 				else if ((Math.abs(offset[0]) <= 32 && Math.abs(offset[0]) > 23)
 				|| (Math.abs(offset[1]) <= 32 && Math.abs(offset[1]) > 23))
 				{
 					if (getFootstep() == right)
-						texX = 2;
+						texX += 2;
 					else
-						texX = 0;
+						texX += 0;
 				}
 				else
 				{
-					texX = 1;
+					texX += 1;
 				}
 			}
 			//Set footstep animation for jumping
 			else if (this.isJumping())
 			{
 				if (getStance() == right)
-					texX = 2;
+					texX += 2;
 				else
-					texX = 0;
+					texX += 0;
 			}
 			//Set footstep animation for walking down down-facing ramps
 			else if (this.isRampDescending() && this.getDir() == down)
@@ -235,21 +255,21 @@ public abstract class Agent {
 					|| (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0))
 				{
 					if (getFootstep() == right)
-						texX = 2;
+						texX += 2;
 					else
-						texX = 0;
+						texX += 0;
 				}
 				else if ((Math.abs(offset[0]) <= 23 && Math.abs(offset[0]) > 16)
 				|| (Math.abs(offset[1]) <= 23 && Math.abs(offset[1]) > 16))
 				{
 					if (getFootstep() == right)
-						texX = 0;
+						texX += 0;
 					else
-						texX = 2;
+						texX += 2;
 				}
 				else
 				{
-					texX = 1;
+					texX += 1;
 				}
 			}
 			//Set footstep animation for regular stepping
@@ -260,13 +280,13 @@ public abstract class Agent {
 					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
 						{
 							if (getFootstep() == right)
-								texX = 2;
+								texX += 2;
 							else
-								texX = 0;
+								texX += 0;
 						}
 						else
 						{
-							texX = 1;
+							texX += 1;
 						}
 				}
 				else if (getDir() == down)
@@ -274,13 +294,13 @@ public abstract class Agent {
 					if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
 					{
 						if (getFootstep() == right)
-							texX = 2;
+							texX += 2;
 						else
-							texX = 0;
+							texX += 0;
 					}
 					else
 					{
-						texX = 1;
+						texX += 1;
 					}
 				}
 				else
@@ -288,13 +308,13 @@ public abstract class Agent {
 					if (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0)
 					{
 						if (getFootstep() == right)
-							texX = 2;
+							texX += 2;
 						else
-							texX = 0;
+							texX += 0;
 					}
 					else
 					{
-						texX = 1;
+						texX += 1;
 					}
 				}
 			}
@@ -489,5 +509,21 @@ public abstract class Agent {
 
 	public boolean isSteppingUp() {
 		return steppingUp;
+	}
+
+	public int getTexRow() {
+		return texRow;
+	}
+
+	public void setTexRow(int texRow) {
+		this.texRow = texRow;
+	}
+
+	public int getTexCol() {
+		return texCol;
+	}
+
+	public void setTexCol(int texCol) {
+		this.texCol = texCol;
 	}
 }
