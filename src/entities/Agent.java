@@ -23,7 +23,7 @@ public abstract class Agent {
 	//agent class.  Much of it may be unused by specific agent implementations, but this will allow
 	//for any action to be attributed to any agent.
 	int[] pos = new int[3]; //Position (x, y, z)
-	float[] offset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
+	protected float[] offset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
 	Action currentAction;
 	ArrayList<String> args;	//extra arguments for executing actions
 	private int texCol = 0; //texture row
@@ -31,12 +31,12 @@ public abstract class Agent {
 	private direction dir = down;	//direction the agent is facing
 	private int speed = 2;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
 	boolean stepping = false;	//true if the agent is currently taking a step
-	private boolean steppingUp = false;	//flag signifying when the agent is currently stepping up, used to fix a lighting bug
 	private boolean jumping = false;	//true if the agent is currently jumping
 	private boolean rampAscending = false;	//true if the agent is currently taking a step up a ramp
 	private boolean rampDescending = false;	//true if the agent is currently taking a step down a ramp
 	private boolean onRamp = false;	//true if the agent is currently standing on top of a ramp
 	private boolean transparent = false; //true if the agent should not block light sources
+	private boolean renderOnPlaceholder = false; //true if the agent should render on its placeholder's position while moving (for steps in +y direction)
 	private direction footstep = left; //whether the next step is the left or right foot
 	private direction stance = right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
@@ -189,95 +189,111 @@ public abstract class Agent {
 	 */
 	public void renderAgent(int pixelSize, int terrainTextureSize)
 	{
-		GL11.glPushMatrix();
-		
-			texture.bind();
-			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-		
-			float tConvX = ((float)TEXTURE_SIZE_X)/((float)TEXTURE_SHEET_WIDTH);
-			float tConvY = ((float)TEXTURE_SIZE_Y)/((float)TEXTURE_SHEET_HEIGHT);
+		if (!isRenderOnPlaceholder())
+		{
+			GL11.glPushMatrix();
 			
-			int texX = getTexCol() * 3;
-			int texY = getTexRow();
-			switch (getDir())
-			{
-			case down:
-				texY += 0;
-				break;
-			case right:
-				texY += 1;
-				break;
-			case left:
-				texY += 2;
-				break;
-			case up:
-				texY += 3;				
-				break;
-			}
+				texture.bind();
+				GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 			
-			//Special case footstep animations
-			//Set footstep animation for walking up ramps down-facing ramps
-			if (this.isRampAscending() && this.getDir() == up)
-			{
-				if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
-					|| (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7))
+				float tConvX = ((float)TEXTURE_SIZE_X)/((float)TEXTURE_SHEET_WIDTH);
+				float tConvY = ((float)TEXTURE_SIZE_Y)/((float)TEXTURE_SHEET_HEIGHT);
+				
+				int texX = getTexCol() * 3;
+				int texY = getTexRow();
+				switch (getDir())
 				{
-					if (getFootstep() == right)
-						texX += 0;
-					else
-						texX += 2;
+				case down:
+					texY += 0;
+					break;
+				case right:
+					texY += 1;
+					break;
+				case left:
+					texY += 2;
+					break;
+				case up:
+					texY += 3;				
+					break;
 				}
-				else if ((Math.abs(offset[0]) <= 32 && Math.abs(offset[0]) > 23)
-				|| (Math.abs(offset[1]) <= 32 && Math.abs(offset[1]) > 23))
+				
+				//Special case footstep animations
+				//Set footstep animation for walking up ramps down-facing ramps
+				if (this.isRampAscending() && this.getDir() == up)
 				{
-					if (getFootstep() == right)
+					if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+						|| (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7))
+					{
+						if (getFootstep() == right)
+							texX += 0;
+						else
+							texX += 2;
+					}
+					else if ((Math.abs(offset[0]) <= 32 && Math.abs(offset[0]) > 23)
+					|| (Math.abs(offset[1]) <= 32 && Math.abs(offset[1]) > 23))
+					{
+						if (getFootstep() == right)
+							texX += 2;
+						else
+							texX += 0;
+					}
+					else
+					{
+						texX += 1;
+					}
+				}
+				//Set footstep animation for jumping
+				else if (this.isJumping())
+				{
+					if (getStance() == right)
 						texX += 2;
 					else
 						texX += 0;
 				}
+				//Set footstep animation for walking down down-facing ramps
+				else if (this.isRampDescending() && this.getDir() == down)
+				{
+					if ((Math.abs(offset[0]) <= 7 && Math.abs(offset[0]) > 0)
+						|| (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0))
+					{
+						if (getFootstep() == right)
+							texX += 2;
+						else
+							texX += 0;
+					}
+					else if ((Math.abs(offset[0]) <= 23 && Math.abs(offset[0]) > 16)
+					|| (Math.abs(offset[1]) <= 23 && Math.abs(offset[1]) > 16))
+					{
+						if (getFootstep() == right)
+							texX += 0;
+						else
+							texX += 2;
+					}
+					else
+					{
+						texX += 1;
+					}
+				}
+				//Set footstep animation for regular stepping
 				else
 				{
-					texX += 1;
-				}
-			}
-			//Set footstep animation for jumping
-			else if (this.isJumping())
-			{
-				if (getStance() == right)
-					texX += 2;
-				else
-					texX += 0;
-			}
-			//Set footstep animation for walking down down-facing ramps
-			else if (this.isRampDescending() && this.getDir() == down)
-			{
-				if ((Math.abs(offset[0]) <= 7 && Math.abs(offset[0]) > 0)
-					|| (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0))
-				{
-					if (getFootstep() == right)
-						texX += 2;
-					else
-						texX += 0;
-				}
-				else if ((Math.abs(offset[0]) <= 23 && Math.abs(offset[0]) > 16)
-				|| (Math.abs(offset[1]) <= 23 && Math.abs(offset[1]) > 16))
-				{
-					if (getFootstep() == right)
-						texX += 0;
-					else
-						texX += 2;
-				}
-				else
-				{
-					texX += 1;
-				}
-			}
-			//Set footstep animation for regular stepping
-			else
-			{
-				if (getDir() == left || getDir() == right)
-				{
-					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+					if (getDir() == left || getDir() == right)
+					{
+						if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+							{
+								if (getFootstep() == right)
+									texX += 2;
+								else
+									texX += 0;
+							}
+							else
+							{
+								texX += 1;
+							}
+					}
+					else if (getDir() == down)
+					{
+						if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
 						{
 							if (getFootstep() == right)
 								texX += 2;
@@ -288,54 +304,41 @@ public abstract class Agent {
 						{
 							texX += 1;
 						}
-				}
-				else if (getDir() == down)
-				{
-					if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
-					{
-						if (getFootstep() == right)
-							texX += 2;
-						else
-							texX += 0;
 					}
 					else
 					{
-						texX += 1;
-					}
-				}
-				else
-				{
-					if (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0)
-					{
-						if (getFootstep() == right)
-							texX += 2;
+						if (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0)
+						{
+							if (getFootstep() == right)
+								texX += 2;
+							else
+								texX += 0;
+						}
 						else
-							texX += 0;
-					}
-					else
-					{
-						texX += 1;
+						{
+							texX += 1;
+						}
 					}
 				}
-			}
-			
-			int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2 + (int)(offset[0]));
-			int xMax = xMin + pixelSize * (TEXTURE_SIZE_X);
-			int yMin = pixelSize * ((int)(offset[1]));
-			int yMax = yMin + pixelSize * (TEXTURE_SIZE_Y);
-			
-			GL11.glBegin(GL11.GL_QUADS);
-				GL11.glTexCoord2f(texX * tConvX, texY*tConvY + tConvY);
-				GL11.glVertex2f(xMin, yMin);
-				GL11.glTexCoord2f(texX*tConvX + tConvX, texY*tConvY + tConvY);
-				GL11.glVertex2f(xMax, yMin);
-				GL11.glTexCoord2f(texX*tConvX + tConvX, texY * tConvY);
-				GL11.glVertex2f(xMax, yMax);
-				GL11.glTexCoord2f(texX*tConvX, texY * tConvY);
-				GL11.glVertex2f(xMin, yMax);
-			GL11.glEnd();
-			
-		GL11.glPopMatrix();
+				
+				int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2 + (int)(offset[0]));
+				int xMax = xMin + pixelSize * (TEXTURE_SIZE_X);
+				int yMin = pixelSize * ((int)(offset[1]));
+				int yMax = yMin + pixelSize * (TEXTURE_SIZE_Y);
+				
+				GL11.glBegin(GL11.GL_QUADS);
+					GL11.glTexCoord2f(texX * tConvX, texY*tConvY + tConvY);
+					GL11.glVertex2f(xMin, yMin);
+					GL11.glTexCoord2f(texX*tConvX + tConvX, texY*tConvY + tConvY);
+					GL11.glVertex2f(xMax, yMin);
+					GL11.glTexCoord2f(texX*tConvX + tConvX, texY * tConvY);
+					GL11.glVertex2f(xMax, yMax);
+					GL11.glTexCoord2f(texX*tConvX, texY * tConvY);
+					GL11.glVertex2f(xMin, yMax);
+				GL11.glEnd();
+				
+			GL11.glPopMatrix();
+		}
 	}
 
 	
@@ -503,14 +506,6 @@ public abstract class Agent {
 		return transparent;
 	}
 
-	public void setSteppingUp(boolean steppingUp) {
-		this.steppingUp = steppingUp;
-	}
-
-	public boolean isSteppingUp() {
-		return steppingUp;
-	}
-
 	public int getTexRow() {
 		return texRow;
 	}
@@ -525,5 +520,13 @@ public abstract class Agent {
 
 	public void setTexCol(int texCol) {
 		this.texCol = texCol;
+	}
+
+	public boolean isRenderOnPlaceholder() {
+		return renderOnPlaceholder;
+	}
+
+	public void setRenderOnPlaceholder(boolean renderOnPlaceholder) {
+		this.renderOnPlaceholder = renderOnPlaceholder;
 	}
 }

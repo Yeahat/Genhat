@@ -16,7 +16,7 @@ public class SimpleStep implements Action {
 	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)
-	{		
+	{
 		//invalid arguments, do nothing
 		if (args.size() < 1)
 		{
@@ -35,14 +35,12 @@ public class SimpleStep implements Action {
 				
 				if(canStep(agent, world, up))
 				{
-					agent.setSteppingUp(true);
+					world.moveAgent(agent, 0, 1, 0);
+					agent.setOffsetY(-16);
 					int[] pos = agent.getPos();
-					Placeholder h1 = new Placeholder(pos[0], pos[1] + 1, pos[2]);
-					if (!agent.isTransparent())	//shadow up step bug fix hack thing
-					{
-						agent.setTransparent(true);
-						h1.setTransparent(false);
-					}
+					//set placeholder to render instead of agent (fixes a graphical glitch caused by tile render order)
+					agent.setRenderOnPlaceholder(true);
+					Placeholder h1 = new Placeholder(agent, pos[0], pos[1] - 1, pos[2]);
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -53,19 +51,16 @@ public class SimpleStep implements Action {
 					return;
 				}
 			}
-			
-			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-			if (agent.getOffsetY() >= 16)
+
+			System.out.println("Offset Y: " + agent.getOffsetY());
+			if (agent.getOffsetY() >= 0)
 			{
 				swapFootstep(agent);
 				int[] pos = agent.getPos();
-				if (!world.getAgentAt(pos[0], pos[1] + 1, pos[2]).isTransparent()) //shadow up step bug fix hack thing
-					agent.setTransparent(false);
-				world.removeAgentAt(pos[0], pos[1] + 1, pos[2]);
-				world.moveAgent(agent, 0, 1, 0);
+				world.removeAgentAt(pos[0], pos[1] - 1, pos[2]);
 				agent.setOffsetY(0);
+				agent.setRenderOnPlaceholder(false);
 				agent.setStepping(false);
-				agent.setSteppingUp(false);
 				finishedStep = true;
 			}
 			
@@ -88,7 +83,7 @@ public class SimpleStep implements Action {
 					world.moveAgent(agent, 0, -1, 0);
 					agent.setOffsetY(16);
 					int[] pos = agent.getPos();
-					Placeholder h1 = new Placeholder(pos[0], pos[1] + 1, pos[2]);
+					Placeholder h1 = new Placeholder(agent, pos[0], pos[1] + 1, pos[2]);
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -130,7 +125,7 @@ public class SimpleStep implements Action {
 					world.moveAgent(agent, -1, 0, 0);
 					agent.setOffsetX(16);
 					int[] pos = agent.getPos();
-					Placeholder h1 = new Placeholder(pos[0] + 1, pos[1], pos[2]);
+					Placeholder h1 = new Placeholder(agent, pos[0] + 1, pos[1], pos[2]);
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -172,7 +167,7 @@ public class SimpleStep implements Action {
 					world.moveAgent(agent, 1, 0, 0);
 					agent.setOffsetX(-16);
 					int[] pos = agent.getPos();
-					Placeholder h1 = new Placeholder(pos[0] - 1, pos[1], pos[2]);
+					Placeholder h1 = new Placeholder(agent, pos[0] - 1, pos[1], pos[2]);
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);

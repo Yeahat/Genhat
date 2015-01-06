@@ -56,7 +56,7 @@ public class RampStep implements Action {
 						world.moveAgent(agent, 0, 1, 1);
 						agent.setOffsetY(-32);
 						int[] pos = agent.getPos();
-						Placeholder h1 = new Placeholder(pos[0], pos[1] - 1, pos[2] - 1);
+						Placeholder h1 = new Placeholder(agent, pos[0], pos[1] - 1, pos[2] - 1);
 						world.addAgent(h1);
 						finishedStep = false;
 						agent.setRampAscending(true);
@@ -99,7 +99,7 @@ public class RampStep implements Action {
 					int[] pos = agent.getPos();
 					if (canStepRamp(agent, world, down, false, false))
 					{
-						Placeholder holder = new Placeholder(pos[0], pos[1] - 1, pos[2] - 1);
+						Placeholder holder = new Placeholder(agent, pos[0], pos[1] - 1, pos[2] - 1);
 						world.addAgent(holder);
 						finishedStep = false;
 						agent.setRampDescending(true);
@@ -155,7 +155,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(16);
 							agent.setOffsetY(-16);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] + 1, p1[1], p1[2] - 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] + 1, p1[1], p1[2] - 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampAscending(true);
@@ -177,7 +177,7 @@ public class RampStep implements Action {
 							world.moveAgent(agent, -1, 0, 0);
 							agent.setOffsetX(16);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] + 1, p1[1], p1[2]);
+							Placeholder h1 = new Placeholder(agent, p1[0] + 1, p1[1], p1[2]);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampAscending(true);
@@ -200,7 +200,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(16);
 							agent.setOffsetY(-24);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] + 1, p1[1], p1[2] - 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] + 1, p1[1], p1[2] - 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampAscending(true);
@@ -314,7 +314,7 @@ public class RampStep implements Action {
 							world.moveAgent(agent, -1, 0, 0);
 							agent.setOffsetX(16);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] + 1, p1[1], p1[2]);
+							Placeholder h1 = new Placeholder(agent, p1[0] + 1, p1[1], p1[2]);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampDescending(true);
@@ -337,7 +337,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(16);
 							agent.setOffsetY(8);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] + 1, p1[1], p1[2] + 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] + 1, p1[1], p1[2] + 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampDescending(true);
@@ -360,7 +360,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(16);
 							agent.setOffsetY(8);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] + 1, p1[1], p1[2] + 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] + 1, p1[1], p1[2] + 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampDescending(true);
@@ -479,7 +479,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(-16);
 							agent.setOffsetY(-16);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] - 1, p1[1], p1[2] - 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] - 1, p1[1], p1[2] - 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampAscending(true);
@@ -501,7 +501,7 @@ public class RampStep implements Action {
 							world.moveAgent(agent, 1, 0, 0);
 							agent.setOffsetX(-16);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] - 1, p1[1], p1[2]);
+							Placeholder h1 = new Placeholder(agent, p1[0] - 1, p1[1], p1[2]);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampAscending(true);
@@ -524,7 +524,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(-16);
 							agent.setOffsetY(-24);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] - 1, p1[1], p1[2] - 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] - 1, p1[1], p1[2] - 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampAscending(true);
@@ -638,7 +638,7 @@ public class RampStep implements Action {
 							world.moveAgent(agent, 1, 0, 0);
 							agent.setOffsetX(-16);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] - 1, p1[1], p1[2]);
+							Placeholder h1 = new Placeholder(agent, p1[0] - 1, p1[1], p1[2]);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampDescending(true);
@@ -661,7 +661,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(-16);
 							agent.setOffsetY(8);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] - 1, p1[1], p1[2] + 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] - 1, p1[1], p1[2] + 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampDescending(true);
@@ -684,7 +684,7 @@ public class RampStep implements Action {
 							agent.setOffsetX(-16);
 							agent.setOffsetY(8);
 							int[] p1 = agent.getPos();
-							Placeholder h1 = new Placeholder(p1[0] - 1, p1[1], p1[2] + 1);
+							Placeholder h1 = new Placeholder(agent, p1[0] - 1, p1[1], p1[2] + 1);
 							world.addAgent(h1);
 							finishedStep = false;
 							agent.setRampDescending(true);

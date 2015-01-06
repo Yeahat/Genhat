@@ -13,7 +13,7 @@ import things.ThingGridCell;
 import utils.DisplayText;
 import entities.Agent;
 import entities.Hero;
-
+import entities.Placeholder;
 import static world.Terrain.terrainType.*;
 import static entities.Agent.direction.*;
 import static world.World.timeOfDay.*;
@@ -818,8 +818,11 @@ public class World {
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
-								if (agent.isSteppingUp())
-									setLighting(isShadowed(i, j + 1, k), lightModGrid[i][j + 1][k]);
+								if (agent.getClass() == Placeholder.class)
+								{
+									int[] effectivePos = ((Placeholder)agent).getEffectivePos();
+									setLighting(isShadowed(effectivePos[0], effectivePos[1], effectivePos[2]), lightModGrid[effectivePos[0]][effectivePos[1]][effectivePos[2]]);
+								}
 								else
 									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
 								GL11.glTranslatef(x, y, 0);

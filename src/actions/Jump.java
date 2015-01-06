@@ -36,13 +36,13 @@ public class Jump implements Action {
 						world.moveAgent(agent, 0, 1, 1);
 						agent.setOffsetY(-32);
 						int[] p1 = agent.getPos();
-						Placeholder h1 = new Placeholder(p1[0], p1[1] - 1, p1[2] - 1);
+						Placeholder h1 = new Placeholder(agent, p1[0], p1[1] - 1, p1[2] - 1);
 						world.addAgent(h1);
 						break;
 					case down:
 						switched = false;
 						int[] p2 = agent.getPos();
-						Placeholder holder1 = new Placeholder(p2[0], p2[1] - 1, p2[2] + 1);
+						Placeholder holder1 = new Placeholder(agent, p2[0], p2[1] - 1, p2[2] + 1);
 						world.addAgent(holder1);
 						break;
 					case left:
@@ -50,7 +50,7 @@ public class Jump implements Action {
 						agent.setOffsetX(16);
 						agent.setOffsetY(-16);
 						int[] p3 = agent.getPos();
-						Placeholder h3 = new Placeholder(p3[0] + 1, p3[1], p3[2] - 1);
+						Placeholder h3 = new Placeholder(agent, p3[0] + 1, p3[1], p3[2] - 1);
 						world.addAgent(h3);
 						break;
 					case right:
@@ -58,7 +58,7 @@ public class Jump implements Action {
 						agent.setOffsetX(-16);
 						agent.setOffsetY(-16);
 						int[] p4 = agent.getPos();
-						Placeholder h4 = new Placeholder(p4[0] - 1, p4[1], p4[2] - 1);
+						Placeholder h4 = new Placeholder(agent, p4[0] - 1, p4[1], p4[2] - 1);
 						world.addAgent(h4);
 						break;
 					}
@@ -70,19 +70,19 @@ public class Jump implements Action {
 					{
 					case up:
 						switched = false;
-						Placeholder holder4 = new Placeholder(pos[0], pos[1] + 1, pos[2] - 1);
+						Placeholder holder4 = new Placeholder(agent, pos[0], pos[1] + 1, pos[2] - 1);
 						world.addAgent(holder4);
 						break;
 					case down:
-						Placeholder holder3 = new Placeholder(pos[0], pos[1] - 1, pos[2] - 1);
+						Placeholder holder3 = new Placeholder(agent, pos[0], pos[1] - 1, pos[2] - 1);
 						world.addAgent(holder3);
 						break;
 					case left:
-						Placeholder holder1 = new Placeholder(pos[0] - 1, pos[1], pos[2] - 1);
+						Placeholder holder1 = new Placeholder(agent, pos[0] - 1, pos[1], pos[2] - 1);
 						world.addAgent(holder1);
 						break;
 					case right:
-						Placeholder holder2 = new Placeholder(pos[0] + 1, pos[1], pos[2] - 1);
+						Placeholder holder2 = new Placeholder(agent, pos[0] + 1, pos[1], pos[2] - 1);
 						world.addAgent(holder2);
 						break;
 					}
@@ -134,7 +134,7 @@ public class Jump implements Action {
 					if (!switched)
 					{
 						int[] pos = agent.getPos();
-						Placeholder h = new Placeholder(pos[0], pos[1], pos[2]);
+						Placeholder h = new Placeholder(agent, pos[0], pos[1], pos[2]);
 						world.removeAgentAt(pos[0], pos[1] - 1, pos[2] + 1);
 						world.moveAgent(agent, 0, -1, 1);
 						world.addAgent(h);
@@ -223,7 +223,7 @@ public class Jump implements Action {
 					if (!switched)
 					{
 						int[] pos = agent.getPos();
-						Placeholder h = new Placeholder(pos[0], pos[1], pos[2]);
+						Placeholder h = new Placeholder(agent, pos[0], pos[1], pos[2]);
 						world.removeAgentAt(pos[0], pos[1] + 1, pos[2] - 1);
 						world.moveAgent(agent, 0, 1, -1);
 						world.addAgent(h);
