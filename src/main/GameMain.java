@@ -161,19 +161,23 @@ public class GameMain {
 		switch (world.getCs())
 		{
 		case walking:
-			//TODO: clean this up to not repeatedly set speed (reading is faster than writing!)
-			//TODO: also, speed up on button press if not currently jumping, for a more responsive feel
 			if (Keyboard.isKeyDown(Keyboard.KEY_C))
 			{
 				Hero player = world.getPlayer();
-				if (player != null && player.isIdle())
-					player.setSpeed(4);
+				if (player != null && !player.isJumping())
+				{
+					if (player.getSpeed() != 4)
+						player.setSpeed(4);
+				}
 			}
 			else
 			{
 				Hero player = world.getPlayer();
-				if (player != null && player.isIdle())
-					player.setSpeed(2);
+				if (player != null && !player.isJumping())
+				{
+					if (player.getSpeed() != 2)
+						player.setSpeed(2);
+				}
 			}
 			
 			//Arrow Keys
@@ -255,19 +259,20 @@ public class GameMain {
 			}
 		break;
 		case talking:
-			//TODO: only set the speed if it's not already set (reading is faster than writing!)
 			if (Keyboard.isKeyDown(Keyboard.KEY_C))
 			{
 				if (world.isTextBoxActive())
 				{
-					world.getTextDisplay().setSpeed(8);
+					if (world.getTextDisplay().getSpeed() != 8)
+						world.getTextDisplay().setSpeed(8);
 				}
 			}
 			else
 			{
 				if (world.isTextBoxActive())
 				{
-					world.getTextDisplay().setSpeed(1);
+					if (world.getTextDisplay().getSpeed() != 1)
+						world.getTextDisplay().setSpeed(1);
 				}
 			}
 		break;
