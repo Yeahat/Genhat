@@ -52,7 +52,7 @@ public class SimpleStep implements Action {
 				}
 			}
 
-			System.out.println("Offset Y: " + agent.getOffsetY());
+			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() >= 0)
 			{
 				swapFootstep(agent);

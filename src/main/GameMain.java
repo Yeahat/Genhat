@@ -100,33 +100,32 @@ public class GameMain {
 					if (Keyboard.getEventKey() == Keyboard.KEY_Z)
 					{
 						Hero player = world.getPlayer();
-						direction d = player.getDir();
-						int[] pos = player.getPos();
-						int x = pos[0];
-						int y = pos[1];
-						int z = pos[2];
-						switch (d)
-						{
-						case up: y++; break;
-						case down: y--; break;
-						case left: x--; break;
-						case right: x++; break;
-						}
-						if (world.getAgentAt(x, y, z) != null)
-							world.getAgentAt(x, y, z).interact(player, world);
-						else if (world.hasThing(x, y, z))
-							world.getThingsAt(x, y, z).interact(player, world);
-					}
-					else if (Keyboard.getEventKey() == Keyboard.KEY_X)
-					{
-						Hero player = world.getPlayer();
 						if (player != null)
 						{
-							if (player.isIdle())
+							direction d = player.getDir();
+							int[] pos = player.getPos();
+							int x = pos[0];
+							int y = pos[1];
+							int z = pos[2];
+							switch (d)
 							{
-								ArrayList<String> newArgs = new ArrayList<String>();
-								player.setArgs(newArgs);
-								player.setCurrentAction(player.getJumpAction());
+							case up: y++; break;
+							case down: y--; break;
+							case left: x--; break;
+							case right: x++; break;
+							}
+							if (world.getAgentAt(x, y, z) != null)
+								world.getAgentAt(x, y, z).interact(player, world);
+							else if (world.hasThing(x, y, z))
+								world.getThingsAt(x, y, z).interact(player, world);
+							else
+							{
+								if (player.isIdle())
+								{
+									ArrayList<String> newArgs = new ArrayList<String>();
+									player.setArgs(newArgs);
+									player.setCurrentAction(player.getJumpAction());
+								}
 							}
 						}
 					}
@@ -142,16 +141,6 @@ public class GameMain {
 							}
 						}
 					}
-					else if (Keyboard.getEventKey() == Keyboard.KEY_X)
-					{
-						if (world.isTextBoxActive())
-						{
-							if (world.getTextDisplay().sendInput(Keyboard.KEY_X))
-							{
-								world.setTextBoxActive(false);
-							}
-						}
-					}
 				break;
 				}
 			}
@@ -161,7 +150,7 @@ public class GameMain {
 		switch (world.getCs())
 		{
 		case walking:
-			if (Keyboard.isKeyDown(Keyboard.KEY_C))
+			if (Keyboard.isKeyDown(Keyboard.KEY_X))
 			{
 				Hero player = world.getPlayer();
 				if (player != null && !player.isJumping())
@@ -259,7 +248,7 @@ public class GameMain {
 			}
 		break;
 		case talking:
-			if (Keyboard.isKeyDown(Keyboard.KEY_C))
+			if (Keyboard.isKeyDown(Keyboard.KEY_X))
 			{
 				if (world.isTextBoxActive())
 				{
@@ -643,30 +632,17 @@ public class GameMain {
 			}
 		}
 		
-		/*
-		//screen edge tests top
-		for (int n = 40; n < 50; n ++)
+		//jumping/lighting/interact test
+		for (int i = 12; i < 15; i ++)
 		{
-			for (int i = 1; i < 10; i ++)
+			for (int j = 25; j < 28; j ++)
 			{
-				for (int j = 0; j < i; j ++)
-				{
-					t[20+i][n][j] = new Terrain(grass, dirt);
-				}
+				t[i][j][1] = new Terrain(dirt, grass);
 			}
+			t[i][27][2] = new Terrain(dirt, grass);
 		}
-		//screen edge tests bottom
-		for (int n = 0; n < 15; n ++)
-		{
-			for (int i = 1; i < 10; i ++)
-			{
-				for (int j = 0; j < i; j ++)
-				{
-					t[20+i][n][j] = new Terrain(grass, dirt);
-				}
-			}
-		}
-		*/
+		Candle jumpCandle = new Candle();
+		world.addThing(jumpCandle, 14, 27, 3);
 		
 		//house test
 		//floor
