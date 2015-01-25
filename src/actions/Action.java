@@ -16,4 +16,8 @@ public interface Action {
 	public void execute(Agent agent, World world, ArrayList<String> args);
 	
 	public boolean isFinished();
+	
+	public boolean requestInterrupt();
+	
+	public boolean isInterruptable();
 }

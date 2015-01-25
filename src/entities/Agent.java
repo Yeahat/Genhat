@@ -1,6 +1,7 @@
 package entities;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
@@ -25,6 +26,12 @@ public abstract class Agent {
 	int[] pos = new int[3]; //Position (x, y, z)
 	protected float[] offset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
 	Action currentAction;
+	Stack<Action> heldActionStack = new Stack<Action>(); //action that is put on hold until an interaction is completed
+	Stack<ArrayList<String>> heldActionArgsStack = new Stack<ArrayList<String>>();
+	private boolean interruptRequested = false;
+	private boolean interrupted = false;
+	private boolean interactingWithHero = false;
+	Agent waitingInteractee; //the character who initiated an interaction and interrupt request
 	ArrayList<String> args;	//extra arguments for executing actions
 	private int texCol = 0; //texture row
 	private int texRow = 0; //texture column
@@ -528,5 +535,29 @@ public abstract class Agent {
 
 	public void setRenderOnPlaceholder(boolean renderOnPlaceholder) {
 		this.renderOnPlaceholder = renderOnPlaceholder;
+	}
+
+	public boolean isInterruptRequested() {
+		return interruptRequested;
+	}
+
+	public void setInterruptRequested(boolean interruptRequested) {
+		this.interruptRequested = interruptRequested;
+	}
+
+	public boolean isInterrupted() {
+		return interrupted;
+	}
+
+	public void setInterrupted(boolean interrupted) {
+		this.interrupted = interrupted;
+	}
+
+	public boolean isInteractingWithHero() {
+		return interactingWithHero;
+	}
+
+	public void setInteractingWithHero(boolean interactingWithHero) {
+		this.interactingWithHero = interactingWithHero;
 	}
 }

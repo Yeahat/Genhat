@@ -34,4 +34,14 @@ public class Wait implements Action
 		return (frames == 0);
 	}
 
+	@Override
+	public boolean requestInterrupt() {
+		return true;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return true;
+	}
+
 }

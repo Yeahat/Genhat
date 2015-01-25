@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import world.World;
 import entities.Agent;
-
 import static entities.Agent.direction.*;
 
 public class Step implements Action {
@@ -215,5 +214,15 @@ public class Step implements Action {
 		{
 			return false;
 		}
+	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return finishedStep;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return true;
 	}
 }

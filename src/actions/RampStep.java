@@ -9,7 +9,6 @@ import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
 import entities.Agent.direction;
-
 import static entities.Agent.direction.*;
 
 public class RampStep implements Action {
@@ -885,5 +884,15 @@ public class RampStep implements Action {
 		{
 			agent.setFootstep(right);
 		}
+	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return finishedStep;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return true;
 	}
 }

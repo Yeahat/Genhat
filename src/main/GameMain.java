@@ -635,7 +635,7 @@ public class GameMain {
 		//jumping/lighting/interact test
 		for (int i = 12; i < 15; i ++)
 		{
-			for (int j = 25; j < 28; j ++)
+			for (int j = 25; j < 31; j ++)
 			{
 				t[i][j][1] = new Terrain(dirt, grass);
 			}
@@ -643,6 +643,12 @@ public class GameMain {
 		}
 		Candle jumpCandle = new Candle();
 		world.addThing(jumpCandle, 14, 27, 3);
+		Stool jumpStool = new Stool();
+		Stool jumpStool2 = new Stool();
+		Stool jumpStool3 = new Stool();
+		world.addThing(jumpStool, 13, 26, 2);
+		world.addThing(jumpStool2, 14, 25, 2);
+		world.addThing(jumpStool3, 13, 29, 2);
 		
 		//house test
 		//floor

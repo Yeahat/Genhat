@@ -53,5 +53,14 @@ public class Turn implements Action {
 	public boolean isFinished() {
 		return true;	//one frame action, so always return true for finished
 	}
+	
+	@Override
+	public boolean requestInterrupt() {
+		return true;
+	}
 
+	@Override
+	public boolean isInterruptable() {
+		return true;
+	}
 }

@@ -123,5 +123,15 @@ public class Wander implements Action {
 		
 		return success;
 	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return step.isFinished();
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return true;
+	}
 	
 }

@@ -426,4 +426,14 @@ public class Jump implements Action {
 		default:	return 0;
 		}
 	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return false;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return false;
+	}
 }

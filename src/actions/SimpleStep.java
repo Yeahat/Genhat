@@ -277,4 +277,14 @@ public class SimpleStep implements Action {
 			agent.setFootstep(right);
 		}
 	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return finishedStep;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return true;
+	}
 }

@@ -11,6 +11,7 @@ public class Converse implements Action
 	ArrayList<String> waitTimes = new ArrayList<String>();
 	Say say = new Say();
 	Wait wait = new Wait();
+	boolean talkingToHero = false;
 	
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args)
@@ -25,6 +26,12 @@ public class Converse implements Action
 				System.out.println("Note that the final wait time does not need to be included, as it will not be used.");
 				return;
 			}
+			
+			if (agent == world.getPlayer())
+				talkingToHero = true;
+			else
+				talkingToHero = false;
+			
 			for (int i = 0; i < args.size(); i += 3)
 			{
 				sayArgs.add(args.get(i));
@@ -69,5 +76,15 @@ public class Converse implements Action
 	public boolean isFinished()
 	{
 		return sayArgs.isEmpty();
+	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return !talkingToHero;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return !talkingToHero;
 	}
 }

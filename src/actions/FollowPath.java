@@ -64,9 +64,10 @@ public class FollowPath implements Action
 			}
 			
 			//handle invalid strings in the path
-			if (currentStep != 'u' || currentStep != 'd' || currentStep != 'l' || currentStep != 'r')
+			if (currentStep != 'u' && currentStep != 'd' && currentStep != 'l' && currentStep != 'r')
 			{
 				currentStep = '-';
+				return;
 			}
 			else
 			{
@@ -106,6 +107,18 @@ public class FollowPath implements Action
 			return false;
 	}
 
+	@Override
+	public boolean isInterruptable()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean requestInterrupt()
+	{
+		return !executingStep;
+	}
+	
 	public void setLooping(boolean isLooping)
 	{
 		looping = isLooping;

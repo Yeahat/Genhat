@@ -10,6 +10,7 @@ public class Say implements Action
 {
 	boolean started = false;
 	boolean finished = false;
+	boolean talkingToHero = false;
 	
 	Turn turn = new Turn();
 	
@@ -24,6 +25,11 @@ public class Say implements Action
 				System.out.println("Say must take 2 required argument denoting the speaker's name and the text, and an optional argment for whether the speaker should face the hero first as either: {true, false}");
 				return;
 			}
+			
+			if (agent == world.getPlayer())
+				talkingToHero = true;
+			else
+				talkingToHero = false;
 			
 			String name = args.get(0);
 			String text = args.get(1);
@@ -85,6 +91,16 @@ public class Say implements Action
 	public boolean isFinished()
 	{
 		return finished;
+	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return !talkingToHero;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return !talkingToHero;
 	}
 
 }

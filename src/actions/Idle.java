@@ -26,4 +26,14 @@ public class Idle implements Action {
 	{
 		return true;
 	}
+
+	@Override
+	public boolean requestInterrupt() {
+		return true;
+	}
+
+	@Override
+	public boolean isInterruptable() {
+		return true;
+	}
 }

@@ -9,6 +9,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import actions.Converse;
+import actions.FollowPath;
 import actions.Jump;
 import actions.Say;
 import actions.Step;
@@ -28,6 +29,7 @@ public class Innkeeper extends Agent
 	Say say;
 	Converse converse;
 	Turn turn;
+	FollowPath followPath;
 	
 	/**
 	 * Constructor
@@ -61,10 +63,38 @@ public class Innkeeper extends Agent
 	@Override
 	public void interact(Agent agent, World world)
 	{
+		if (currentAction.isInterruptable())
+		{
+			if (agent == world.getPlayer())
+			{
+				setInteractingWithHero(true);
+				world.setCs(talking);
+			}
+			
+			if (currentAction.requestInterrupt())
+			{
+				setInterrupted(true);
+				//queue current action and commence with interaction
+				heldActionStack.push(currentAction);
+				heldActionArgsStack.push(args);
+				beginInteraction(agent, world);
+			}
+			else
+			{
+				setInterruptRequested(true);
+				waitingInteractee = agent;
+			}
+		}
+		else
+		{
+			return;	//the agent cannot be interacted with due to their current action
+		}
+	}
+	
+	private void beginInteraction(Agent agent, World world)
+	{
 		if (agent == world.getPlayer())
 		{
-			world.setCs(talking);
-			
 			if (conversationNumber == 0)
 			{
 				currentAction = converse;
@@ -145,6 +175,8 @@ public class Innkeeper extends Agent
 		converse = new Converse();
 		say = new Say();
 		turn = new Turn();
+		followPath = new FollowPath(true, 0);
+		followPath.setPath("lllrrrrrrlll");
 	}
 	
 	@Override
@@ -161,11 +193,66 @@ public class Innkeeper extends Agent
 	@Override
 	public void decideNextAction(World world)
 	{
-		if ((currentAction == say || currentAction == converse) && currentAction.isFinished())
+		if (isInteractingWithHero())
 		{
-			world.setCs(walking);
-			currentAction = idle;
-			args.clear();
+			if (isInterruptRequested())
+			{
+				if (currentAction.requestInterrupt())
+				{
+					setInterrupted(true);
+					//queue current action and commence with interaction
+					heldActionStack.push(currentAction);
+					heldActionArgsStack.push(args);
+					beginInteraction(waitingInteractee, world);
+					setInterruptRequested(false);
+				}
+			}
+			else if ((currentAction == say || currentAction == converse) && currentAction.isFinished())
+			{
+				world.setCs(walking);
+				setInteractingWithHero(false);
+				if (isInterrupted())
+				{
+					currentAction = heldActionStack.pop();
+					args = heldActionArgsStack.pop();
+					if (heldActionStack.isEmpty())
+						setInterrupted(false);
+				}
+				else
+				{
+					currentAction = idle;
+					args.clear();
+				}
+			}
+		}
+		else if (isInterruptRequested())
+		{
+			if (currentAction.requestInterrupt())
+			{
+				setInterrupted(true);
+				//queue current action and commence with interaction
+				heldActionStack.push(currentAction);
+				heldActionArgsStack.push(args);
+				beginInteraction(waitingInteractee, world);
+				setInterruptRequested(false);
+			}
+		}
+		else if (isInterrupted())
+		{
+			if (currentAction.isFinished())
+			{
+				currentAction = heldActionStack.pop();
+				args = heldActionArgsStack.pop();
+				if (heldActionStack.isEmpty())
+					setInterrupted(false);
+			}
+		}
+		else
+		{
+			if (currentAction == idle)
+			{
+				currentAction = followPath;
+			}
 		}
 	}
 
