@@ -7,29 +7,29 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import things.Stairs.StairsBuilder;
+import things.Stairs.stairsType;
+import things.Thing.connectionContext;
+import world.World;
+import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
+import static things.Thing.connectionContext.standalone;
 
-public class HorizontalBar extends Thing {
+public class Bar extends Thing {
 
-	public HorizontalBar()
-	{
-		loadTextures();
-		
-		texRow = 2;
-		texCol = 0;
-		blocking = true;
-		setDir(up);
-	}
+	private final connectionContext connection;
 	
-	public HorizontalBar(direction d)
+	private Bar(BarBuilder builder)
 	{
-		loadTextures();
+		this.dir = builder.dir;
+		this.connection = builder.connection;
 		
 		texRow = 2;
 		texCol = 0;
 		blocking = true;
-		setDir(d);
+		
+		loadTextures();
 	}
 	
 	@Override
@@ -39,6 +39,20 @@ public class HorizontalBar extends Thing {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
+	@Override
+	public void interact(Agent agent, World world){
+		//get direction of interaction
+		int x = 2*pos[0] - agent.getPos()[0];
+		int y = 2*pos[1] - agent.getPos()[1];
+		int z = pos[2];
+		
+		//pass on interaction if there is an agent one space along the interaction direction
+		if (world.isOccupied(x, y, z))
+		{
+			world.getAgentAt(x, y, z).interact(agent, world);
+		}
+	}
+	
 	@Override
 	public void renderThing(int pixelSize, int terrainTextureSize) {
 		GL11.glPushMatrix();
@@ -51,18 +65,19 @@ public class HorizontalBar extends Thing {
 			
 			int texX = texCol * 4;
 			int texY = texRow;
-			switch (getDir())
+			if (dir == up || dir == down)
 			{
-			case left:
-				texX += 0;
-				break;
-			case down:
+				texY += 1;
+			}
+			switch (connection)
+			{
+			case middle:
 				texX += 1;
 				break;
-			case right:
+			case end:
 				texX += 2;
 				break;
-			case up:
+			case standalone:
 				texX += 3;				
 				break;
 			}
@@ -86,4 +101,28 @@ public class HorizontalBar extends Thing {
 		GL11.glPopMatrix();
 	}
 
+	public static class BarBuilder
+	{
+		private connectionContext connection = standalone;
+		private direction dir = left;
+		
+		public BarBuilder(){}
+		
+		public BarBuilder connection(connectionContext connection)
+		{
+			this.connection = connection;
+			return this;
+		}
+		
+		public BarBuilder dir(direction dir)
+		{
+			this.dir = dir;
+			return this;
+		}
+		
+		public Bar build()
+		{
+			return new Bar(this);
+		}
+	}
 }

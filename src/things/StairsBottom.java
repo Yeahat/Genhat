@@ -10,9 +10,9 @@ import entities.Agent.direction;
 
 import static entities.Agent.direction.*;
 
-public class StairsIndoorBottom extends Thing {
+public class StairsBottom extends Thing {
 
-	public StairsIndoorBottom()
+	public StairsBottom()
 	{
 		loadTextures();
 		
@@ -24,7 +24,7 @@ public class StairsIndoorBottom extends Thing {
 		ramp = false;
 	}
 	
-	public StairsIndoorBottom(direction d)
+	public StairsBottom(direction d)
 	{
 		loadTextures();
 		

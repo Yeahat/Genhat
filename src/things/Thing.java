@@ -8,20 +8,25 @@ import entities.Agent;
 import entities.Agent.direction;
 
 public abstract class Thing {
+	public enum connectionContext
+	{
+		start, middle, end, standalone
+	}
+	
 	//State
 	boolean blocking = true;
 	boolean crossable = false;
 	boolean ramp = false;
 	boolean transparent = false; //true if thing should not block light sources
-	private boolean lightSource = false;
-	private boolean antiLightSource = false;
-	private float lightPower = 0.6f; //strength of light emission if the Thing is a light source, light absorption if the thing is an anti light source
-	private int[] pos = new int[3]; //Position (x, y, z)
-	private float[] realOffset = new float[3]; //sub-grid offset from the current position (x, y, z) measured in pixels (default is 16 pixels per grid space)
-	private float[] pixelOffset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
-	private direction dir;	//direction the thing is facing
-	private float terminalVelocity = 8.0f; //maximum change in offset allowed
-	private float[] velocity = new float[3]; //frame-by-frame changes in (x, y, z) position of the thing
+	protected boolean lightSource = false;
+	protected boolean antiLightSource = false;
+	protected float lightPower = 0.6f; //strength of light emission if the Thing is a light source, light absorption if the thing is an anti light source
+	protected int[] pos = new int[3]; //Position (x, y, z)
+	protected float[] realOffset = new float[3]; //sub-grid offset from the current position (x, y, z) measured in pixels (default is 16 pixels per grid space)
+	protected float[] pixelOffset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
+	protected direction dir;	//direction the thing is facing
+	protected float terminalVelocity = 8.0f; //maximum change in offset allowed
+	protected float[] velocity = new float[3]; //frame-by-frame changes in (x, y, z) position of the thing
 	
 	//Texture
 	Texture texture;
@@ -55,6 +60,16 @@ public abstract class Thing {
 	 * @param world the world in which the thing exists
 	 */
 	public void interact(Agent agent, World world){}
+	
+	/**
+	 * Method to call when removing a thing from the world, allows a thing's removal to first make any necessary changes
+	 * to surrounding things that it affects.
+	 * @return whatever's left when the thing is removed (often null or a destroyed version of the thing)
+	 */
+	public Thing remove()
+	{
+		return null;
+	}
 	
 	/**
 	 * Define at what point gravity affects the thing.  This defaults to determining if a blocking thing, agent, or

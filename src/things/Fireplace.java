@@ -172,6 +172,7 @@ public class Fireplace extends Thing {
 		setWoodLevel(3);
 	}
 	
+	//TODO: Have the piece check to make sure it has a left and right piece and adjust rendering accordingly, make the same changes for the left and right side
 	@Override
 	public void update()
 	{

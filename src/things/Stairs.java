@@ -6,52 +6,57 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import things.Chair.ChairBuilder;
+import things.Chair.chairType;
 import entities.Agent.direction;
-
 import static entities.Agent.direction.*;
+import static things.Thing.connectionContext.*;
+import static things.Stairs.stairsType.*;
 
 public class Stairs extends Thing {
-
-	public Stairs()
+	public enum stairsType
 	{
-		loadTextures();
-		
-		texRow = 0;
-		texCol = 0;
-		setDir(down);
-		blocking = false;
-		crossable = true;
-		ramp = true;
+		outdoorWooden, indoorWooden;
 	}
+	private final stairsType type;
+	private final connectionContext connection;
+	private final StairsBottom associatedBottom;	//an extra thing rendered for graphical consistancy
 	
-	public Stairs(direction d)
+	private Stairs(StairsBuilder builder)
 	{
+		this.type = builder.type;
+		this.connection = builder.connection;
+		this.dir = builder.dir;
+		
+		this.crossable = true;
+		this.ramp = true;
+		
+		switch (this.type)
+		{
+		case outdoorWooden:
+			this.texRow = 0;
+			this.texCol = 0;
+			break;
+		case indoorWooden:
+			this.texRow = 4;
+			this.texCol = 0;
+			break;
+		}
+
+		if ((this.dir == left && (this.connection == middle || this.connection == connectionContext.start))
+				|| (this.dir == right && (this.connection == middle || this.connection == connectionContext.end)))
+			associatedBottom = new StairsBottom(this.dir);
+		else
+			associatedBottom = null;
+		
 		loadTextures();
-		
-		texRow = 0;
-		texCol = 0;
-		setDir(d);
-		crossable = true;
-		ramp = true;
-		
-		if (d == down)
-		{
-			blocking = false;
-		}
-		else if (d == right)
-		{
-			blocking = true;
-		}
-		else if (d == left)
-		{
-			blocking = true;
-		}
 	}
 	
 	@Override
 	public void loadTextures()
 	{
 		try {
+			//stairs of all types currently use the same texture sheet, add a conditional if this changes in the future
 			texture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/objects/thing1.png"));
 		} catch (IOException e) {e.printStackTrace();}
 	}
@@ -69,20 +74,40 @@ public class Stairs extends Thing {
 		
 		int texX = texCol * 4;
 		int texY = texRow;
-		switch (getDir())
+		if (type == outdoorWooden)
 		{
-		case down:
-			texX += 0;
-			break;
-		case right:
-			texX += 1;
-			break;
-		case up:
-			texX += 2;
-			break;
-		case left:
-			texX += 3;				
-			break;
+			switch (getDir())
+			{
+			case down:
+				texX += 0;
+				break;
+			case right:
+				texX += 1;
+				break;
+			case up:
+				texX += 2;
+				break;
+			case left:
+				texX += 3;				
+				break;
+			}
+		}
+		else if (type == indoorWooden)
+		{
+			if (dir == left)
+				texY += 1;
+			switch (connection)
+			{
+			case middle:
+				texX += 1;
+				break;
+			case end:
+				texX += 2;
+				break;
+			case standalone:
+				texX += 3;
+				break;
+			}
 		}
 		
 		int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2);
@@ -102,5 +127,47 @@ public class Stairs extends Thing {
 		GL11.glEnd();
 		
 	GL11.glPopMatrix();
+	}
+	
+	@Override
+	public Stairs remove()
+	{
+		if (this.associatedBottom != null)
+			this.associatedBottom.remove();
+		return null;
+	}
+	
+	public StairsBottom getAssociatedBottom() {
+		return associatedBottom;
+	}
+
+	public static class StairsBuilder
+	{
+		private final stairsType type;
+		private connectionContext connection = standalone;
+		private direction dir = right;
+		
+		
+		public StairsBuilder(stairsType type)
+		{
+			this.type = type;
+		}
+		
+		public StairsBuilder connection(connectionContext connection)
+		{
+			this.connection = connection;
+			return this;
+		}
+		
+		public StairsBuilder dir(direction dir)
+		{
+			this.dir = dir;
+			return this;
+		}
+		
+		public Stairs build()
+		{
+			return new Stairs(this);
+		}
 	}
 }

@@ -20,20 +20,18 @@ import things.Fireplace;
 import things.FireplaceChimney;
 import things.FireplaceSide;
 import things.Firewood;
-import things.HorizontalBar;
-import things.LightSource;
+import things.Bar;
 import things.Stairs;
-import things.StairsIndoor;
-import things.StairsIndoorBottom;
-import things.Stool;
 import things.Table;
-import things.VerticalBar;
 import things.WallCandle;
 import world.Terrain;
 import world.World;
 import static world.Terrain.terrainType.*;
 import static entities.Agent.direction.*;
 import static world.World.timeOfDay.*;
+import static things.Chair.chairType.*;
+import static things.Thing.connectionContext.*;
+import static things.Stairs.stairsType.*;
 
 
 public class GameMain {
@@ -463,87 +461,6 @@ public class GameMain {
 		world.setPlayer(hero);
 	}
 	
-	private void genTestWorldStairs()
-	{
-		int xs = 6, ys = 6, zs = 6;
-		Terrain[][][] t = new Terrain[xs][ys][zs];
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				for (int k = 0; k < zs; k ++)
-				{
-					t[i][j][k] = new Terrain(air);
-				}
-			}
-		}
-		
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				t[i][j][0] = new Terrain(grass);
-			}
-		}
-		
-		t[2][2][1] = new Terrain(grass);
-		t[2][3][1] = new Terrain(grass);
-		t[3][2][1] = new Terrain(grass);
-		t[3][3][1] = new Terrain(grass);
-		t[2][2][2] = new Terrain(dirt);
-		t[2][3][2] = new Terrain(dirt);
-		t[1][2][1] = new Terrain(grass);
-		t[0][2][1] = new Terrain(grass);
-		t[0][3][1] = new Terrain(grass);
-		t[0][3][2] = new Terrain(dirt);
-		t[1][3][1] = new Terrain(grass);
-		t[1][3][2] = new Terrain(dirt);
-		t[0][4][1] = new Terrain(grass);
-		t[0][4][2] = new Terrain(dirt);
-		t[1][4][1] = new Terrain(grass);
-		t[1][4][2] = new Terrain(dirt);
-		t[5][5][1] = new Terrain(grass);
-		//t[4][1][1] = new Terrain(grass);
-		//t[3][0][1] = new Terrain(grass);
-		//t[4][0][1] = new Terrain(grass);
-		
-		
-		Stairs s1 = new Stairs();
-		Stairs s2 = new Stairs();
-		Stairs s3 = new Stairs(right);
-		Stairs s4 = new Stairs(right);
-		Stairs s5 = new Stairs(right);
-		Stairs s6 = new Stairs(left);
-		Stairs s7 = new Stairs();
-		Stairs s8 = new Stairs();
-		Stairs s9 = new Stairs(left);
-		Stairs s10 = new Stairs(left);
-		
-		world = new World(xs, ys, zs);
-		world.setTerrain(t);
-		world.addThing(s1, 3, 1, 1);
-		world.addThing(s2, 2, 1, 1);
-		world.addThing(s3, 4, 2, 1);
-		world.addThing(s4, 4, 3, 1);
-		world.addThing(s5, 3, 3, 2);
-		world.addThing(s6, 1, 2, 2);
-		world.addThing(s7, 0, 1, 1);
-		world.addThing(s8, 0, 2, 2);
-		world.addThing(s9, 4, 5, 1);
-		world.addThing(s10, 5, 5, 2);
-		
-		ArrayList<Agent> agents = new ArrayList<Agent>();
-		
-		Hero hero = new Hero();
-		int[] pos = {5, 1, 1};
-		world.setDisplayCenter(pos);
-		hero.setPos(pos);
-		agents.add(hero);
-		
-		world.addAgents(agents);
-		world.setPlayer(hero);
-	}
-	
 	private void genTestWorldJump()
 	{
 		int xs = 6, ys = 6, zs = 8;
@@ -643,9 +560,9 @@ public class GameMain {
 		}
 		Candle jumpCandle = new Candle();
 		world.addThing(jumpCandle, 14, 27, 3);
-		Stool jumpStool = new Stool();
-		Stool jumpStool2 = new Stool();
-		Stool jumpStool3 = new Stool();
+		Chair jumpStool = new Chair.ChairBuilder(stoolWooden).build();
+		Chair jumpStool2 = new Chair.ChairBuilder(stoolWooden).build();
+		Chair jumpStool3 = new Chair.ChairBuilder(stoolWooden).build();
 		world.addThing(jumpStool, 13, 26, 2);
 		world.addThing(jumpStool2, 14, 25, 2);
 		world.addThing(jumpStool3, 13, 29, 2);
@@ -684,27 +601,27 @@ public class GameMain {
 		t[30][30][2] = new Terrain(glass, air);
 		
 		//house objects
-		HorizontalBar b1 = new HorizontalBar(left);
+		Bar b1 = new Bar.BarBuilder().connection(start).build();
 		world.addThing(b1, 27, 35, 1);
 		for (int i = 0; i < 3; i ++)
 		{
-			HorizontalBar bar = new HorizontalBar(down);
+			Bar bar = new Bar.BarBuilder().connection(middle).build();
 			world.addThing(bar, 28+i, 35, 1);
 		}
-		HorizontalBar b2 = new HorizontalBar(right);
+		Bar b2 = new Bar.BarBuilder().connection(end).build();
 		world.addThing(b2, 31, 35, 1);
-		HorizontalBar b3 = new HorizontalBar(left);
+		Bar b3 = new Bar.BarBuilder().connection(start).build();
 		world.addThing(b3, 33, 35, 1);
-		HorizontalBar b4 = new HorizontalBar(right);
+		Bar b4 = new Bar.BarBuilder().connection(end).build();
 		world.addThing(b4, 34, 35, 1);
-		VerticalBar b5 = new VerticalBar(up);
+		Bar b5 = new Bar.BarBuilder().dir(up).connection(end).build();
 		world.addThing(b5, 27, 36, 1);
-		VerticalBar b6 = new VerticalBar(up);
+		Bar b6 = new Bar.BarBuilder().dir(up).connection(end).build();
 		world.addThing(b6, 34, 36, 1);
 		
-		Stool stool1 = new Stool();
-		Stool stool2 = new Stool();
-		Stool stool3 = new Stool();
+		Chair stool1 = new Chair.ChairBuilder(stoolWooden).build();
+		Chair stool2 = new Chair.ChairBuilder(stoolWooden).build();
+		Chair stool3 = new Chair.ChairBuilder(stoolWooden).build();
 		world.addThing(stool1, 28, 34, 1);
 		world.addThing(stool2, 29, 34, 1);
 		world.addThing(stool3, 30, 34, 1);
@@ -713,12 +630,12 @@ public class GameMain {
 		Table t2 = new Table();
 		world.addThing(t1, 38, 33, 1);
 		world.addThing(t2, 42, 33, 1);
-		Chair c1 = new Chair(left);
-		Chair c2 = new Chair(right);
-		Chair c3 = new Chair(left);
-		Chair c4 = new Chair(right);
-		Chair c5 = new Chair(up);
-		Chair c6 = new Chair(down);
+		Chair c1 = new Chair.ChairBuilder(chairWooden).dir(left).build();
+		Chair c2 = new Chair.ChairBuilder(chairWooden).dir(right).build();
+		Chair c3 = new Chair.ChairBuilder(chairWooden).dir(left).build();
+		Chair c4 = new Chair.ChairBuilder(chairWooden).dir(right).build();
+		Chair c5 = new Chair.ChairBuilder(chairWooden).dir(up).build();
+		Chair c6 = new Chair.ChairBuilder(chairWooden).dir(down).build();
 		world.addThing(c1, 39, 33, 1);
 		world.addThing(c2, 37, 33, 1);
 		world.addThing(c3, 43, 33, 1);
@@ -726,21 +643,19 @@ public class GameMain {
 		world.addThing(c5, 42, 32, 1);
 		world.addThing(c6, 42, 34, 1);
 		
-		StairsIndoor s1 = new StairsIndoor(right, down);
-		StairsIndoor s2 = new StairsIndoor(right, left);
-		StairsIndoor s3 = new StairsIndoor(right, up);
-		StairsIndoorBottom sb1 = new StairsIndoorBottom(right);
-		StairsIndoorBottom sb2 = new StairsIndoorBottom(right);
+		Stairs s1 = new Stairs.StairsBuilder(indoorWooden).dir(right).connection(start).build();
+		Stairs s2 = new Stairs.StairsBuilder(indoorWooden).dir(right).connection(middle).build();
+		Stairs s3 = new Stairs.StairsBuilder(indoorWooden).dir(right).connection(end).build();
 		world.addThing(s1, 40, 36, 1);
 		world.addThing(s2, 41, 36, 2);
 		world.addThing(s3, 42, 36, 3);
-		world.addThing(sb1, 41, 36, 1);
-		world.addThing(sb2, 42, 36, 2);
+		world.addThing(s2.getAssociatedBottom(), 41, 36, 1);
+		world.addThing(s3.getAssociatedBottom(), 42, 36, 2);
 		
 		WallCandle candle1 = new WallCandle();
 		WallCandle candle2 = new WallCandle();
 		WallCandle candle3 = new WallCandle();
-		//world.addThing(candle1, 38, 36, 2);
+		world.addThing(candle1, 38, 36, 2);
 		world.addThing(candle2, 33, 36, 2);
 		world.addThing(candle3, 28, 36, 2);
 		
@@ -797,7 +712,6 @@ public class GameMain {
 		
 		world.setTerrain(t);
 		
-		
 		//agents
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
@@ -808,7 +722,7 @@ public class GameMain {
 		agents.add(hero);
 		
 		Innkeeper innkeeper = new Innkeeper("char1", 0, 1);
-		int[] posInnkeeper = {35, 34, 1};
+		int[] posInnkeeper = {31, 36, 1};
 		innkeeper.setPos(posInnkeeper);
 		agents.add(innkeeper);
 		

@@ -7,6 +7,8 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import world.World;
+import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
 
@@ -39,6 +41,20 @@ public class Table extends Thing {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
+	@Override
+	public void interact(Agent agent, World world){
+		//get direction of interaction
+		int x = 2*pos[0] - agent.getPos()[0];
+		int y = 2*pos[1] - agent.getPos()[1];
+		int z = pos[2];
+		
+		//pass on interaction if there is an agent one space along the interaction direction
+		if (world.isOccupied(x, y, z))
+		{
+			world.getAgentAt(x, y, z).interact(agent, world);
+		}
+	}
+	
 	@Override
 	public void renderThing(int pixelSize, int terrainTextureSize) {
 		GL11.glPushMatrix();

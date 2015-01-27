@@ -176,7 +176,7 @@ public class Innkeeper extends Agent
 		say = new Say();
 		turn = new Turn();
 		followPath = new FollowPath(true, 0);
-		followPath.setPath("lllrrrrrrlll");
+		followPath.setPath("lllrrrrrll");
 	}
 	
 	@Override

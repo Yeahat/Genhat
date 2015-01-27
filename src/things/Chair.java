@@ -3,7 +3,6 @@ package things;
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -12,59 +11,43 @@ import world.World;
 import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
+import static things.Chair.chairType.*;
 
 public class Chair extends Thing {
-
-	boolean pushedIn;
-	
-	public Chair()
+	public enum chairType
 	{
+		chairWooden, stoolWooden
+	}
+	private boolean pushedIn;
+	private final chairType type;
+	
+	private Chair(ChairBuilder builder)
+	{
+		this.type = builder.type;
+		this.dir = builder.dir;
+		this.pushedIn = builder.pushedIn;
+		
+		this.transparent = true;
+		
+		if (this.type == chairWooden)
+		{
+			this.texRow = 1;
+			this.texCol = 0;
+		}
+		else if (this.type == stoolWooden)
+		{
+			this.texRow = 3;
+			this.texCol = 0;
+		}
+		
+		if (!this.pushedIn)
+		{
+			this.blocking = false;
+		}
+		
 		loadTextures();
-		
-		texRow = 1;
-		texCol = 0;
-		transparent = true;
-		setDir(left);
-		
-		pushedIn = true;
-		blocking = true;
-		
 	}
 	
-	public Chair(direction d)
-	{
-		loadTextures();
-		
-		texRow = 1;
-		texCol = 0;
-		transparent = true;
-		setDir(d);
-		
-		pushedIn = true;
-		blocking = true;
-	}
-	
-	/**
-	 * Overloaded constructor
-	 * @param d direction
-	 * @param p pushed in flag
-	 */
-	public Chair(direction d, boolean p)
-	{
-		loadTextures();
-		
-		texRow = 1;
-		texCol = 0;
-		transparent = true;
-		setDir(d);
-		
-		pushedIn = p;
-		if (pushedIn)
-			blocking = true;
-		else
-			blocking = false;
-	}
-
 	@Override
 	public void interact(Agent agent, World world)
 	{
@@ -86,6 +69,7 @@ public class Chair extends Thing {
 	@Override
 	public void loadTextures() {
 		try {
+			//chairs of all types currently use the same texture sheet, add a conditional if this changes in the future
 			texture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/objects/thing2.png"));
 		} catch (IOException e) {e.printStackTrace();}
 	}
@@ -150,4 +134,32 @@ public class Chair extends Thing {
 		GL11.glPopMatrix();
 	}
 
+	public static class ChairBuilder
+	{
+		private final chairType type;
+		private direction dir = up;
+		private boolean pushedIn = true;
+		
+		public ChairBuilder(chairType type)
+		{
+			this.type = type;
+		}
+		
+		public ChairBuilder dir(direction dir)
+		{
+			this.dir = dir;
+			return this;
+		}
+		
+		public ChairBuilder pushedIn(boolean pushedIn)
+		{
+			this.pushedIn = pushedIn;
+			return this;
+		}
+		
+		public Chair build()
+		{
+			return new Chair(this);
+		}
+	}
 }
