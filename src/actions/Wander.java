@@ -3,7 +3,7 @@ package actions;
 import java.util.ArrayList;
 import java.util.Random;
 
-import utils.Distance;
+import utils.planners.Distance;
 import world.Position;
 import world.World;
 import entities.Agent;

@@ -2,7 +2,7 @@ package actions;
 
 import java.util.ArrayList;
 
-import utils.PathPlanners;
+import utils.planners.PathPlanners;
 import world.Position;
 import world.World;
 import entities.Agent;

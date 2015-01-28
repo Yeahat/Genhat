@@ -1,4 +1,4 @@
-package utils;
+package utils.display;
 
 import java.util.ArrayList;
 

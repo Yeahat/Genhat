@@ -2,7 +2,7 @@ package actions;
 
 import java.util.ArrayList;
 
-import utils.DisplayText;
+import utils.display.DisplayText;
 import world.Position;
 import world.World;
 import entities.Agent;

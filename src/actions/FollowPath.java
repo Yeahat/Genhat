@@ -8,17 +8,19 @@ import entities.Agent;
 public class FollowPath implements Action 
 {	
 	String path;
-	int frequency;
+	boolean frequencySpecified = false;
+	boolean waitFinished = true;
 	boolean looping;
 	boolean executingStep;
 	char currentStep;
 
 	Step step;
+	Wait wait = new Wait();
 	ArrayList<String> stepArgs;
+	ArrayList<String> waitArgs = new ArrayList<String>();
 	
 	public FollowPath()
 	{
-		frequency = 0;
 		step = new Step();
 		path = "";
 		looping = false;
@@ -27,9 +29,8 @@ public class FollowPath implements Action
 		stepArgs = new ArrayList<String>();
 	}
 	
-	public FollowPath(boolean isLooping, int freq)
+	public FollowPath(boolean isLooping)
 	{
-		frequency = freq;
 		step = new Step();
 		path = "";
 		looping = isLooping;
@@ -41,6 +42,28 @@ public class FollowPath implements Action
 	@Override
 	public void execute(Agent agent, World world, ArrayList<String> args) 
 	{
+		//invalid arguments, do nothing
+		if (args.size() < 1)
+		{
+			System.out.println("Invalid arguments to action FollowPath.");
+			System.out.println("FollowPath must take 1 argument denoting path to follow, as a string composed of characters from [U,D,L,R],");
+			System.out.println("and an optional second argument denoting a wait period as an integer (defaults to 0 if unspecified).");
+			return;
+		}
+		if (path.length() == 0 && currentStep == '-') //read path from args
+		{
+			path = args.get(0);
+			//read frequency if it's specified
+			if (args.size() > 1)
+			{
+				waitArgs.clear();
+				waitArgs.add(args.get(1));
+				frequencySpecified = true;
+			}
+			else
+				frequencySpecified = false;
+		}
+		
 		if (currentStep == '-' && path.length() == 0)
 			return;
 		
@@ -61,39 +84,41 @@ public class FollowPath implements Action
 					path = path.substring(1);
 			}
 			
-			//handle invalid strings in the path
-			if (currentStep != 'u' && currentStep != 'd' && currentStep != 'l' && currentStep != 'r')
+			stepArgs.clear();
+			switch (currentStep)
 			{
-				currentStep = '-';
-				return;
+			case 'U':	stepArgs.add("up");		break;
+			case 'D':	stepArgs.add("down");	break;
+			case 'L':	stepArgs.add("left");	break;
+			case 'R':	stepArgs.add("right");	break;
 			}
-			else
-			{
-				stepArgs.clear();
-				switch (currentStep)
-				{
-				case 'u':	stepArgs.add("up");		break;
-				case 'd':	stepArgs.add("down");	break;
-				case 'l':	stepArgs.add("left");	break;
-				case 'r':	stepArgs.add("right");	break;
-				}
-				executingStep = false;
-			}
+			executingStep = false;
+			if (frequencySpecified)
+				waitFinished = false;
 		}
 		
-		step.execute(agent, world, stepArgs);
-		if (step.isFinished() && !executingStep)
+		if (!waitFinished)
 		{
-			//step is blocked by something, try again on the next cycle
+			wait.execute(agent, world, waitArgs);
+			if (wait.isFinished())
+				waitFinished = true;
 		}
-		else if (!executingStep)
+		else
 		{
-			executingStep = true;
-		}
-		else if (executingStep && step.isFinished())
-		{
-			executingStep = false;
-			currentStep = '-';
+			step.execute(agent, world, stepArgs);
+			if (step.isFinished() && !executingStep)
+			{
+				//step is blocked by something, try again on the next cycle
+			}
+			else if (!executingStep)
+			{
+				executingStep = true;
+			}
+			else if (executingStep && step.isFinished())
+			{
+				executingStep = false;
+				currentStep = '-';
+			}
 		}
 	}
 
@@ -120,15 +145,5 @@ public class FollowPath implements Action
 	public void setLooping(boolean isLooping)
 	{
 		looping = isLooping;
-	}
-	
-	public void setFrequency(int freq)
-	{
-		frequency = freq;
-	}
-	
-	public void setPath(String newPath)
-	{
-		path = newPath.toLowerCase();
 	}
 }

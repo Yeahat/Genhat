@@ -13,12 +13,18 @@ import actions.Converse;
 import actions.FollowPath;
 import actions.Say;
 import actions.Turn;
+import actions.WalkToPoint;
 import world.Position;
 import world.World;
 import static world.World.controlState.*;
 
 public class Innkeeper extends Agent
 {
+	//testing
+	String path = "RRRLLLLLRR";
+	Position testPos1 = new Position(31, 36, 1);
+	Position testPos2 = new Position(29, 29, 1);
+	
 	//state
 	int conversationNumber;
 	
@@ -30,6 +36,7 @@ public class Innkeeper extends Agent
 	Converse converse;
 	Turn turn;
 	FollowPath followPath;
+	WalkToPoint walkToPoint;
 	
 	/**
 	 * Constructor
@@ -125,14 +132,13 @@ public class Innkeeper extends Agent
 				args.add("What's new?");
 				args.add("10");
 				args.add("Innesley");
-				args.add("Nothing much.  The inn's not finished, so I can't offer you a room.  All we can do is "
-						+ "have a conversation, but that's still something!");
-				args.add("30");
-				args.add("Baldorf");
-				args.add("S'pose so...\n\n\n\n\n\nI'm still tired and hungry though!  Conditions are bad for us test characters...");
+				args.add("I can walk wherever I want!");
 				args.add("10");
+				args.add("Baldorf");
+				args.add("Great! But why do you keep going back and forth between two specific spots?");
+				args.add("30");
 				args.add("Innesley");
-				args.add("We don't even have a concept of time yet, so how can you be hungry or tired?");
+				args.add("Because... that's where I want to go!");
 				
 				conversationNumber ++;
 			}
@@ -141,7 +147,8 @@ public class Innkeeper extends Agent
 				currentAction = say;
 				args.clear();
 				args.add("Innesley");
-				args.add("I have big plans for a top floor!  Or maybe I'll learn to walk around on my own first!  There's so much to do.");
+				args.add("I have big plans for a top floor!  I'd also like to be able to walk up stairs, and maybe even adjust my walking on-the-fly to"
+						+ "avoid other moving people... Like you!  I also have an embarrassing habit of blocking people into tight spaces and not moving...");
 			}
 		}
 		else
@@ -175,8 +182,8 @@ public class Innkeeper extends Agent
 		converse = new Converse();
 		say = new Say();
 		turn = new Turn();
-		followPath = new FollowPath(true, 0);
-		followPath.setPath("lllrrrrrll");
+		followPath = new FollowPath(true);
+		walkToPoint = new WalkToPoint();
 	}
 	
 	@Override
@@ -251,7 +258,27 @@ public class Innkeeper extends Agent
 		{
 			if (currentAction == idle)
 			{
+				args.clear();
+				if (pos.equals(testPos1))
+				{
+					args.add(testPos2.toString());
+				}
+				else
+				{
+					args.add(testPos1.toString());
+				}
+				currentAction = walkToPoint;
+				/*
 				currentAction = followPath;
+				args.clear();
+				args.add(path);
+				args.add("30");
+				*/
+			}
+			else if (currentAction.isFinished())
+			{
+				args.clear();
+				currentAction = idle;
 			}
 		}
 	}

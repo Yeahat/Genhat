@@ -68,7 +68,7 @@ public class GameMain {
 			
 			//update the screen
 			Display.update();
-			Display.sync(32);			
+			Display.sync(32);
 		}
 		
 		//Exit
@@ -647,6 +647,7 @@ public class GameMain {
 		world.addThing(s3, 42, 36, 3);
 		world.addThing(s2.getAssociatedBottom(), 41, 36, 1);
 		world.addThing(s3.getAssociatedBottom(), 42, 36, 2);
+		t[43][36][3] = new Terrain(dirt, dirt);
 		
 		WallCandle candle1 = new WallCandle();
 		WallCandle candle2 = new WallCandle();

@@ -10,7 +10,7 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import things.Thing;
 import things.ThingGridCell;
-import utils.DisplayText;
+import utils.display.DisplayText;
 import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
@@ -1074,6 +1074,11 @@ public class World {
 		return thingGrid[x][y][z];
 	}
 	
+	public ThingGridCell getThingsAt(Position pos)
+	{
+		return thingGrid[pos.x][pos.y][pos.z];
+	}
+	
 	public Terrain getTerrainAt(int x, int y, int z)
 	{
 		return terrainGrid[x][y][z];
@@ -1183,6 +1188,14 @@ public class World {
 	{
 		if (this.isInBounds(x, y, z))
 			return thingGrid[x][y][z] != null && !thingGrid[x][y][z].isEmpty();
+		else
+			return false;
+	}
+	
+	public boolean hasThing(Position pos)
+	{
+		if (this.isInBounds(pos.x, pos.y, pos.z))
+			return thingGrid[pos.x][pos.y][pos.z] != null && !thingGrid[pos.x][pos.y][pos.z].isEmpty();
 		else
 			return false;
 	}
@@ -1323,6 +1336,21 @@ public class World {
 	public boolean isInBounds(int x, int y, int z)
 	{
 		if (x >= 0 && x < terrainGrid.length && y >= 0 && y < terrainGrid[0].length && z >= 0 && z < terrainGrid[0][0].length)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Check whether a specified location is within the bounds of the world grid
+	 * 
+	 * @param Position 3D grid position
+	 * @return true if the specified grid space is within bounds
+	 */
+	public boolean isInBounds(Position pos)
+	{
+		if (pos.x >= 0 && pos.x < terrainGrid.length && pos.y >= 0 && pos.y < terrainGrid[0].length && pos.z >= 0 && pos.z < terrainGrid[0][0].length)
 		{
 			return true;
 		}

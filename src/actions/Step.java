@@ -2,7 +2,7 @@ package actions;
 
 import java.util.ArrayList;
 
-import utils.PathPlanners;
+import utils.planners.PathPlanners;
 import world.Position;
 import world.World;
 import entities.Agent;
@@ -100,7 +100,7 @@ public class Step implements Action {
 				finishedStep = false;
 				//check for ramps
 				Position pos = agent.getPos();
-				boolean[] rampStepCheck = PathPlanners.checkForRampStep(agent, world, pos, left);
+				boolean[] rampStepCheck = PathPlanners.checkForRampStep(world, pos, left);
 				//Ramp step
 				if (rampStepCheck[0])
 				{
@@ -134,7 +134,7 @@ public class Step implements Action {
 				finishedStep = false;
 				//check for ramps
 				Position pos = agent.getPos();
-				boolean[] rampStepCheck = PathPlanners.checkForRampStep(agent, world, pos, right);
+				boolean[] rampStepCheck = PathPlanners.checkForRampStep(world, pos, right);
 				//Ramp step
 				if (rampStepCheck[0])
 				{
