@@ -3,15 +3,12 @@ package things;
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import world.World;
 
 import entities.Agent;
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
 
 public class Firewood extends Thing {
 

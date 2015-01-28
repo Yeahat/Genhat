@@ -3,13 +3,9 @@ package things;
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import things.Stairs.StairsBuilder;
-import things.Stairs.stairsType;
-import things.Thing.connectionContext;
 import world.World;
 import entities.Agent;
 import entities.Agent.direction;
@@ -42,9 +38,9 @@ public class Bar extends Thing {
 	@Override
 	public void interact(Agent agent, World world){
 		//get direction of interaction
-		int x = 2*pos[0] - agent.getPos()[0];
-		int y = 2*pos[1] - agent.getPos()[1];
-		int z = pos[2];
+		int x = 2*pos.x - agent.getPos().x;
+		int y = 2*pos.y - agent.getPos().y;
+		int z = pos.z;
 		
 		//pass on interaction if there is an agent one space along the interaction direction
 		if (world.isOccupied(x, y, z))
@@ -71,6 +67,8 @@ public class Bar extends Thing {
 			}
 			switch (connection)
 			{
+			case start:
+				break;
 			case middle:
 				texX += 1;
 				break;

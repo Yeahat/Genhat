@@ -6,8 +6,6 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import things.Chair.ChairBuilder;
-import things.Chair.chairType;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
 import static things.Thing.connectionContext.*;
@@ -98,6 +96,8 @@ public class Stairs extends Thing {
 				texY += 1;
 			switch (connection)
 			{
+			case start:
+				break;
 			case middle:
 				texX += 1;
 				break;

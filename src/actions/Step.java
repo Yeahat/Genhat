@@ -2,6 +2,8 @@ package actions;
 
 import java.util.ArrayList;
 
+import utils.PathPlanners;
+import world.Position;
 import world.World;
 import entities.Agent;
 import static entities.Agent.direction.*;
@@ -34,9 +36,9 @@ public class Step implements Action {
 			{
 				finishedStep = false;
 				//check for ramps
-				int[] pos = agent.getPos();
-				if (world.hasThing(pos[0], pos[1], pos[2]) && world.getThingsAt(pos[0], pos[1], pos[2]).hasRamp()
-						&& world.getThingsAt(pos[0], pos[1], pos[2]).getRampDir() == down)
+				Position pos = agent.getPos();
+				if (world.hasThing(pos.z, pos.y, pos.z) && world.getThingsAt(pos.z, pos.y, pos.z).hasRamp()
+						&& world.getThingsAt(pos.z, pos.y, pos.z).getRampDir() == down)
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
@@ -65,9 +67,9 @@ public class Step implements Action {
 			{
 				finishedStep = false;
 				//check for ramps
-				int[] pos = agent.getPos();
-				if (world.hasThing(pos[0], pos[1] - 1, pos[2] - 1) && world.getThingsAt(pos[0], pos[1] - 1, pos[2] - 1).hasRamp()
-						&& world.getThingsAt(pos[0], pos[1] - 1, pos[2] - 1).getRampDir() == down)
+				Position pos = agent.getPos();
+				if (world.hasThing(pos.z, pos.y - 1, pos.z - 1) && world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).hasRamp()
+						&& world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).getRampDir() == down)
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
@@ -97,27 +99,17 @@ public class Step implements Action {
 			{
 				finishedStep = false;
 				//check for ramps
-				int[] pos = agent.getPos();
-				//Ascend ramp
-				if ((world.hasThing(pos[0] - 1, pos[1], pos[2]) && world.getThingsAt(pos[0] - 1, pos[1], pos[2]).hasRamp()
-						&& world.getThingsAt(pos[0] - 1, pos[1], pos[2]).getRampDir() == left)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
-								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == left))
+				Position pos = agent.getPos();
+				boolean[] rampStepCheck = PathPlanners.checkForRampStep(agent, world, pos, left);
+				//Ramp step
+				if (rampStepCheck[0])
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
-					tempArgs.add("ascending");
-					rampStep.execute(agent, world, tempArgs);
-				}
-				//Descend ramp
-				else if ((world.hasThing(pos[0] - 1, pos[1], pos[2] - 1) && world.getThingsAt(pos[0] - 1, pos[1], pos[2] - 1).hasRamp()
-						&& world.getThingsAt(pos[0] - 1, pos[1], pos[2] - 1).getRampDir() == right)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
-								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == right))
-				{
-					ArrayList<String> tempArgs = new ArrayList<String>();
-					tempArgs.addAll(args);
-					tempArgs.add("descending");
+					if (rampStepCheck[1])
+						tempArgs.add("ascending");
+					else
+						tempArgs.add("descending");
 					rampStep.execute(agent, world, tempArgs);
 				}
 				//Normal step
@@ -141,27 +133,17 @@ public class Step implements Action {
 			{
 				finishedStep = false;
 				//check for ramps
-				int[] pos = agent.getPos();
-				//Ascend ramp
-				if ((world.hasThing(pos[0] + 1, pos[1], pos[2]) && world.getThingsAt(pos[0] + 1, pos[1], pos[2]).hasRamp()
-						&& world.getThingsAt(pos[0] + 1, pos[1], pos[2]).getRampDir() == right)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
-								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == right))
+				Position pos = agent.getPos();
+				boolean[] rampStepCheck = PathPlanners.checkForRampStep(agent, world, pos, right);
+				//Ramp step
+				if (rampStepCheck[0])
 				{
 					ArrayList<String> tempArgs = new ArrayList<String>();
 					tempArgs.addAll(args);
-					tempArgs.add("ascending");
-					rampStep.execute(agent, world, tempArgs);
-				}
-				//Descend ramp
-				else if ((world.hasThing(pos[0] + 1, pos[1], pos[2] - 1) && world.getThingsAt(pos[0] + 1, pos[1], pos[2] - 1).hasRamp()
-						&& world.getThingsAt(pos[0] + 1, pos[1], pos[2] - 1).getRampDir() == left)
-						|| (world.hasThing(pos[0], pos[1], pos[2] - 1) && world.getThingsAt(pos[0], pos[1], pos[2] - 1).hasRamp()
-								&& world.getThingsAt(pos[0], pos[1], pos[2] - 1).getRampDir() == left))
-				{
-					ArrayList<String> tempArgs = new ArrayList<String>();
-					tempArgs.addAll(args);
-					tempArgs.add("descending");
+					if (rampStepCheck[1])
+						tempArgs.add("ascending");
+					else
+						tempArgs.add("descending");
 					rampStep.execute(agent, world, tempArgs);
 				}
 				//Normal step

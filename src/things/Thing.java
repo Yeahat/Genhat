@@ -2,8 +2,8 @@ package things;
 
 import org.newdawn.slick.opengl.Texture;
 
+import world.Position;
 import world.World;
-
 import entities.Agent;
 import entities.Agent.direction;
 
@@ -21,7 +21,7 @@ public abstract class Thing {
 	protected boolean lightSource = false;
 	protected boolean antiLightSource = false;
 	protected float lightPower = 0.6f; //strength of light emission if the Thing is a light source, light absorption if the thing is an anti light source
-	protected int[] pos = new int[3]; //Position (x, y, z)
+	protected Position pos = new Position(); //Position (x, y, z)
 	protected float[] realOffset = new float[3]; //sub-grid offset from the current position (x, y, z) measured in pixels (default is 16 pixels per grid space)
 	protected float[] pixelOffset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
 	protected direction dir;	//direction the thing is facing
@@ -114,11 +114,11 @@ public abstract class Thing {
 	 */
 	private boolean blockedBelow(World world)
 	{
-		if (pos[2] - 1 < 0)
+		if (pos.z - 1 < 0)
 			return true;
-		if ((world.getTerrainAt(pos[0], pos[1], pos[2] - 1) != null && world.getTerrainAt(pos[0], pos[1], pos[2] - 1).isBlocking())
-				|| (world.getThingsAt(pos[0], pos[1], pos[2] - 1) != null && world.getThingsAt(pos[0], pos[1], pos[2] - 1).isBlocking())
-				|| world.getAgentAt(pos[0], pos[1], pos[2] - 1) != null)
+		if ((world.getTerrainAt(pos.x, pos.y, pos.z - 1) != null && world.getTerrainAt(pos.x, pos.y, pos.z - 1).isBlocking())
+				|| (world.getThingsAt(pos.x, pos.y, pos.z - 1) != null && world.getThingsAt(pos.x, pos.y, pos.z - 1).isBlocking())
+				|| world.getAgentAt(pos.x, pos.y, pos.z - 1) != null)
 			return true;
 		return false;
 	}
@@ -130,10 +130,10 @@ public abstract class Thing {
 	 */
 	private boolean blockedAbove(World world)
 	{
-		if (!world.isInBounds(pos[0], pos[1], pos[2] + 1)
-				|| (world.getTerrainAt(pos[0], pos[1], pos[2] + 1) != null && world.getTerrainAt(pos[0], pos[1], pos[2] + 1).isBlocking())
-				|| (world.getThingsAt(pos[0], pos[1], pos[2] + 1) != null && world.getThingsAt(pos[0], pos[1], pos[2] + 1).isBlocking())
-				|| world.getAgentAt(pos[0], pos[1], pos[2] + 1) != null)
+		if (!world.isInBounds(pos.x, pos.y, pos.z + 1)
+				|| (world.getTerrainAt(pos.x, pos.y, pos.z + 1) != null && world.getTerrainAt(pos.x, pos.y, pos.z + 1).isBlocking())
+				|| (world.getThingsAt(pos.x, pos.y, pos.z + 1) != null && world.getThingsAt(pos.x, pos.y, pos.z + 1).isBlocking())
+				|| world.getAgentAt(pos.x, pos.y, pos.z + 1) != null)
 			return true;
 		return false;
 	}
@@ -146,7 +146,7 @@ public abstract class Thing {
 	 */
 	private boolean blockedInDirection(World world, direction d)
 	{
-		int x = pos[0], y = pos[1], z = pos[2];
+		int x = pos.x, y = pos.y, z = pos.z;
 		
 		switch (d)
 		{
@@ -247,11 +247,11 @@ public abstract class Thing {
 		return ramp;
 	}
 
-	public void setPos(int[] pos) {
-		this.pos = pos;
+	public void setPos(Position pos) {
+		this.pos = new Position(pos);
 	}
 
-	public int[] getPos() {
+	public Position getPos() {
 		return pos;
 	}
 

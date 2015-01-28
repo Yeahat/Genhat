@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import utils.Distance;
+import world.Position;
 import world.World;
 import entities.Agent;
 
@@ -90,8 +91,8 @@ public class Wander implements Action {
 	
 	private boolean setStepDirection(Agent agent)
 	{
-		int[] pos1 = agent.getHomePos();
-		int[] pos2 = new int[2];
+		Position pos1 = agent.getHomePos();
+		Position pos2 = new Position(pos1);
 		int loopCount = 0;
 		boolean success = true;
 		
@@ -99,18 +100,15 @@ public class Wander implements Action {
 		//or stop if a suitable direction is not found within a number of attempts
 		do
 		{
-			pos2[0] = agent.getPos()[0];
-			pos2[1] = agent.getPos()[1];
-			
 			setTurnDirection();
 			if (stepArgs.get(0).equals("up"))
-				pos2[1] += 1;
+				pos2.y += 1;
 			else if (stepArgs.get(0).equals("down"))
-				pos2[1] -= 1;
+				pos2.y -= 1;
 			else if (stepArgs.get(0).equals("right"))
-				pos2[0] += 1;
+				pos2.x += 1;
 			else
-				pos2[0] -= 1;
+				pos2.x -= 1;
 			
 			loopCount ++;
 			if (loopCount > 32)

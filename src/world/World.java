@@ -15,7 +15,6 @@ import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
 import static world.Terrain.terrainType.*;
-import static entities.Agent.direction.*;
 import static world.World.timeOfDay.*;
 import static world.World.controlState.*;
 
@@ -161,9 +160,9 @@ public class World {
 			return terrainGrid[0][0].length;
 		}
 		
-		int x = player.getPos()[0];
-		int y = player.getPos()[1];
-		int z = player.getPos()[2];
+		int x = player.getPos().x;
+		int y = player.getPos().y;
+		int z = player.getPos().z;
 		
 		//roof check
 		for (int k = z; k < terrainGrid[0][0].length; k ++)
@@ -195,9 +194,9 @@ public class World {
 	public void updateCameraScrollLock()
 	{
 		Hero player = getPlayer();
-		int[] pos = player.getPos();
-		float screenPosX = pos[0] + player.getOffsetX()*(1.0f/16.0f);
-		float screenPosY = pos[1] + pos[2] + player.getOffsetY()*(1.0f/16.0f);
+		Position pos = player.getPos();
+		float screenPosX = pos.x + player.getOffsetX()*(1.0f/16.0f);
+		float screenPosY = pos.y + pos.z + player.getOffsetY()*(1.0f/16.0f);
 		if (!cameraLockV)
 		{
 			if (screenPosY <= (9.0f + (height - 1.0f)) && screenPosY >= depth - 9.0f)
@@ -250,9 +249,9 @@ public class World {
 	public void updateCamera()
 	{
 		Hero player = getPlayer();
-		int[] pos = player.getPos();
-		float screenPosX = pos[0] + player.getOffsetX()*(1.0f/16.0f);
-		float screenPosY = pos[1] + pos[2] + player.getOffsetY()*(1.0f/16.0f);
+		Position pos = player.getPos();
+		float screenPosX = pos.x + player.getOffsetX()*(1.0f/16.0f);
+		float screenPosY = pos.y + pos.z + player.getOffsetY()*(1.0f/16.0f);
 		float[] newDisplayCenter = new float[2];
 		if (isCameraLockH())
 		{
@@ -341,10 +340,10 @@ public class World {
 		
 		for (int n = 0; n < lightSources.size(); n ++)
 		{
-			int[] lightPos = lightSources.get(n).getPos();
-			int i = lightPos[0];
-			int j = lightPos[1];
-			int k = lightPos[2];
+			Position lightPos = lightSources.get(n).getPos();
+			int i = lightPos.x;
+			int j = lightPos.y;
+			int k = lightPos.z;
 			if ((i >= xMin && i <= xMax) || (j >= yMin && j <= yMax) || (k >= zMin && k <= zMax))
 			{
 				//TODO: Update this to distinguish between point and directed lights
@@ -379,10 +378,10 @@ public class World {
 		
 		for (int n = 0; n < antiLightSources.size(); n ++)
 		{
-			int[] lightPos = antiLightSources.get(n).getPos();
-			int i = lightPos[0];
-			int j = lightPos[1];
-			int k = lightPos[2];
+			Position lightPos = antiLightSources.get(n).getPos();
+			int i = lightPos.x;
+			int j = lightPos.y;
+			int k = lightPos.z;
 			if ((i >= xMin && i <= xMax) || (j >= yMin && j <= yMax) || (k >= zMin && k <= zMax))
 			{
 				//TODO: Update this to distinguish between point and directed lights
@@ -820,8 +819,8 @@ public class World {
 							GL11.glPushMatrix();
 								if (agent.getClass() == Placeholder.class)
 								{
-									int[] effectivePos = ((Placeholder)agent).getEffectivePos();
-									setLighting(isShadowed(effectivePos[0], effectivePos[1], effectivePos[2]), lightModGrid[effectivePos[0]][effectivePos[1]][effectivePos[2]]);
+									Position effectivePos = ((Placeholder)agent).getEffectivePos();
+									setLighting(isShadowed(effectivePos.x, effectivePos.y, effectivePos.z), lightModGrid[effectivePos.x][effectivePos.y][effectivePos.z]);
 								}
 								else
 									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
@@ -993,8 +992,8 @@ public class World {
 	{
 		agents.add(newAgent);
 		
-		int[] pos = newAgent.getPos();
-		agentGrid[pos[0]][pos[1]][pos[2]] = newAgent;
+		Position pos = newAgent.getPos();
+		agentGrid[pos.x][pos.y][pos.z] = newAgent;
 	}
 	
 	/**
@@ -1006,8 +1005,8 @@ public class World {
 		agents.addAll(newAgents);
 		for (int i = 0; i < newAgents.size(); i ++)
 		{
-			int[] pos = newAgents.get(i).getPos();
-			agentGrid[pos[0]][pos[1]][pos[2]] = newAgents.get(i);
+			Position pos = newAgents.get(i).getPos();
+			agentGrid[pos.x][pos.y][pos.z] = newAgents.get(i);
 		}
 	}
 	
@@ -1027,8 +1026,7 @@ public class World {
 		if (thingGrid[x][y][z] == null)
 			thingGrid[x][y][z] = new ThingGridCell();
 		thingGrid[x][y][z].addThing(t);
-		int[] pos = {x, y, z};
-		t.setPos(pos);
+		t.setPos(new Position(x, y, z));
 		things.add(t);
 		if (t.isLightSource())
 			lightSources.add(t);
@@ -1050,10 +1048,10 @@ public class World {
 	
 	public void moveThing(Thing thing, int xChange, int yChange, int zChange)
 	{
-		int[] pos = thing.getPos();
-		int oldX = pos[0];
-		int oldY = pos[1];
-		int oldZ = pos[2];
+		Position pos = thing.getPos();
+		int oldX = pos.x;
+		int oldY = pos.y;
+		int oldZ = pos.z;
 		int newX = oldX + xChange;
 		int newY = oldY + yChange;
 		int newZ = oldZ + zChange;
@@ -1063,8 +1061,7 @@ public class World {
 		}
 		else
 		{
-			int[] newPos = {newX, newY, newZ};
-			thing.setPos(newPos);
+			thing.setPos(new Position(newX, newY, newZ));
 			thingGrid[oldX][oldY][oldZ].removeThing(thing);
 			if (thingGrid[newX][newY][newZ] == null)
 				thingGrid[newX][newY][newZ] = new ThingGridCell();
@@ -1084,10 +1081,10 @@ public class World {
 	
 	public void moveAgent(Agent agent, int xChange, int yChange, int zChange)
 	{
-		int[] pos = agent.getPos();
-		int oldX = pos[0];
-		int oldY = pos[1];
-		int oldZ = pos[2];
+		Position pos = agent.getPos();
+		int oldX = pos.x;
+		int oldY = pos.y;
+		int oldZ = pos.z;
 		int newX = oldX + xChange;
 		int newY = oldY + yChange;
 		int newZ = oldZ + zChange;
@@ -1097,8 +1094,7 @@ public class World {
 		}
 		else
 		{
-			int[] newPos = {newX, newY, newZ};
-			agent.setPos(newPos);
+			agent.setPos(new Position(newX, newY, newZ));
 			agentGrid[oldX][oldY][oldZ] = null;
 			agentGrid[newX][newY][newZ] = agent;
 		}
@@ -1120,10 +1116,10 @@ public class World {
 	 * 
 	 * @param center the new display center
 	 */
-	public void setDisplayCenter(int[] center)
+	public void setDisplayCenter(Position center)
 	{
-		displayCenter[0] = center[0];
-		displayCenter[1] = center[1];
+		displayCenter[0] = center.x;
+		displayCenter[1] = center.y;
 	}
 	
 	public void cycleTimeOfDay()

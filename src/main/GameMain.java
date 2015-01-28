@@ -24,6 +24,7 @@ import things.Bar;
 import things.Stairs;
 import things.Table;
 import things.WallCandle;
+import world.Position;
 import world.Terrain;
 import world.World;
 import static world.Terrain.terrainType.*;
@@ -101,10 +102,10 @@ public class GameMain {
 						if (player != null)
 						{
 							direction d = player.getDir();
-							int[] pos = player.getPos();
-							int x = pos[0];
-							int y = pos[1];
-							int z = pos[2];
+							Position pos = player.getPos();
+							int x = pos.x;
+							int y = pos.y;
+							int z = pos.z;
 							switch (d)
 							{
 							case up: y++; break;
@@ -447,14 +448,11 @@ public class GameMain {
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
-		int[] pos = {1, 1, 2};
-		world.setDisplayCenter(pos);
-		hero.setPos(pos);
+		hero.setPos(new Position(1, 1, 2));
 		agents.add(hero);
 		
-		int[] wPos = {8, 6, 2};
-		Wanderer wanderer = new Wanderer(wPos, 32, 2);
-		wanderer.setPos(wPos);
+		Wanderer wanderer = new Wanderer(new Position(8, 6, 2), 32, 2);
+		wanderer.setPos(new Position(8, 6, 2));
 		agents.add(wanderer);
 		
 		world.addAgents(agents);
@@ -510,9 +508,7 @@ public class GameMain {
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
-		int[] pos = {4, 1, 1};
-		world.setDisplayCenter(pos);
-		hero.setPos(pos);
+		hero.setPos(new Position(4, 1, 1));
 		agents.add(hero);
 		
 		world.addAgents(agents);
@@ -716,14 +712,11 @@ public class GameMain {
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
-		int[] pos = {25, 25, 1};
-		world.setDisplayCenter(pos);
-		hero.setPos(pos);
+		hero.setPos(new Position(25, 25, 1));
 		agents.add(hero);
 		
 		Innkeeper innkeeper = new Innkeeper("char1", 0, 1);
-		int[] posInnkeeper = {31, 36, 1};
-		innkeeper.setPos(posInnkeeper);
+		innkeeper.setPos(new Position(31, 36, 1));
 		agents.add(innkeeper);
 		
 		world.setTod(sunrise);

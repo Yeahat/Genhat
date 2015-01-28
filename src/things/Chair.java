@@ -51,7 +51,7 @@ public class Chair extends Thing {
 	@Override
 	public void interact(Agent agent, World world)
 	{
-		if (!world.isOccupied(this.getPos()[0], this.getPos()[1], this.getPos()[2]))
+		if (!world.isOccupied(this.getPos().x, this.getPos().y, this.getPos().z))
 		{
 			if (pushedIn)
 			{

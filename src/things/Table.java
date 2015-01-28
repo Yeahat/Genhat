@@ -3,7 +3,6 @@ package things;
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -44,9 +43,9 @@ public class Table extends Thing {
 	@Override
 	public void interact(Agent agent, World world){
 		//get direction of interaction
-		int x = 2*pos[0] - agent.getPos()[0];
-		int y = 2*pos[1] - agent.getPos()[1];
-		int z = pos[2];
+		int x = 2*pos.x - agent.getPos().x;
+		int y = 2*pos.y - agent.getPos().y;
+		int z = pos.z;
 		
 		//pass on interaction if there is an agent one space along the interaction direction
 		if (world.isOccupied(x, y, z))

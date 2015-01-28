@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
 import static entities.Agent.direction.*;
+import world.Position;
 import world.World;
 import actions.Action;
 import actions.Idle;
@@ -23,7 +24,7 @@ public abstract class Agent {
 	//Note: All state information for any agent implementation should go here, not in the specific
 	//agent class.  Much of it may be unused by specific agent implementations, but this will allow
 	//for any action to be attributed to any agent.
-	int[] pos = new int[3]; //Position (x, y, z)
+	Position pos = new Position(); //Position (x, y, z)
 	protected float[] offset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
 	Action currentAction;
 	Stack<Action> heldActionStack = new Stack<Action>(); //action that is put on hold until an interaction is completed
@@ -47,7 +48,7 @@ public abstract class Agent {
 	private direction footstep = left; //whether the next step is the left or right foot
 	private direction stance = right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
-	private int[] homePos;
+	private Position homePos;
 	
 	//Actions: List all actions of this agent here
 	Idle idle;
@@ -374,19 +375,15 @@ public abstract class Agent {
 	 * Setter for position
 	 * @param newPos new values for position (x, y, z), must be of size 3 or it will do nothing
 	 */
-	public void setPos(int[] newPos)
+	public void setPos(Position pos)
 	{
-		if (newPos.length < 3)
-			return;
-		pos[0] = newPos[0];
-		pos[1] = newPos[1];
-		pos[2] = newPos[2];
+		this.pos = pos;
 	}
 	
 	/**
 	 * Getter for position
 	 */
-	public int[] getPos()
+	public Position getPos()
 	{
 		return pos;
 	}
@@ -455,14 +452,6 @@ public abstract class Agent {
 
 	public int getHeight() {
 		return height;
-	}
-
-	public void setHomePos(int[] homePos) {
-		this.homePos = homePos;
-	}
-
-	public int[] getHomePos() {
-		return homePos;
 	}
 
 	public void setRampAscending(boolean rampStepping) {
@@ -559,5 +548,13 @@ public abstract class Agent {
 
 	public void setInteractingWithHero(boolean interactingWithHero) {
 		this.interactingWithHero = interactingWithHero;
+	}
+
+	public Position getHomePos() {
+		return homePos;
+	}
+
+	public void setHomePos(Position homePos) {
+		this.homePos = homePos;
 	}
 }

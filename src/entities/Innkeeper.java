@@ -4,16 +4,16 @@ import static entities.Agent.direction.down;
 import static entities.Agent.direction.left;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import actions.Converse;
 import actions.FollowPath;
-import actions.Jump;
 import actions.Say;
-import actions.Step;
 import actions.Turn;
+import world.Position;
 import world.World;
 import static world.World.controlState.*;
 
@@ -76,7 +76,7 @@ public class Innkeeper extends Agent
 				setInterrupted(true);
 				//queue current action and commence with interaction
 				heldActionStack.push(currentAction);
-				heldActionArgsStack.push(args);
+				heldActionArgsStack.push(new ArrayList<String>(args));
 				beginInteraction(agent, world);
 			}
 			else
@@ -148,9 +148,9 @@ public class Innkeeper extends Agent
 		{
 			currentAction = turn;
 			args.clear();
-			int[] agentPos = agent.getPos();
-			int xDiff = pos[0] - agentPos[0];
-			int yDiff = pos[1] - agentPos[1];
+			Position agentPos = agent.getPos();
+			int xDiff = pos.x - agentPos.x;
+			int yDiff = pos.y - agentPos.y;
 			if (Math.abs(xDiff) > Math.abs(yDiff))
 			{
 				if (xDiff < 0)
@@ -202,7 +202,7 @@ public class Innkeeper extends Agent
 					setInterrupted(true);
 					//queue current action and commence with interaction
 					heldActionStack.push(currentAction);
-					heldActionArgsStack.push(args);
+					heldActionArgsStack.push(new ArrayList<String>(args));
 					beginInteraction(waitingInteractee, world);
 					setInterruptRequested(false);
 				}
@@ -232,7 +232,7 @@ public class Innkeeper extends Agent
 				setInterrupted(true);
 				//queue current action and commence with interaction
 				heldActionStack.push(currentAction);
-				heldActionArgsStack.push(args);
+				heldActionArgsStack.push(new ArrayList<String>(args));
 				beginInteraction(waitingInteractee, world);
 				setInterruptRequested(false);
 			}

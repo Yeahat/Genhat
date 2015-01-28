@@ -3,6 +3,7 @@ package actions;
 import java.util.ArrayList;
 
 import utils.DisplayText;
+import world.Position;
 import world.World;
 import entities.Agent;
 
@@ -46,10 +47,10 @@ public class Say implements Action
 			if (turnFirst)
 			{
 				ArrayList<String> turnArgs = new ArrayList<String>();
-				int[] heroPos = world.getPlayer().getPos();
-				int[] agentPos = agent.getPos();
-				int xDiff = agentPos[0] - heroPos[0];
-				int yDiff = agentPos[1] - heroPos[1];
+				Position heroPos = world.getPlayer().getPos();
+				Position agentPos = agent.getPos();
+				int xDiff = agentPos.x - heroPos.x;
+				int yDiff = agentPos.y - heroPos.y;
 				if (Math.abs(xDiff) > Math.abs(yDiff))
 				{
 					if (xDiff < 0)

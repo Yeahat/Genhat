@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import world.World;
 import entities.Agent;
 
-import static entities.Agent.direction.*;
-
 public class FollowPath implements Action 
 {	
 	String path;

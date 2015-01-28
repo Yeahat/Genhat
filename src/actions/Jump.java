@@ -2,11 +2,11 @@ package actions;
 
 import java.util.ArrayList;
 
+import world.Position;
 import world.World;
 import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
-
 import static entities.Agent.direction.*;
 
 public class Jump implements Action {
@@ -30,59 +30,56 @@ public class Jump implements Action {
 				//set initial positions and offsets for all 8 cases
 				if (jumpingUp)
 				{
+					Position pos = agent.getPos();
 					switch (agent.getDir())
 					{
 					case up:
 						world.moveAgent(agent, 0, 1, 1);
 						agent.setOffsetY(-32);
-						int[] p1 = agent.getPos();
-						Placeholder h1 = new Placeholder(agent, p1[0], p1[1] - 1, p1[2] - 1);
+						Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z - 1));
 						world.addAgent(h1);
 						break;
 					case down:
 						switched = false;
-						int[] p2 = agent.getPos();
-						Placeholder holder1 = new Placeholder(agent, p2[0], p2[1] - 1, p2[2] + 1);
+						Placeholder holder1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z + 1));
 						world.addAgent(holder1);
 						break;
 					case left:
 						world.moveAgent(agent, -1, 0, 1);
 						agent.setOffsetX(16);
 						agent.setOffsetY(-16);
-						int[] p3 = agent.getPos();
-						Placeholder h3 = new Placeholder(agent, p3[0] + 1, p3[1], p3[2] - 1);
+						Placeholder h3 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z - 1));
 						world.addAgent(h3);
 						break;
 					case right:
 						world.moveAgent(agent, 1, 0, 1);
 						agent.setOffsetX(-16);
 						agent.setOffsetY(-16);
-						int[] p4 = agent.getPos();
-						Placeholder h4 = new Placeholder(agent, p4[0] - 1, p4[1], p4[2] - 1);
+						Placeholder h4 = new Placeholder(agent, new Position(pos.x - 1, pos.y, pos.z - 1));
 						world.addAgent(h4);
 						break;
 					}
 				}
 				else
 				{
-					int[] pos = agent.getPos();
+					Position pos = agent.getPos();
 					switch (agent.getDir())
 					{
 					case up:
 						switched = false;
-						Placeholder holder4 = new Placeholder(agent, pos[0], pos[1] + 1, pos[2] - 1);
+						Placeholder holder4 = new Placeholder(agent, new Position(pos.x, pos.y + 1, pos.z - 1));
 						world.addAgent(holder4);
 						break;
 					case down:
-						Placeholder holder3 = new Placeholder(agent, pos[0], pos[1] - 1, pos[2] - 1);
+						Placeholder holder3 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z - 1));
 						world.addAgent(holder3);
 						break;
 					case left:
-						Placeholder holder1 = new Placeholder(agent, pos[0] - 1, pos[1], pos[2] - 1);
+						Placeholder holder1 = new Placeholder(agent, new Position(pos.x - 1, pos.y, pos.z - 1));
 						world.addAgent(holder1);
 						break;
 					case right:
-						Placeholder holder2 = new Placeholder(agent, pos[0] + 1, pos[1], pos[2] - 1);
+						Placeholder holder2 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z - 1));
 						world.addAgent(holder2);
 						break;
 					}
@@ -106,8 +103,8 @@ public class Jump implements Action {
 				agent.setOffsetY(dstJumped + lookupHeight() - 32);
 				if (dstJumped >= 16)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] - 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x, pos.y - 1, pos.z - 1);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
@@ -133,9 +130,9 @@ public class Jump implements Action {
 				{
 					if (!switched)
 					{
-						int[] pos = agent.getPos();
-						Placeholder h = new Placeholder(agent, pos[0], pos[1], pos[2]);
-						world.removeAgentAt(pos[0], pos[1] - 1, pos[2] + 1);
+						Position pos = agent.getPos();
+						Placeholder h = new Placeholder(agent, new Position(pos.x, pos.y, pos.z));
+						world.removeAgentAt(pos.x, pos.y - 1, pos.z + 1);
 						world.moveAgent(agent, 0, -1, 1);
 						world.addAgent(h);
 						switched = true;
@@ -145,8 +142,8 @@ public class Jump implements Action {
 					
 				if (dstJumped >= 16)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0], pos[1] + 1, pos[2] - 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x, pos.y + 1, pos.z - 1);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
@@ -168,8 +165,8 @@ public class Jump implements Action {
 				agent.setOffsetY(-16 + lookupHeight());
 				if (agent.getOffsetX() <= 0)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0] + 1, pos[1], pos[2] - 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x + 1, pos.y, pos.z - 1);
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
@@ -191,8 +188,8 @@ public class Jump implements Action {
 				agent.setOffsetY(-16 + lookupHeight());
 				if (agent.getOffsetX() >= 0)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0] - 1, pos[1], pos[2] - 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x - 1, pos.y, pos.z - 1);
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
@@ -222,9 +219,9 @@ public class Jump implements Action {
 				{
 					if (!switched)
 					{
-						int[] pos = agent.getPos();
-						Placeholder h = new Placeholder(agent, pos[0], pos[1], pos[2]);
-						world.removeAgentAt(pos[0], pos[1] + 1, pos[2] - 1);
+						Position pos = agent.getPos();
+						Placeholder h = new Placeholder(agent, new Position(pos.x, pos.y, pos.z));
+						world.removeAgentAt(pos.x, pos.y + 1, pos.z - 1);
 						world.moveAgent(agent, 0, 1, -1);
 						world.addAgent(h);
 						switched = true;
@@ -234,8 +231,8 @@ public class Jump implements Action {
 					
 				if (dstJumped >= 16)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] + 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x, pos.y - 1, pos.z + 1);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
@@ -256,8 +253,8 @@ public class Jump implements Action {
 				agent.setOffsetY(-dstJumped - (16 - lookupHeight()));
 				if (dstJumped >= 16)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0], pos[1] - 1, pos[2] - 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x, pos.y - 1, pos.z - 1);
 					world.moveAgent(agent, 0, -1, -1);
 					agent.setOffsetY(0);
 					agent.setJumping(false);
@@ -279,8 +276,8 @@ public class Jump implements Action {
 				agent.setOffsetY(lookupHeight() - 16);
 				if (agent.getOffsetX() <= -16)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0] - 1, pos[1], pos[2] - 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x - 1, pos.y, pos.z - 1);
 					world.moveAgent(agent, -1, 0, -1);
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
@@ -303,8 +300,8 @@ public class Jump implements Action {
 				agent.setOffsetY(lookupHeight() - 16);
 				if (agent.getOffsetX() >= 16)
 				{
-					int[] pos = agent.getPos();
-					world.removeAgentAt(pos[0] + 1, pos[1], pos[2] - 1);
+					Position pos = agent.getPos();
+					world.removeAgentAt(pos.x + 1, pos.y, pos.z - 1);
 					world.moveAgent(agent, 1, 0, -1);
 					agent.setOffsetX(0);
 					agent.setOffsetY(0);
@@ -332,9 +329,9 @@ public class Jump implements Action {
 
 	private boolean canJump(Agent agent, World world)
 	{
-		int[] pos = agent.getPos();
-		int xFinish = pos[0];
-		int yFinish = pos[1];
+		Position pos = agent.getPos();
+		int xFinish = pos.x;
+		int yFinish = pos.y;
 		switch (agent.getDir())
 		{
 		case up:	yFinish ++;	break;
@@ -345,11 +342,11 @@ public class Jump implements Action {
 		}
 		
 		//Check to see if the jump should be ascending
-		if (world.isLandable(xFinish, yFinish, pos[2] + 1))
+		if (world.isLandable(xFinish, yFinish, pos.z + 1))
 		{
 			jumpingUp = true;
 			//Check if the area one space above the agent is blocked
-			if (!world.isInBounds(pos[0], pos[1], pos[2] + agent.getHeight()) || world.isBlocked(pos[0], pos[1], pos[2] + agent.getHeight()))
+			if (!world.isInBounds(pos.x, pos.y, pos.z + agent.getHeight()) || world.isBlocked(pos.x, pos.y, pos.z + agent.getHeight()))
 			{
 				return false;
 			}
@@ -358,7 +355,7 @@ public class Jump implements Action {
 				//check the spaces the agent will occupy upon landing for blocking
 				for (int z = 0; z < agent.getHeight(); z++)
 				{
-					if (!world.isInBounds(xFinish, yFinish, pos[2] + 1 + z) || world.isBlocked(xFinish, yFinish, pos[2] + 1 + z))
+					if (!world.isInBounds(xFinish, yFinish, pos.z + 1 + z) || world.isBlocked(xFinish, yFinish, pos.z + 1 + z))
 					{
 						return false;
 					}
@@ -368,7 +365,7 @@ public class Jump implements Action {
 			}
 		}
 		//Check to see if the jump should be descending
-		else if (world.isLandable(xFinish, yFinish, pos[2] - 1))
+		else if (world.isLandable(xFinish, yFinish, pos.z - 1))
 		{
 			jumpingUp = false;
 			
@@ -376,7 +373,7 @@ public class Jump implements Action {
 			//as one space above the agent's landing position that will be jumped through
 			for (int z = 0; z <= agent.getHeight(); z++)
 			{
-				if (!world.isInBounds(xFinish, yFinish, pos[2] - 1 + z) || world.isBlocked(xFinish, yFinish, pos[2] - 1 + z))
+				if (!world.isInBounds(xFinish, yFinish, pos.z - 1 + z) || world.isBlocked(xFinish, yFinish, pos.z - 1 + z))
 				{
 					return false;
 				}

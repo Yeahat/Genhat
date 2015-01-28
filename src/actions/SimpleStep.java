@@ -2,12 +2,12 @@ package actions;
 
 import java.util.ArrayList;
 
+import utils.PathPlanners;
+import world.Position;
 import world.World;
 import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
-import entities.Agent.direction;
-
 import static entities.Agent.direction.*;
 
 public class SimpleStep implements Action {
@@ -33,14 +33,14 @@ public class SimpleStep implements Action {
 			{
 				agent.setDir(up);
 				
-				if(canStep(agent, world, up))
+				if(PathPlanners.canStep(agent, world, agent.getPos(), up))
 				{
 					world.moveAgent(agent, 0, 1, 0);
 					agent.setOffsetY(-16);
-					int[] pos = agent.getPos();
+					Position pos = agent.getPos();
 					//set placeholder to render instead of agent (fixes a graphical glitch caused by tile render order)
 					agent.setRenderOnPlaceholder(true);
-					Placeholder h1 = new Placeholder(agent, pos[0], pos[1] - 1, pos[2]);
+					Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z));
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -56,8 +56,8 @@ public class SimpleStep implements Action {
 			if (agent.getOffsetY() >= 0)
 			{
 				swapFootstep(agent);
-				int[] pos = agent.getPos();
-				world.removeAgentAt(pos[0], pos[1] - 1, pos[2]);
+				Position pos = agent.getPos();
+				world.removeAgentAt(pos.x, pos.y - 1, pos.z);
 				agent.setOffsetY(0);
 				agent.setRenderOnPlaceholder(false);
 				agent.setStepping(false);
@@ -78,12 +78,12 @@ public class SimpleStep implements Action {
 			{
 				agent.setDir(down);
 
-				if(canStep(agent, world, down))
+				if(PathPlanners.canStep(agent, world, agent.getPos(), down))
 				{
 					world.moveAgent(agent, 0, -1, 0);
 					agent.setOffsetY(16);
-					int[] pos = agent.getPos();
-					Placeholder h1 = new Placeholder(agent, pos[0], pos[1] + 1, pos[2]);
+					Position pos = agent.getPos();
+					Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y + 1, pos.z));
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -98,8 +98,8 @@ public class SimpleStep implements Action {
 			agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() <= 0)
 			{
-				int[] pos = agent.getPos();
-				world.removeAgentAt(pos[0], pos[1] + 1, pos[2]);
+				Position pos = agent.getPos();
+				world.removeAgentAt(pos.x, pos.y + 1, pos.z);
 				swapFootstep(agent);
 				agent.setOffsetY(0);
 				agent.setStepping(false);
@@ -120,12 +120,12 @@ public class SimpleStep implements Action {
 			{
 				agent.setDir(left);
 
-				if(canStep(agent, world, left))
+				if(PathPlanners.canStep(agent, world, agent.getPos(), left))
 				{
 					world.moveAgent(agent, -1, 0, 0);
 					agent.setOffsetX(16);
-					int[] pos = agent.getPos();
-					Placeholder h1 = new Placeholder(agent, pos[0] + 1, pos[1], pos[2]);
+					Position pos = agent.getPos();
+					Placeholder h1 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z));
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -140,8 +140,8 @@ public class SimpleStep implements Action {
 			agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() <= 0)
 			{
-				int[] pos = agent.getPos();
-				world.removeAgentAt(pos[0] + 1, pos[1], pos[2]);
+				Position pos = agent.getPos();
+				world.removeAgentAt(pos.x + 1, pos.y, pos.z);
 				swapFootstep(agent);
 				agent.setOffsetX(0);
 				agent.setStepping(false);
@@ -162,12 +162,12 @@ public class SimpleStep implements Action {
 			{
 				agent.setDir(right);
 
-				if(canStep(agent, world, right))
+				if(PathPlanners.canStep(agent, world, agent.getPos(), right))
 				{
 					world.moveAgent(agent, 1, 0, 0);
 					agent.setOffsetX(-16);
-					int[] pos = agent.getPos();
-					Placeholder h1 = new Placeholder(agent, pos[0] - 1, pos[1], pos[2]);
+					Position pos = agent.getPos();
+					Placeholder h1 = new Placeholder(agent, new Position(pos.x - 1, pos.y, pos.z));
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);
@@ -182,8 +182,8 @@ public class SimpleStep implements Action {
 			agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() >= 0)
 			{
-				int[] pos = agent.getPos();
-				world.removeAgentAt(pos[0] - 1, pos[1], pos[2]);
+				Position pos = agent.getPos();
+				world.removeAgentAt(pos.x - 1, pos.y, pos.z);
 				swapFootstep(agent);
 				agent.setOffsetX(0);
 				agent.setStepping(false);
@@ -212,59 +212,7 @@ public class SimpleStep implements Action {
 		return finishedStep;
 	}
 	
-	/**
-	 * Determine whether it is possible to step to the next location, incorporating bounds checking,
-	 * collision checking with things and objects, and ensuring that the next location either has
-	 * solid ground below it or a crossable thing on it
-	 * 
-	 * @param agent the agent taking the action
-	 * @param world the world
-	 * @param dir the direction of the step
-	 * @return true if the agent can step in the given direction, false otherwise
-	 */
-	private boolean canStep(Agent agent, World world, direction dir)
-	{
-		int[] pos = agent.getPos();
-		int x = pos[0];
-		int y = pos[1];
-		
-		switch (dir)
-		{
-		case up:
-			y += 1;
-		break;
-		case down:
-			y -= 1;
-		break;
-		case left:
-			x -= 1;
-		break;
-		case right:
-			x += 1;
-		break;
-		}
-		
-		for (int z = pos[2]; z < pos[2] + agent.getHeight(); z ++)
-		{
-			//grid bounds check
-			if (!world.isInBounds(x, y, z))
-			{
-				return false;
-			}
-			//collision check
-			if (world.isBlocked(x, y, z))
-			{
-				return false;
-			}
-		}
-		//ground check
-		if (!world.isCrossable(x, y, pos[2]))
-		{
-			return false;
-		}
-		
-		return true;
-	}
+	
 		
 	private void swapFootstep(Agent agent)
 	{

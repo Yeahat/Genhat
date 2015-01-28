@@ -10,16 +10,13 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import actions.Step;
-import actions.Turn;
 import actions.Wander;
-
+import world.Position;
 import world.World;
 
 public class Wanderer extends Agent {
 	int frequency;
 	int distance;
-	int[] homePosTemp;
 	
 	//Actions
 	Wander wander;
@@ -27,23 +24,13 @@ public class Wanderer extends Agent {
 	/**
 	 * Constructor
 	 */
-	public Wanderer(int[] homePosition, int freq, int dst)
+	public Wanderer(Position homePos, int frequency, int distance)
 	{
 		super(false, false);
 		
-		frequency = freq;
-		distance = dst;
-		homePosTemp = new int[3];
-		if (homePosition.length < 3)
-		{
-			homePosTemp = getPos();
-		}
-		else
-		{
-			homePosTemp[0] = homePosition[0];
-			homePosTemp[1] = homePosition[1];
-			homePosTemp[2] = homePosition[2];
-		}
+		this.frequency = frequency;
+		this.distance = distance;
+		this.setHomePos(homePos);
 		
 		setActions();		
 		initState();
@@ -65,7 +52,6 @@ public class Wanderer extends Agent {
 		setStepping(false);
 		setFootstep(left);
 		setHeight(2);
-		setHomePos(homePosTemp);
 	}
 	
 	@Override

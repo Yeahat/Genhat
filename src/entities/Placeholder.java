@@ -7,21 +7,20 @@ import static entities.Agent.direction.up;
 
 import org.lwjgl.opengl.GL11;
 
+import world.Position;
 import world.World;
 
 public class Placeholder extends Agent {
 
 	Agent agent; //the agent for which the placeholder is acting
 	
-	public Placeholder(Agent a, int x, int y, int z)
+	public Placeholder(Agent agent, Position pos)
 	{
-		pos[0] = x;
-		pos[1] = y;
-		pos[2] = z;
+		this.pos = pos;
 		
-		agent = a;
+		this.agent = agent;
 		
-		if (a.isRenderOnPlaceholder() && !a.isTransparent())
+		if (agent.isRenderOnPlaceholder() && !agent.isTransparent())
 			this.setTransparent(false);
 		else
 			this.setTransparent(true);
@@ -48,7 +47,7 @@ public class Placeholder extends Agent {
 			//make any necessary adjustments to offsets to account for difference between hero and placeholder
 			this.offset[0] = agent.offset[0];
 			this.offset[1] = agent.offset[1];
-			if (agent.pos[1] > this.pos[1])
+			if (agent.pos.y > this.pos.y)
 			{
 				this.offset[1] += 16;
 			}
@@ -219,11 +218,11 @@ public class Placeholder extends Agent {
 		if (obj.getClass() != this.getClass())
 			return false;
 		
-		int[] pos2 = ((Placeholder)(obj)).getPos();
-		return (pos2[0] == pos[0] && pos2[1] == pos[1] && pos2[2] == pos[2]);
+		Position pos2 = ((Placeholder)(obj)).getPos();
+		return (pos2.x == pos.x && pos2.x == pos.x && pos2.x == pos.x);
 	}
 	
-	public int[] getEffectivePos()
+	public Position getEffectivePos()
 	{
 		return agent.pos;
 	}
