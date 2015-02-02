@@ -176,9 +176,10 @@ public class PathPlanners {
 				z -= 1;
 		}
 
-		int kMax = pos.z + agent.getHeight();
-		if (continuingDescent)
-			kMax -= 1;
+		int kMax = z + agent.getHeight();
+		//if (continuingDescent)
+		//	kMax -= 1;
+		
 		for (int k = z; k < kMax; k ++)
 		{
 			//grid bounds check
@@ -190,12 +191,14 @@ public class PathPlanners {
 			//collision check
 			if (dir == left || dir == right)
 			{
-				if (world.hasThing(x, y, k) && (world.getThingsAt(x, y, k).hasRamp() && (world.getThingsAt(x, y, k).getRampDir() == left || world.getThingsAt(x, y, k).getRampDir() == right)))
+				//NOTE: added k==z as test to prevent stacked ramps from allowing passage
+				if (k == z && world.hasThing(x, y, k) && (world.getThingsAt(x, y, k).hasRamp() && (world.getThingsAt(x, y, k).getRampDir() == left || world.getThingsAt(x, y, k).getRampDir() == right)))
 				{
 					if (world.getAgentAt(x, y, k) != null)
 					{
 						return false;
 					}
+					//TODO: check any non-ramp things and make sure they're not blocking or are crossable?
 				}
 				else if (world.isBlocked(x, y, k))
 				{

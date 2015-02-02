@@ -169,7 +169,10 @@ public class World {
 		{
 			if (terrainGrid[x][y][k].getTerrainType() != air)
 			{
-				return z + 2;
+				//adjustment for standing on stairs
+				if (z - 1 >= 0 && this.hasThing(x, y, z - 1) && this.getThingsAt(x, y, z - 1).hasRamp())
+					return z + player.getHeight() - 1;
+				return z + player.getHeight();
 			}
 		}
 		
@@ -184,7 +187,12 @@ public class World {
 				if (k + i >= terrainGrid[0][0].length)
 					break;
 				if (terrainGrid[x][j][k + i].getTerrainType() != air)
-					return z + 2;
+				{
+					//adjustment for standing on stairs
+					if (z - 1 >= 0 && this.hasThing(x, y, z - 1) && this.getThingsAt(x, y, z - 1).hasRamp())
+						return z + player.getHeight() - 1;
+					return z + player.getHeight();
+				}
 			}
 		}
 		
@@ -554,14 +562,17 @@ public class World {
 							}
 							else
 							{
-								GL11.glColor3f(0, 0, 0);
-								GL11.glBegin(GL11.GL_QUADS);
-									GL11.glVertex2f(0, 0);
-									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-								GL11.glEnd();
-								GL11.glColor3f(1, 1, 1);
+								if (terrainGrid[i][j][k-1].type != air)
+								{
+									GL11.glColor3f(0, 0, 0);
+									GL11.glBegin(GL11.GL_QUADS);
+										GL11.glVertex2f(0, 0);
+										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
+										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
+										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+									GL11.glEnd();
+									GL11.glColor3f(1, 1, 1);
+								}
 							}
 							
 						GL11.glPopMatrix();
@@ -718,7 +729,7 @@ public class World {
 						}
 					}
 					//Display hanging bottom vertical textures
-					if (k + 1 <= kMax && terrainGrid[i][j][k+1].getTerrainType() != air && k - 1 >= 0
+					if (k + 1 < kMax && terrainGrid[i][j][k+1].getTerrainType() != air && k - 1 >= 0
 							&& ((!terrainGrid[i][j][k+1].isUnblendedVertical() && (terrainGrid[i][j][k].getTerrainType() == air || terrainGrid[i][j][k].isUnblendedVertical()))
 									|| (terrainGrid[i][j][k+1].isUnblendedVertical() && (terrainGrid[i][j][k].getTerrainType() == air || terrainGrid[i][j][k].getTerrainType() != terrainGrid[i][j][k+1].getTerrainType()))))
 					{

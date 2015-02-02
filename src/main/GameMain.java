@@ -563,13 +563,14 @@ public class GameMain {
 		world.addThing(jumpStool2, 14, 25, 2);
 		world.addThing(jumpStool3, 13, 29, 2);
 		
-		//house test
-		//floor
+		//inn test
+		//bottom and top floor
 		for (int i = 25; i < 45; i ++)
 		{
 			for (int j = 30; j < 38; j ++)
 			{
 				t[i][j][0] = new Terrain(dirt, woodPlank);
+				t[i][j][3] = new Terrain(woodSupport, woodPlank);
 			}
 		}
 		//walls
@@ -591,10 +592,25 @@ public class GameMain {
 			}
 		}
 		
+		//doorway top
+		t[34][30][3] = new Terrain(rock);
+		t[35][30][3] = new Terrain(rock);
+		
+		//openings for stairs and chimney
+		t[36][36][3] = new Terrain(air);
+		t[37][36][3] = new Terrain(air);
+		t[38][36][3] = new Terrain(air);
+		t[41][36][3] = new Terrain(air);
+		t[42][36][3] = new Terrain(air);
+		
 		//windows
 		t[28][30][2] = new Terrain(glass, air);
 		t[29][30][2] = new Terrain(glass, air);
 		t[30][30][2] = new Terrain(glass, air);
+		
+		t[39][30][2] = new Terrain(glass, air);
+		t[40][30][2] = new Terrain(glass, air);
+		t[41][30][2] = new Terrain(glass, air);
 		
 		//house objects
 		Bar b1 = new Bar.BarBuilder().connection(start).build();
@@ -647,7 +663,6 @@ public class GameMain {
 		world.addThing(s3, 42, 36, 3);
 		world.addThing(s2.getAssociatedBottom(), 41, 36, 1);
 		world.addThing(s3.getAssociatedBottom(), 42, 36, 2);
-		t[43][36][3] = new Terrain(dirt, dirt);
 		
 		WallCandle candle1 = new WallCandle();
 		WallCandle candle2 = new WallCandle();

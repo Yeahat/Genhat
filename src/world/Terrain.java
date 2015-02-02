@@ -5,7 +5,7 @@ import static world.Terrain.terrainType.*;
 public class Terrain {
 	public enum terrainType
 	{
-		grass, dirt, air, rock, thatch, glass, woodPlank
+		grass, dirt, air, rock, thatch, glass, woodPlank, woodSupport
 	}
 	
 	boolean blocking;
@@ -184,7 +184,7 @@ public class Terrain {
 	private void setUnblended()
 	{
 		//add the names of any new unblended vertical terrain types here
-		if (type == glass)
+		if (type == glass || type == woodSupport)
 			unblendedVertical = true;
 		else
 			unblendedVertical = false;
@@ -214,6 +214,8 @@ public class Terrain {
 			texRow = 0; texCol = 3; break;
 		case woodPlank:
 			texRow = 1; texCol = 0; break;
+		case woodSupport:
+			texRow = 1; texCol = 2; break;
 			
 		//Unset (blank)
 		default:
