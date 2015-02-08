@@ -5,7 +5,7 @@ import static world.Terrain.terrainType.*;
 public class Terrain {
 	public enum terrainType
 	{
-		grass, dirt, air, rock, thatch, glass, woodPlank, woodSupport
+		grass, dirt, air, rock, thatch, glass, window, windowProtruding, woodPlank, woodPlankWeathered, woodSupport, wallLight
 	}
 	
 	boolean blocking;
@@ -172,7 +172,7 @@ public class Terrain {
 	private void setTransparent()
 	{
 		//add the names of any new transparent terrain types here
-		if (type == air || type == glass)
+		if (type == air || type == glass || type == window || type == windowProtruding)
 			transparent = true;
 		else
 			transparent = false;
@@ -184,7 +184,7 @@ public class Terrain {
 	private void setUnblended()
 	{
 		//add the names of any new unblended vertical terrain types here
-		if (type == glass || type == woodSupport)
+		if (type == glass || type == window || type == windowProtruding || type == woodSupport)
 			unblendedVertical = true;
 		else
 			unblendedVertical = false;
@@ -216,6 +216,12 @@ public class Terrain {
 			texRow = 1; texCol = 0; break;
 		case woodSupport:
 			texRow = 1; texCol = 2; break;
+		case wallLight:
+			texRow = 2; texCol = 0; break;
+		case woodPlankWeathered:
+			texRow = 2; texCol = 1; break;
+		case windowProtruding: 
+			texRow = 2; texCol = 2; break;
 			
 		//Unset (blank)
 		default:

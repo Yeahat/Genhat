@@ -564,13 +564,12 @@ public class GameMain {
 		world.addThing(jumpStool3, 13, 29, 2);
 		
 		//inn test
-		//bottom and top floor
+		//bottom and top floor and roof
 		for (int i = 25; i < 45; i ++)
 		{
 			for (int j = 30; j < 38; j ++)
 			{
 				t[i][j][0] = new Terrain(dirt, woodPlank);
-				t[i][j][3] = new Terrain(woodSupport, woodPlank);
 			}
 		}
 		//walls
@@ -582,6 +581,11 @@ public class GameMain {
 				if (i < 34 || i > 35)
 					t[i][30][k] = new Terrain(rock);
 			}
+			for (int k = 4; k < 7; k ++)
+			{
+				t[i][37][k] = new Terrain(woodPlankWeathered, thatch);
+				t[i][30][k] = new Terrain(wallLight, thatch);
+			}
 		}
 		for (int j = 30; j < 38; j ++)
 		{
@@ -589,6 +593,27 @@ public class GameMain {
 			{
 				t[25][j][k] = new Terrain(rock);
 				t[44][j][k] = new Terrain(rock);
+			}
+			for (int k = 4; k < 6; k ++)
+			{
+				t[24][j][k] = new Terrain(wallLight, thatch);
+				t[45][j][k] = new Terrain(wallLight, thatch);
+				t[25][j][k] = new Terrain(wallLight, thatch);
+				t[44][j][k] = new Terrain(wallLight, thatch);
+			}
+		}
+		for (int i = 25; i < 45; i ++)
+		{
+			for (int j = 31; j < 37; j ++)
+			{
+				t[i][j][3] = new Terrain(woodSupport, woodPlank);
+			}
+		}
+		for (int i = 25; i < 45; i ++)
+		{
+			for (int j = 31; j < 37; j ++)
+			{
+				t[i][j][6] = new Terrain(woodSupport, thatch);
 			}
 		}
 		
@@ -604,13 +629,26 @@ public class GameMain {
 		t[42][36][3] = new Terrain(air);
 		
 		//windows
-		t[28][30][2] = new Terrain(glass, air);
-		t[29][30][2] = new Terrain(glass, air);
-		t[30][30][2] = new Terrain(glass, air);
+		t[28][30][2] = new Terrain(windowProtruding, air);
+		t[29][30][2] = new Terrain(windowProtruding, air);
+		t[30][30][2] = new Terrain(windowProtruding, air);
 		
-		t[39][30][2] = new Terrain(glass, air);
-		t[40][30][2] = new Terrain(glass, air);
-		t[41][30][2] = new Terrain(glass, air);
+		t[39][30][2] = new Terrain(windowProtruding, air);
+		t[40][30][2] = new Terrain(windowProtruding, air);
+		t[41][30][2] = new Terrain(windowProtruding, air);
+		
+		
+		t[27][30][5] = new Terrain(window, air);
+		t[27][37][5] = new Terrain(window, air);
+		
+		t[32][30][5] = new Terrain(window, air);
+		t[32][37][5] = new Terrain(window, air);
+		
+		t[37][30][5] = new Terrain(window, air);
+		//t[37][37][5] = new Terrain(window, air);
+		
+		t[42][30][5] = new Terrain(window, air);
+		t[42][37][5] = new Terrain(window, air);
 		
 		//house objects
 		Bar b1 = new Bar.BarBuilder().connection(start).build();
@@ -684,6 +722,7 @@ public class GameMain {
 		FireplaceChimney chimney1 = new FireplaceChimney(down);
 		FireplaceChimney chimney2 = new FireplaceChimney(down);
 		FireplaceChimney chimney3 = new FireplaceChimney(down);
+		FireplaceChimney chimney4 = new FireplaceChimney(down);
 		FireplaceChimney chimneytop = new FireplaceChimney(up);
 		world.addThing(fp, 37, 36, 1);
 		world.addThing(fpside1, 36, 36, 1);
@@ -691,7 +730,9 @@ public class GameMain {
 		world.addThing(chimney1, 37, 36, 3);
 		world.addThing(chimney2, 37, 36, 4);
 		world.addThing(chimney3, 37, 36, 5);
-		world.addThing(chimneytop, 37, 36, 6);
+		world.addThing(chimney4, 37, 36, 6);
+		world.addThing(chimneytop, 37, 36, 7);
+		t[37][36][6] = new Terrain(air);
 		
 		Firewood fw1 = new Firewood();
 		Firewood fw2 = new Firewood();
