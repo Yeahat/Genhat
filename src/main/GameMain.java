@@ -14,6 +14,7 @@ import entities.Hero;
 import entities.Innkeeper;
 import entities.Wanderer;
 import entities.Agent.direction;
+import things.Beam;
 import things.Candle;
 import things.Chair;
 import things.Fireplace;
@@ -32,6 +33,7 @@ import static entities.Agent.direction.*;
 import static world.World.timeOfDay.*;
 import static things.Chair.chairType.*;
 import static things.Thing.connectionContext.*;
+import static things.Thing.Orientation.*;
 import static things.Stairs.stairsType.*;
 
 
@@ -583,8 +585,8 @@ public class GameMain {
 			}
 			for (int k = 4; k < 7; k ++)
 			{
-				t[i][37][k] = new Terrain(woodPlankWeathered, thatch);
-				t[i][30][k] = new Terrain(wallLight, thatch);
+				t[i][37][k] = new Terrain(woodPlank, thatch);
+				t[i][30][k] = new Terrain(plaster, thatch);
 			}
 		}
 		for (int j = 30; j < 38; j ++)
@@ -596,10 +598,10 @@ public class GameMain {
 			}
 			for (int k = 4; k < 6; k ++)
 			{
-				t[24][j][k] = new Terrain(wallLight, thatch);
-				t[45][j][k] = new Terrain(wallLight, thatch);
-				t[25][j][k] = new Terrain(wallLight, thatch);
-				t[44][j][k] = new Terrain(wallLight, thatch);
+				t[24][j][k] = new Terrain(plaster, thatch);
+				t[45][j][k] = new Terrain(plaster, thatch);
+				t[25][j][k] = new Terrain(plaster, thatch);
+				t[44][j][k] = new Terrain(plaster, thatch);
 			}
 		}
 		for (int i = 25; i < 45; i ++)
@@ -622,9 +624,7 @@ public class GameMain {
 		t[35][30][3] = new Terrain(rock);
 		
 		//openings for stairs and chimney
-		t[36][36][3] = new Terrain(air);
 		t[37][36][3] = new Terrain(air);
-		t[38][36][3] = new Terrain(air);
 		t[41][36][3] = new Terrain(air);
 		t[42][36][3] = new Terrain(air);
 		
@@ -649,6 +649,92 @@ public class GameMain {
 		
 		t[42][30][5] = new Terrain(window, air);
 		t[42][37][5] = new Terrain(window, air);
+		
+		//exterior wood beams
+		Beam dbeam1 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
+		Beam dbeam2 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
+		Beam dbeam3 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
+		world.addThing(dbeam1, 28, 30, 4);
+		world.addThing(dbeam2, 29, 30, 5);
+		world.addThing(dbeam2, 30, 30, 6);
+		Beam dbeam4 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
+		Beam dbeam5 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
+		Beam dbeam6 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
+		world.addThing(dbeam4, 41, 30, 4);
+		world.addThing(dbeam5, 40, 30, 5);
+		world.addThing(dbeam6, 39, 30, 6);
+		Beam dbeam7 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
+		Beam dbeam8 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
+		world.addThing(dbeam7, 45, 30, 4);
+		world.addThing(dbeam8, 24, 30, 4);
+		Beam vbeam1 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
+		Beam vbeam2 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
+		Beam vbeam3 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
+		Beam vbeam4 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
+		Beam vbeam5 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
+		Beam vbeam6 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
+		Beam vbeam7 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
+		Beam vbeam8 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
+		Beam vbeam9 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
+		Beam vbeam10 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
+		Beam vbeam11 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
+		Beam vbeam12 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
+		Beam vbeam14 = new Beam.BeamBuilder().orientation(vertical).connection(standalone).dir(right).build();
+		world.addThing(vbeam1, 26, 30, 4);
+		world.addThing(vbeam2, 26, 30, 5);
+		world.addThing(vbeam3, 26, 30, 6);
+		world.addThing(vbeam4, 31, 30, 4);
+		world.addThing(vbeam5, 31, 30, 5);
+		world.addThing(vbeam6, 31, 30, 6);
+		world.addThing(vbeam7, 36, 30, 4);
+		world.addThing(vbeam8, 36, 30, 5);
+		world.addThing(vbeam9, 36, 30, 6);
+		world.addThing(vbeam10, 41, 30, 4);
+		world.addThing(vbeam11, 41, 30, 5);
+		world.addThing(vbeam12, 41, 30, 6);
+		world.addThing(vbeam14, 45, 30, 4);
+		Beam vbeam15 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
+		Beam vbeam16 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
+		Beam vbeam17 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
+		Beam vbeam18 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
+		Beam vbeam19 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
+		Beam vbeam20 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
+		Beam vbeam21 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
+		Beam vbeam22 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
+		Beam vbeam23 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
+		Beam vbeam24 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
+		Beam vbeam25 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
+		Beam vbeam26 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
+		Beam vbeam27 = new Beam.BeamBuilder().orientation(vertical).connection(standalone).dir(left).build();
+		world.addThing(vbeam27, 24, 30, 4);
+		world.addThing(vbeam15, 28, 30, 4);
+		world.addThing(vbeam16, 28, 30, 5);
+		world.addThing(vbeam17, 28, 30, 6);
+		world.addThing(vbeam18, 33, 30, 4);
+		world.addThing(vbeam19, 33, 30, 5);
+		world.addThing(vbeam20, 33, 30, 6);
+		world.addThing(vbeam21, 38, 30, 4);
+		world.addThing(vbeam22, 38, 30, 5);
+		world.addThing(vbeam23, 38, 30, 6);
+		world.addThing(vbeam24, 43, 30, 4);
+		world.addThing(vbeam25, 43, 30, 5);
+		world.addThing(vbeam26, 43, 30, 6);
+		Beam hbeam1 = new Beam.BeamBuilder().orientation(horizontal).connection(start).dir(right).build();
+		Beam hbeam2 = new Beam.BeamBuilder().orientation(horizontal).connection(start).dir(left).build();
+		world.addThing(hbeam1, 24, 30, 3);
+		world.addThing(hbeam2, 24, 30, 4);
+		Beam hbeam3 = new Beam.BeamBuilder().orientation(horizontal).connection(end).dir(right).build();
+		Beam hbeam4 = new Beam.BeamBuilder().orientation(horizontal).connection(end).dir(left).build();
+		world.addThing(hbeam3, 45, 30, 3);
+		world.addThing(hbeam4, 45, 30, 4);
+		for (int i = 25; i <= 44; i ++)
+		{
+			Beam botBeam = new Beam.BeamBuilder().orientation(horizontal).connection(middle).dir(right).build();
+			Beam topBeam = new Beam.BeamBuilder().orientation(horizontal).connection(middle).dir(left).build();
+			world.addThing(botBeam, i, 30, 3);
+			world.addThing(topBeam, i, 30, 4);
+		}
+		
 		
 		//house objects
 		Bar b1 = new Bar.BarBuilder().connection(start).build();

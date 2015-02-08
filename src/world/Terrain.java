@@ -5,7 +5,7 @@ import static world.Terrain.terrainType.*;
 public class Terrain {
 	public enum terrainType
 	{
-		grass, dirt, air, rock, thatch, glass, window, windowProtruding, woodPlank, woodPlankWeathered, woodSupport, wallLight
+		grass, dirt, air, rock, thatch, glass, window, windowProtruding, woodPlank, woodPlankWeathered, woodSupport, plaster
 	}
 	
 	boolean blocking;
@@ -216,7 +216,7 @@ public class Terrain {
 			texRow = 1; texCol = 0; break;
 		case woodSupport:
 			texRow = 1; texCol = 2; break;
-		case wallLight:
+		case plaster:
 			texRow = 2; texCol = 0; break;
 		case woodPlankWeathered:
 			texRow = 2; texCol = 1; break;

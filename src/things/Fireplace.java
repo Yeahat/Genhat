@@ -32,6 +32,9 @@ public class Fireplace extends Thing {
 		texCol = 1;
 		blocking = true;
 		crossable = false;
+		fullBlock = true;
+		tallBlock = true;
+		blockingWidth = 22;
 		setLightSource(true);
 
 		lit = true;
@@ -53,6 +56,9 @@ public class Fireplace extends Thing {
 		texCol = 1;
 		blocking = true;
 		crossable = false;
+		fullBlock = true;
+		tallBlock = true;
+		blockingWidth = 22;
 		
 		if (isLit)
 		{
@@ -83,6 +89,9 @@ public class Fireplace extends Thing {
 		texCol = 1;
 		blocking = true;
 		crossable = false;
+		fullBlock = true;
+		tallBlock = true;
+		blockingWidth = 22;
 		
 		if (isLit)
 		{

@@ -13,11 +13,19 @@ public abstract class Thing {
 		start, middle, end, standalone
 	}
 	
+	public enum Orientation
+	{
+		horizontal, vertical, diagonal
+	}
+	
 	//State
-	boolean blocking = true;
-	boolean crossable = false;
-	boolean ramp = false;
-	boolean transparent = false; //true if thing should not block light sources
+	protected boolean blocking = true;
+	protected boolean crossable = false;
+	protected boolean ramp = false;
+	protected boolean transparent = false; //true if thing should not block light sources
+	protected boolean fullBlock = false; //true if thing should be replaced with a black square when one space above the render level, as with terrain
+	protected boolean tallBlock = false; //set to true only if things is fullBlock and occupies two vertical spaces
+	protected int blockingWidth = 16; //blocking width, only used if fullBlock, defaulted to the default cell width
 	protected boolean lightSource = false;
 	protected boolean antiLightSource = false;
 	protected float lightPower = 0.6f; //strength of light emission if the Thing is a light source, light absorption if the thing is an anti light source
@@ -29,9 +37,9 @@ public abstract class Thing {
 	protected float[] velocity = new float[3]; //frame-by-frame changes in (x, y, z) position of the thing
 	
 	//Texture
-	Texture texture;
-	int texRow;
-	int texCol;
+	protected Texture texture;
+	protected int texRow;
+	protected int texCol;
 	protected int TEXTURE_SIZE_X = 24;	//Sprite sheet character width, this can be overridden
 	protected int TEXTURE_SIZE_Y = 32;	//Sprite sheet character height, this can be overridden
 	protected int TEXTURE_SHEET_WIDTH = 256; //Sprite sheet height, this can be overridden (must be a multiple of 2)

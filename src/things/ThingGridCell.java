@@ -52,6 +52,40 @@ public class ThingGridCell {
 		return false;
 	}
 	
+	public boolean hasFullBlock()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).fullBlock)
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean hasTallBlock()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).tallBlock)
+				return true;
+		}
+		return false;
+	}
+	
+	public int getBlockingWidth()
+	{
+		int maxWidth = 0;
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).fullBlock)
+			{
+				if (thingList.get(i).blockingWidth > maxWidth)
+					maxWidth = thingList.get(i).blockingWidth;
+			}
+		}
+		return maxWidth;
+	}
+	
 	/**
 	 * Get the direction of a ramp (assuming there is a ramp in this cell)
 	 * @return the direction of the ramp in this cell

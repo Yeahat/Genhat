@@ -2,7 +2,7 @@ package utils.planners;
 
 import world.Position;
 
-public class Node implements Comparable{
+public class Node implements Comparable<Object>{
 	private final Position pos;
 	private final String path;
 	private final int h;

@@ -562,6 +562,9 @@ public class World {
 							}
 							else
 							{
+								//Commented out conditional also accounts for having a fullBlock thing below the piece of vertical terrain.
+								//Uncomment this if there is ever a thing that is made to replace a wall.
+								//if (terrainGrid[i][j][k-1].type != air || (this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()))
 								if (terrainGrid[i][j][k-1].type != air)
 								{
 									GL11.glColor3f(0, 0, 0);
@@ -801,11 +804,12 @@ public class World {
 				}
 				
 				// Render Things
-				if (k < kMax)
+				for (int i = iMin; i <= iMax; i ++)
 				{
-					for (int i = iMin; i <= iMax; i ++)
+					
+					if (this.hasThing(i, j, k))
 					{
-						if (this.hasThing(i, j, k))
+						if (k < kMax)
 						{
 							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
@@ -816,8 +820,35 @@ public class World {
 								thingGrid[i][j][k].renderThings(PIXEL_SIZE, TEXTURE_SIZE);
 							GL11.glPopMatrix();
 						}
+						else
+						{
+							//NOTE: The commented out condition will render black boxes over a fullBlock thing even if vertical terrain is under it, 
+							//not just if it's another fullBlock thing.  Test this to see which looks better.
+							//if (terrainGrid[i][j][k-1].type != air || (this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()))
+							if (this.getThingsAt(i, j, k).hasFullBlock() && ((this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()) || this.hasThing(i, j, k-2) && this.getThingsAt(i, j, k-2).hasTallBlock()))
+							{
+								int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+								int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+								
+								int adjustment = (this.getThingsAt(i, j, k).getBlockingWidth() - TEXTURE_SIZE) / 2;
+								
+								GL11.glPushMatrix();
+									GL11.glColor3f(0, 0, 0);
+									GL11.glTranslatef(x - (PIXEL_SIZE*adjustment), y, 0);
+									GL11.glBegin(GL11.GL_QUADS);
+										GL11.glVertex2f(0, 0);
+										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE + (PIXEL_SIZE*adjustment*2), 0);
+										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE + (PIXEL_SIZE*adjustment*2), PIXEL_SIZE*TEXTURE_SIZE);
+										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+									GL11.glEnd();
+									GL11.glColor3f(1, 1, 1);
+								GL11.glPopMatrix();
+							}
+						}
 					}
-					
+				}
+				if (k < kMax)
+				{
 					//Render Agents
 					for (int i = iMin; i <= iMax; i ++)
 					{

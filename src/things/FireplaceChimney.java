@@ -18,6 +18,8 @@ public class FireplaceChimney extends Thing {
 		texRow = 3;
 		texCol = 1;
 		blocking = true;
+		fullBlock = true;
+		blockingWidth = 22;
 		setDir(left);
 	}
 	
@@ -28,6 +30,8 @@ public class FireplaceChimney extends Thing {
 		texRow = 3;
 		texCol = 1;
 		blocking = true;
+		fullBlock = true;
+		blockingWidth = 22;
 		setDir(d);
 	}
 	

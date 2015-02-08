@@ -1,7 +1,5 @@
 package world;
 
-import java.util.Scanner;
-
 public class Position
 {
 	public int x = 0;
