@@ -41,6 +41,7 @@ public class SimpleStep implements Action {
 					//set placeholder to render instead of agent (fixes a graphical glitch caused by tile render order)
 					agent.setRenderOnPlaceholder(true);
 					Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z));
+					h1.setTransparent(true);
 					world.addAgent(h1);
 					finishedStep = false;
 					agent.setStepping(true);

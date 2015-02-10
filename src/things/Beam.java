@@ -33,10 +33,10 @@ public class Beam extends Thing {
 		 *   up - left half of beam for overlapping cells
 		 *   
 		 * diagonal:
-		 *   left: single beam, top-left to bottom-right (main) diagonal
-		 *   right: single beam, bottom-left to top-right diagonal
-		 *   up: crossing beam, main diagonal on top
-		 *   down: crossing beam, main diagonal on bottom
+		 *   left - single beam, top-left to bottom-right (main) diagonal
+		 *   right - single beam, bottom-left to top-right diagonal
+		 *   up - crossing beam, main diagonal on top
+		 *   down - crossing beam, main diagonal on bottom
 		 */
 		
 		this.dir = builder.dir;
@@ -74,7 +74,13 @@ public class Beam extends Thing {
 			break;
 		case diagonal:
 			texCol = 0;
-			texRow = 1;
+			switch (dir)
+			{
+			case left: texRow = 0; break;
+			case right: texRow = 1; break;
+			case up: texRow = 2; break;
+			case down: texRow = 3; break;
+			}
 			break;
 		}
 		
@@ -83,8 +89,13 @@ public class Beam extends Thing {
 	
 	@Override
 	public void loadTextures() {
+		String sheet;
+		if (orientation == diagonal)
+			sheet = "graphics/objects/thing3.png";
+		else
+			sheet = "graphics/objects/thing1.png";
 		try {
-			texture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/objects/thing1.png"));
+			texture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream(sheet));
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
@@ -101,25 +112,12 @@ public class Beam extends Thing {
 			int texX = texCol * 4;
 			int texY = texRow;
 			
-			if (orientation == diagonal)
+			switch (connection)
 			{
-				switch (dir)
-				{
-				case left: break;
-				case right: texX += 1; break;
-				case up: texX += 2; break;
-				case down: texX += 3; break;
-				}
-			}
-			else
-			{
-				switch (connection)
-				{
-				case start: break;
-				case middle: texX += 1; break;
-				case end: texX += 2; break;
-				case standalone: texX += 3; break;
-				}
+			case start: break;
+			case middle: texX += 1; break;
+			case end: texX += 2; break;
+			case standalone: texX += 3; break;
 			}
 			
 			int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2);

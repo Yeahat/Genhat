@@ -815,7 +815,11 @@ public class World {
 							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
 							
 							GL11.glPushMatrix();
-								setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+								//don't shadow if the thing is in (i.e. on) a vertical wall
+								if (terrainGrid[i][j][k].getTerrainType() != air)
+									setLighting(false, lightModGrid[i][j][k]);
+								else
+									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
 								GL11.glTranslatef(x, y, 0);
 								thingGrid[i][j][k].renderThings(PIXEL_SIZE, TEXTURE_SIZE);
 							GL11.glPopMatrix();

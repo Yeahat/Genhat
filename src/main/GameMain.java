@@ -651,20 +651,20 @@ public class GameMain {
 		t[42][37][5] = new Terrain(window, air);
 		
 		//exterior wood beams
-		Beam dbeam1 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
-		Beam dbeam2 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
-		Beam dbeam3 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
+		Beam dbeam1 = new Beam.BeamBuilder().orientation(diagonal).connection(start).dir(right).build();
+		Beam dbeam2 = new Beam.BeamBuilder().orientation(diagonal).connection(middle).dir(right).build();
+		Beam dbeam3 = new Beam.BeamBuilder().orientation(diagonal).connection(end).dir(right).build();
 		world.addThing(dbeam1, 28, 30, 4);
 		world.addThing(dbeam2, 29, 30, 5);
-		world.addThing(dbeam2, 30, 30, 6);
-		Beam dbeam4 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
-		Beam dbeam5 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
-		Beam dbeam6 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
-		world.addThing(dbeam4, 41, 30, 4);
+		world.addThing(dbeam3, 30, 30, 6);
+		Beam dbeam4 = new Beam.BeamBuilder().orientation(diagonal).connection(start).dir(left).build();
+		Beam dbeam5 = new Beam.BeamBuilder().orientation(diagonal).connection(middle).dir(left).build();
+		Beam dbeam6 = new Beam.BeamBuilder().orientation(diagonal).connection(end).dir(left).build();
+		world.addThing(dbeam4, 39, 30, 6);
 		world.addThing(dbeam5, 40, 30, 5);
-		world.addThing(dbeam6, 39, 30, 6);
-		Beam dbeam7 = new Beam.BeamBuilder().orientation(diagonal).dir(right).build();
-		Beam dbeam8 = new Beam.BeamBuilder().orientation(diagonal).dir(left).build();
+		world.addThing(dbeam6, 41, 30, 4);
+		Beam dbeam7 = new Beam.BeamBuilder().orientation(diagonal).connection(standalone).dir(right).build();
+		Beam dbeam8 = new Beam.BeamBuilder().orientation(diagonal).connection(standalone).dir(left).build();
 		world.addThing(dbeam7, 45, 30, 4);
 		world.addThing(dbeam8, 24, 30, 4);
 		Beam vbeam1 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
@@ -791,9 +791,11 @@ public class GameMain {
 		WallCandle candle1 = new WallCandle();
 		WallCandle candle2 = new WallCandle();
 		WallCandle candle3 = new WallCandle();
-		world.addThing(candle1, 38, 36, 2);
-		world.addThing(candle2, 33, 36, 2);
-		world.addThing(candle3, 28, 36, 2);
+		world.addThing(candle1, 38, 37, 2);
+		world.addThing(candle2, 33, 37, 2);
+		world.addThing(candle3, 28, 37, 2);
+		WallCandle wcandle4 = new WallCandle();
+		world.addThing(wcandle4, 33, 37, 5);
 		
 		Candle candle4 = new Candle();
 		Candle candle5 = new Candle();
