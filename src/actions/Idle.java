@@ -12,7 +12,7 @@ public class Idle implements Action {
 	 * Do nothing, this is the default idle action
 	 */
 	@Override
-	public void execute(Agent agent, World world, ArrayList<String> args) 
+	public void execute(Agent agent, World world) 
 	{
 		return;
 	}

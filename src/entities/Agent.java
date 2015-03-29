@@ -28,12 +28,10 @@ public abstract class Agent {
 	protected float[] offset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
 	Action currentAction;
 	Stack<Action> heldActionStack = new Stack<Action>(); //action that is put on hold until an interaction is completed
-	Stack<ArrayList<String>> heldActionArgsStack = new Stack<ArrayList<String>>();
 	private boolean interruptRequested = false;
 	private boolean interrupted = false;
 	private boolean interactingWithHero = false;
 	Agent waitingInteractee; //the character who initiated an interaction and interrupt request
-	ArrayList<String> args;	//extra arguments for executing actions
 	private int texCol = 0; //texture row
 	private int texRow = 0; //texture column
 	private direction dir = down;	//direction the agent is facing
@@ -49,6 +47,7 @@ public abstract class Agent {
 	private direction stance = right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
 	private Position homePos;
+	private String path; //current path of the agent
 	
 	//Actions: List all actions of this agent here
 	Idle idle;
@@ -125,15 +124,6 @@ public abstract class Agent {
 	}
 	
 	/**
-	 * Add arguments to be used as action parameters
-	 * @param newArgs the new arguments to use when calling actions
-	 */
-	public void setArgs(ArrayList<String> newArgs)
-	{
-		args = newArgs;
-	}
-	
-	/**
 	 * Update the currentAction based on world information
 	 * @param world the world
 	 */
@@ -145,7 +135,7 @@ public abstract class Agent {
 	 */
 	public void executeAction(World world)
 	{
-		currentAction.execute(this, world, args);
+		currentAction.execute(this, world);
 	}
 	
 	/**
@@ -183,7 +173,6 @@ public abstract class Agent {
 	 */
 	public void initState()
 	{
-		args = new ArrayList<String>();
 		offset[0] = 0;
 		offset[1] = 0;
 	}

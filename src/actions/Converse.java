@@ -7,75 +7,75 @@ import entities.Agent;
 
 public class Converse implements Action
 {	
-	ArrayList<String> sayArgs = new ArrayList<String>();
-	ArrayList<String> waitTimes = new ArrayList<String>();
-	Say say = new Say();
-	Wait wait = new Wait();
-	boolean talkingToHero = false;
+	private final ArrayList<String> names;
+	private final ArrayList<String> texts;
+	private final ArrayList<Integer> waitTimes;
+	private final Agent interactee;
+	private boolean talkingToHero;
+	private boolean initialized;
+	private Say say;
+	private Wait wait;
+	
+	public Converse(ArrayList<String> names, ArrayList<String> texts, ArrayList<Integer> waitTimes, Agent interactee)
+	{
+		this.names = names;
+		this.texts = texts;
+		this.waitTimes = waitTimes;
+		this.interactee = interactee;
+		
+		talkingToHero = false;
+		initialized = false;
+	}
 	
 	@Override
-	public void execute(Agent agent, World world, ArrayList<String> args)
+	public void execute(Agent agent, World world)
 	{
+		if (texts.isEmpty() && say.isFinished())
+			return;
+		
 		//start a new conversation
-		if (sayArgs.isEmpty())
+		if (!initialized)
 		{
-			if (args.size() < 2 || (args.size() - 2) % 3 != 0)
-			{
-				System.out.println("Invalid arguments to action Converse.");
-				System.out.println("Converse must take one or more triples of argments in the form {{name, text, waitTime}, {name, text, waitTime}, ...}");
-				System.out.println("Note that the final wait time does not need to be included, as it will not be used.");
-				return;
-			}
-			
-			if (agent == world.getPlayer())
+			if (interactee == world.getPlayer())
 				talkingToHero = true;
-			else
-				talkingToHero = false;
 			
-			for (int i = 0; i < args.size(); i += 3)
-			{
-				sayArgs.add(args.get(i));
-				sayArgs.add(args.get(i + 1));
-				if (i + 3 < args.size())
-					waitTimes.add(args.get(i + 2));
-			}
+			wait = new Wait(waitTimes.get(0));
+			waitTimes.remove(0);
+			
+			initialized = true;
 		}
 		
 		//run say, if say is finished, advance to the next text box
 		if (wait.isFinished())
 		{
-			say.execute(agent, world, sayArgs);
+			if (names.size() > waitTimes.size())
+			{
+				//prepare a new Say action
+				say = new Say(names.get(0), texts.get(0), interactee, true);
+				names.remove(0);
+				texts.remove(0);
+			}
+			say.execute(agent, world);
 			if (say.isFinished())
 			{
-				//pop off the front two arguments (the already displayed name/text pair)
-				sayArgs.remove(0);
-				sayArgs.remove(0);
-				
-				//check if we're done
-				if (sayArgs.size() == 0)
+				//set up the next wait time, if there are any left
+				if (waitTimes.size() != 0)
 				{
-					waitTimes.clear();
-					return;
+					wait = new Wait(waitTimes.get(0));
+					waitTimes.remove(0);
 				}
-				
-				wait.execute(agent, world, waitTimes);
 			}
 		}
 		else
 		{
-			wait.execute(agent, world, waitTimes);
-			if (wait.isFinished())
-			{
-				//pop off the front wait time
-				waitTimes.remove(0);
-			}
+			wait.execute(agent, world);
 		}
 	}
 
 	@Override
 	public boolean isFinished()
 	{
-		return sayArgs.isEmpty();
+		return texts.isEmpty() && say.isFinished();
 	}
 
 	@Override

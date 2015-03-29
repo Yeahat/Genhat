@@ -2,91 +2,96 @@ package actions;
 
 import java.util.ArrayList;
 
-import utils.planners.PathPlanners;
+import utils.planners.AStar;
+import utils.planners.AStar.MovementType;
+import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import entities.Agent;
+import static utils.planners.AStar.MovementType.*;
 
 public class WalkToPoint implements Action {
 
-	private final int plannerID;
-	private boolean planned = false;
-	private boolean initialized = false;
-	private String path = "";
-	private Position goal;
-	private int plannerWait = 0;
+	private boolean initialized;
+	private boolean planning;
+	private boolean finished;
+	private final Position goal;
+	private AStar planner;
 	
 	private FollowPath followPath;
-	ArrayList<String> followPathArgs = new ArrayList<String>();
 	
-	public WalkToPoint()
+	public WalkToPoint(Position goal)
 	{
-		plannerID = 0;
-		followPath = new FollowPath();
+		this.goal = goal;
+		planning = false;
+		finished = false;
+		initialized = false;
+		planner = new AStar(SimpleStepping);
 	}
 	
+	public WalkToPoint(Position goal, MovementType movementType)
+	{
+		this.goal = goal;
+		planning = false;
+		finished = false;
+		initialized = false;
+		planner = new AStar(movementType);
+	}
 	
 	@Override
-	public void execute(Agent agent, World world, ArrayList<String> args)
+	public void execute(Agent agent, World world)
 	{
-		if (!planned)
+		if (finished)
+			return;
+		
+		if (!initialized)
 		{
-			if (!initialized)
-			{
-				if (args.size() < 1)
-				{
-					System.out.println("Invalid arguments to action WalkToPoint.");
-					System.out.println("WalkToPoint must take 1 argument denoting the goal point, as a string from a position in the form: (x, y, z),");
-					System.out.println("and an optional second argument denoting a wait period as an integer (defaults to 0 if unspecified).");
-					return;
-				}
-				goal = Position.posFromString(args.get(0)); //read goal from args
-				//quick goal check in case it's already the current location
-				if (goal.equals(agent.getPos()))
-				{
-					return;
-				}
-				initialized = true;
-			}
-			
-			if (plannerWait == 0)
-			{
-				switch (plannerID)
-				{
-				default:
-				path = PathPlanners.aStarSimpleStep(agent, world, agent.getPos(), goal);
-				break;
-				}
-				followPathArgs.clear();
-				followPathArgs.add(path);
-				if (args.size() > 1)
-					followPathArgs.add(args.get(1));
-				if (path == "")
-				{
-					plannerWait = 30;
-				}
-				planned = true;
-			}
-			else
-				plannerWait --;	
+			planner.startPlanningQuery(agent, world, agent.getPos(), goal);
+			planning = true;
+			initialized = true;
 		}
-		followPath.execute(agent, world, followPathArgs);
-		if (followPath.isFinished())
+		
+		if (planning)
 		{
-			planned = false;
-			initialized = false;
+			planner.plan();
+			
+			//check if planner finished
+			if (!planner.isQueryInProgress())
+			{
+				if (planner.isSolutionFound())
+				{
+					followPath = new FollowPath(planner.getPath(), 0);
+					planning = false;
+				}
+				else
+				{
+					planning = false;
+					finished = true;
+				}
+			}
+		}
+		else
+		{
+			followPath.execute(agent, world);
+			if (followPath.isFinished())
+			{
+				finished = true;
+			}
 		}
 	}
 
 	@Override
 	public boolean isFinished()
 	{
-		return followPath.isFinished();
+		return finished;
 	}
 
 	@Override
 	public boolean requestInterrupt()
 	{
+		if (followPath == null)
+			return true;
+		
 		return followPath.requestInterrupt();
 	}
 

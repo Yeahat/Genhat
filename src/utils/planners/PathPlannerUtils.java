@@ -1,8 +1,5 @@
 package utils.planners;
 
-import static entities.Agent.direction.left;
-import static entities.Agent.direction.right;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
@@ -13,75 +10,7 @@ import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
 
-public class PathPlanners {
-	/**
-	 * A* path planner using only SimpleStep as an action (no ramp steps, jumping, etc.)
-	 * @param agent the agent to plan for (height is accounted for in collisions)
-	 * @param world the world in which to plan (used primarily for collision checking)
-	 * @param start starting position
-	 * @param goal goal position
-	 * @return path string from start to goal, or an empty path on failure
-	 */
-	public static String aStarSimpleStep(Agent agent, World world, Position start, Position goal)
-	{
-		//initialization
-		String path = "";
-		Node currentNode = new Node(start, Distance.distance2D(start, goal), "");
-		PriorityQueue<Node> frontier = new PriorityQueue<Node>();
-		frontier.add(currentNode);
-		ArrayList<Position> explored = new ArrayList<Position>();
-		ArrayList<direction> actions = new ArrayList<direction>();
-		actions.add(up);
-		actions.add(down);
-		actions.add(left);
-		actions.add(right);
-		
-		int loopcount = 0;
-		//search loop
-		while (!frontier.isEmpty())
-		{
-			loopcount ++;
-			currentNode = frontier.poll();
-			
-			if (!explored.contains(currentNode.getPos())) //quick check for duplicates in frontier
-			{
-				//goal check
-				if (currentNode.getPos().equals(goal))
-				{
-					System.out.println("Loops: " + loopcount);
-					return currentNode.getPath();
-				}
-				explored.add(currentNode.getPos());
-				
-				//find and add neighbors to be explored
-				Collections.shuffle(actions); //randomize order of actions so that one equally useful direction will not be arbitrarily prioritized
-				for (int i = 0; i < actions.size(); i ++)
-				{
-					direction dir = actions.get(i);
-					if (canStep(agent, world, currentNode.getPos(), dir))
-					{
-						Position newPos = resultingPosition(world, currentNode.getPos(), dir, false, false);
-						//add any unexplored nodes to the frontier
-						if (!explored.contains(newPos))
-						{
-							String updatedPath = new String(currentNode.getPath());
-							switch (dir)
-							{
-							case up:	updatedPath += "U";	break;
-							case down:	updatedPath += "D";	break;
-							case left:	updatedPath += "L";	break;
-							case right:	updatedPath += "R";	break;
-							}
-							frontier.add(new Node(newPos, Distance.distance2D(newPos, goal), updatedPath));
-						}
-					}
-				}
-			}
-		}
-		System.out.println("Loops: " + loopcount);
-		return path;
-	}
-	
+public class PathPlannerUtils {	
 	/**
 	 * Determine whether it is possible to step to the next location, incorporating bounds checking,
 	 * collision checking with things and objects, and ensuring that the next location either has

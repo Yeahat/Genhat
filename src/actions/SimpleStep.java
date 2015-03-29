@@ -2,57 +2,114 @@ package actions;
 
 import java.util.ArrayList;
 
-import utils.planners.PathPlanners;
+import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import entities.Agent;
+import entities.Agent.direction;
 import entities.Hero;
 import entities.Placeholder;
 import static entities.Agent.direction.*;
 
 public class SimpleStep implements Action {
 
-	boolean finishedStep = true;
+	private final direction dir;
+	private boolean initialized;
+	private boolean finished;
+	
+	public SimpleStep(direction dir)
+	{
+		this.dir = dir;
+		initialized = false;
+		finished = false;
+	}
 	
 	@Override
-	public void execute(Agent agent, World world, ArrayList<String> args)
+	public void execute(Agent agent, World world)
 	{
-		//invalid arguments, do nothing
-		if (args.size() < 1)
-		{
-			System.out.println("Invalid arguments to action SimpleStep.");
-			System.out.println("SimpleStep must take 1 argument denoting direction, as either: {up, down, left, right}");
+		if (finished)
 			return;
-		}
-			
-		String arg1 = args.get(0);
 		
-		if (arg1.equals("up"))
+		if (!initialized)
 		{
-			if (!agent.isStepping())
+			Placeholder h1;
+			switch (dir)
 			{
+			case up:
 				agent.setDir(up);
-				
-				if(PathPlanners.canStep(agent, world, agent.getPos(), up))
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), up))
 				{
 					world.moveAgent(agent, 0, 1, 0);
 					agent.setOffsetY(-16);
 					Position pos = agent.getPos();
 					//set placeholder to render instead of agent (fixes a graphical glitch caused by tile render order)
 					agent.setRenderOnPlaceholder(true);
-					Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z));
+					h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z));
 					h1.setTransparent(true);
-					world.addAgent(h1);
-					finishedStep = false;
-					agent.setStepping(true);
 				}
 				else
 				{
-					finishedStep = true;
+					finished = true;
 					return;
 				}
+			break;
+			case down:
+				agent.setDir(down);
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), down))
+				{
+					world.moveAgent(agent, 0, -1, 0);
+					agent.setOffsetY(16);
+					Position pos = agent.getPos();
+					h1 = new Placeholder(agent, new Position(pos.x, pos.y + 1, pos.z));
+				}
+				else
+				{
+					finished = true;
+					return;
+				}
+			break;
+			case left:
+				agent.setDir(left);
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), left))
+				{
+					world.moveAgent(agent, -1, 0, 0);
+					agent.setOffsetX(16);
+					Position pos = agent.getPos();
+					h1 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z));
+				}
+				else
+				{
+					finished = true;
+					return;
+				}
+			break;
+			case right:
+				agent.setDir(right);
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), right))
+				{
+					world.moveAgent(agent, 1, 0, 0);
+					agent.setOffsetX(-16);
+					Position pos = agent.getPos();
+					h1 = new Placeholder(agent, new Position(pos.x - 1, pos.y, pos.z));
+				}
+				else
+				{
+					finished = true;
+					return;
+				}
+			break;
+			default:
+				h1 = null;	//unreachable unless dir was set to null, which would break everything regardless...
 			}
-
+			
+			world.addAgent(h1);
+			agent.setStepping(true);
+			initialized = true;
+		}
+		
+		switch (dir)
+		{
+		case up:
 			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() >= 0)
 			{
@@ -62,7 +119,7 @@ public class SimpleStep implements Action {
 				agent.setOffsetY(0);
 				agent.setRenderOnPlaceholder(false);
 				agent.setStepping(false);
-				finishedStep = true;
+				finished = true;
 			}
 			
 			//Camera for Hero
@@ -72,30 +129,8 @@ public class SimpleStep implements Action {
 					world.updateCameraScrollLock();
 				world.updateCamera();
 			}
-		}
-		else if (arg1.equals("down"))
-		{
-			if (!agent.isStepping())
-			{
-				agent.setDir(down);
-
-				if(PathPlanners.canStep(agent, world, agent.getPos(), down))
-				{
-					world.moveAgent(agent, 0, -1, 0);
-					agent.setOffsetY(16);
-					Position pos = agent.getPos();
-					Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y + 1, pos.z));
-					world.addAgent(h1);
-					finishedStep = false;
-					agent.setStepping(true);
-				}
-				else
-				{
-					finishedStep = true;
-					return;
-				}
-			}
-
+		break;
+		case down:
 			agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() <= 0)
 			{
@@ -104,7 +139,7 @@ public class SimpleStep implements Action {
 				swapFootstep(agent);
 				agent.setOffsetY(0);
 				agent.setStepping(false);
-				finishedStep = true;
+				finished = true;
 			}
 			
 			//Camera for Hero
@@ -114,30 +149,8 @@ public class SimpleStep implements Action {
 					world.updateCameraScrollLock();
 				world.updateCamera();
 			}
-		}
-		else if (arg1.equals("left"))
-		{
-			if (!agent.isStepping())
-			{
-				agent.setDir(left);
-
-				if(PathPlanners.canStep(agent, world, agent.getPos(), left))
-				{
-					world.moveAgent(agent, -1, 0, 0);
-					agent.setOffsetX(16);
-					Position pos = agent.getPos();
-					Placeholder h1 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z));
-					world.addAgent(h1);
-					finishedStep = false;
-					agent.setStepping(true);
-				}
-				else
-				{
-					finishedStep = true;
-					return;
-				}
-			}
-			
+		break;
+		case left:
 			agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() <= 0)
 			{
@@ -146,7 +159,7 @@ public class SimpleStep implements Action {
 				swapFootstep(agent);
 				agent.setOffsetX(0);
 				agent.setStepping(false);
-				finishedStep = true;
+				finished = true;
 			}
 			
 			//Camera for Hero
@@ -156,30 +169,8 @@ public class SimpleStep implements Action {
 					world.updateCameraScrollLock();
 				world.updateCamera();
 			}
-		}
-		else if (arg1.equals("right"))
-		{
-			if (!agent.isStepping())
-			{
-				agent.setDir(right);
-
-				if(PathPlanners.canStep(agent, world, agent.getPos(), right))
-				{
-					world.moveAgent(agent, 1, 0, 0);
-					agent.setOffsetX(-16);
-					Position pos = agent.getPos();
-					Placeholder h1 = new Placeholder(agent, new Position(pos.x - 1, pos.y, pos.z));
-					world.addAgent(h1);
-					finishedStep = false;
-					agent.setStepping(true);
-				}
-				else
-				{
-					finishedStep = true;
-					return;
-				}
-			}
-			
+		break;
+		case right:
 			agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() >= 0)
 			{
@@ -188,7 +179,7 @@ public class SimpleStep implements Action {
 				swapFootstep(agent);
 				agent.setOffsetX(0);
 				agent.setStepping(false);
-				finishedStep = true;
+				finished = true;
 			}
 			
 			//Camera for Hero
@@ -198,19 +189,14 @@ public class SimpleStep implements Action {
 					world.updateCameraScrollLock();
 				world.updateCamera();
 			}
-		}
-		else
-		{
-			System.out.println("Invalid arguments to action Step.");
-			System.out.println("Step must take 1 argument denoting direction, as either: {up, down, left, right}");
-			return; //invalid arguments, do nothing
+		break;
 		}
 	}
 
 	@Override
 	public boolean isFinished() 
 	{
-		return finishedStep;
+		return finished;
 	}
 	
 	
@@ -229,7 +215,7 @@ public class SimpleStep implements Action {
 
 	@Override
 	public boolean requestInterrupt() {
-		return finishedStep;
+		return finished;
 	}
 
 	@Override

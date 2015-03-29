@@ -10,21 +10,30 @@ import entities.Placeholder;
 import static entities.Agent.direction.*;
 
 public class Jump implements Action {
-	boolean finishedJump = false;
-	boolean jumpingUp = true;	//true if jump is ascending, false if jump is descending
-	boolean switched = false;	//flag for switching position on an descending up-facing jump to correctly occlude agent
-	int stepSize;
-	float dstJumped = 0;	//measures the distance jumped
+	private boolean finished;
+	private boolean jumpingUp;	//true if jump is ascending, false if jump is descending
+	private boolean switched;	//flag for switching position on an descending up-facing jump to correctly occlude agent
+	private float dstJumped;	//measures the distance jumped
+
+	public Jump()
+	{
+		finished = false;
+		dstJumped = 0;
+		switched = false;
+	}
 	
 	@Override
-	public void execute(Agent agent, World world, ArrayList<String> args)
+	public void execute(Agent agent, World world)
 	{
+		if (finished)
+			return;
+		
+		//initialize jump
 		if (!agent.isJumping())
 		{
 			if (canJump(agent, world))
 			{
 				dstJumped = 0;
-				finishedJump = false;
 				agent.setJumping(true);
 				
 				//set initial positions and offsets for all 8 cases
@@ -87,12 +96,12 @@ public class Jump implements Action {
 			}
 			else
 			{
-				finishedJump = true;
+				finished = true;
 				return;
 			}
 		}
 		
-		//Move through the animation for all 8 cases
+		//Execute jump (move through the animation for all 8 cases)
 		if (jumpingUp)
 		{
 			switch (agent.getDir())
@@ -108,7 +117,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				
 				//Camera for Hero
@@ -147,7 +156,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				
 				//Camera for Hero
@@ -171,7 +180,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				//Camera for Hero
 				if (agent.getClass().equals(Hero.class))
@@ -194,7 +203,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				if (agent.getClass().equals(Hero.class))
 				{
@@ -236,7 +245,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				
 				if (agent.getClass().equals(Hero.class))
@@ -259,7 +268,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				
 				if (agent.getClass().equals(Hero.class))
@@ -283,7 +292,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				
 				if (agent.getClass().equals(Hero.class))
@@ -307,7 +316,7 @@ public class Jump implements Action {
 					agent.setOffsetY(0);
 					agent.setJumping(false);
 					swapFootstep(agent);
-					finishedJump = true;
+					finished = true;
 				}
 				
 				if (agent.getClass().equals(Hero.class))
@@ -324,7 +333,7 @@ public class Jump implements Action {
 	@Override
 	public boolean isFinished()
 	{
-		return finishedJump;
+		return finished;
 	}
 
 	private boolean canJump(Agent agent, World world)

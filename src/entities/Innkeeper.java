@@ -1,8 +1,5 @@
 package entities;
 
-import static entities.Agent.direction.down;
-import static entities.Agent.direction.left;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -16,6 +13,8 @@ import actions.Turn;
 import actions.WalkToPoint;
 import world.Position;
 import world.World;
+
+import static entities.Agent.direction.*;
 import static world.World.controlState.*;
 
 public class Innkeeper extends Agent
@@ -83,7 +82,6 @@ public class Innkeeper extends Agent
 				setInterrupted(true);
 				//queue current action and commence with interaction
 				heldActionStack.push(currentAction);
-				heldActionArgsStack.push(new ArrayList<String>(args));
 				beginInteraction(agent, world);
 			}
 			else
@@ -104,74 +102,81 @@ public class Innkeeper extends Agent
 		{
 			if (conversationNumber == 0)
 			{
-				currentAction = converse;
-				args.clear();
-				args.add("Woman");
-				args.add("I haven't seen you around here before.");
-				args.add("10");
-				args.add("Baldorf");
-				args.add("The name's Baldorf.");
-				args.add("10");
-				args.add("Woman");
-				args.add("Innesly.  Nice to meet you, Baldorf!");
-				args.add("10");
-				args.add("Baldorf");
-				args.add("Likewise.  So, got any food or rooms?");
-				args.add("10");
-				args.add("Innesley");
-				args.add("Not exactly... We don't have a kitchen yet and we're kinda going for an “open-air” feeling here..."
+				ArrayList<String> names = new ArrayList<String>();
+				ArrayList<String> texts = new ArrayList<String>();
+				ArrayList<Integer> waitTimes = new ArrayList<Integer>();
+				names.add("Woman");
+				names.add("Baldorf");
+				names.add("Woman");
+				names.add("Baldorf");
+				names.add("Innesley");
+				texts.add("I haven't seen you around here before.");
+				texts.add("The name's Baldorf.");
+				texts.add("Innesly.  Nice to meet you, Baldorf!");
+				texts.add("Likewise.  So, got any food or rooms?");
+				texts.add("Not exactly... We don't have a kitchen yet and we're kinda going for an “open-air” feeling here..."
 						+ "Okay so actually the inn's not finished yet, but we're getting there!");
+				waitTimes.add(0);
+				waitTimes.add(10);
+				waitTimes.add(10);
+				waitTimes.add(10);
+				waitTimes.add(10);
+				converse = new Converse(names, texts, waitTimes, agent);
+				currentAction = converse;
 				
 				conversationNumber ++;
 			}
 			else if (conversationNumber == 1)
 			{
+				ArrayList<String> names = new ArrayList<String>();
+				ArrayList<String> texts = new ArrayList<String>();
+				ArrayList<Integer> waitTimes = new ArrayList<Integer>();
+				names.add("Baldorf");
+				names.add("Innesley");
+				names.add("Baldorf");
+				names.add("Innesley");
+				texts.add("What's new?");
+				texts.add("I can walk wherever I want!");
+				texts.add("Great! But why do you keep going back and forth between two specific spots?");
+				texts.add("Because... that's where I want to go!");
+				waitTimes.add(0);
+				waitTimes.add(10);
+				waitTimes.add(10);
+				waitTimes.add(30);
+				converse = new Converse(names, texts, waitTimes, agent);
 				currentAction = converse;
-				args.clear();
-				args.add("Baldorf");
-				args.add("What's new?");
-				args.add("10");
-				args.add("Innesley");
-				args.add("I can walk wherever I want!");
-				args.add("10");
-				args.add("Baldorf");
-				args.add("Great! But why do you keep going back and forth between two specific spots?");
-				args.add("30");
-				args.add("Innesley");
-				args.add("Because... that's where I want to go!");
-				
+
 				conversationNumber ++;
 			}
 			else
 			{
+				String name = "Innesley";
+				String text = "I have big plans for a top floor!  I'd also like to be able to walk up stairs, and maybe even adjust my walking on-the-fly to"
+						+ "avoid other moving people... Like you!  I also have an embarrassing habit of blocking people into tight spaces and not moving...";
+				say = new Say(name, text, agent);
 				currentAction = say;
-				args.clear();
-				args.add("Innesley");
-				args.add("I have big plans for a top floor!  I'd also like to be able to walk up stairs, and maybe even adjust my walking on-the-fly to"
-						+ "avoid other moving people... Like you!  I also have an embarrassing habit of blocking people into tight spaces and not moving...");
 			}
 		}
 		else
 		{
-			currentAction = turn;
-			args.clear();
 			Position agentPos = agent.getPos();
 			int xDiff = pos.x - agentPos.x;
 			int yDiff = pos.y - agentPos.y;
 			if (Math.abs(xDiff) > Math.abs(yDiff))
 			{
 				if (xDiff < 0)
-					args.add("right");
+					turn = new Turn(right);
 				else
-					args.add("left");
+					turn = new Turn(left);
 			}
 			else
 			{
 				if (yDiff < 0)
-					args.add("up");
+					turn = new Turn(up);
 				else
-					args.add("down");
+					turn = new Turn(down);
 			}
+			currentAction = turn;
 		}
 	}
 	
@@ -179,11 +184,6 @@ public class Innkeeper extends Agent
 	protected void setActions()
 	{
 		super.setActions();
-		converse = new Converse();
-		say = new Say();
-		turn = new Turn();
-		followPath = new FollowPath(true);
-		walkToPoint = new WalkToPoint();
 	}
 	
 	@Override
@@ -209,7 +209,6 @@ public class Innkeeper extends Agent
 					setInterrupted(true);
 					//queue current action and commence with interaction
 					heldActionStack.push(currentAction);
-					heldActionArgsStack.push(new ArrayList<String>(args));
 					beginInteraction(waitingInteractee, world);
 					setInterruptRequested(false);
 				}
@@ -221,14 +220,12 @@ public class Innkeeper extends Agent
 				if (isInterrupted())
 				{
 					currentAction = heldActionStack.pop();
-					args = heldActionArgsStack.pop();
 					if (heldActionStack.isEmpty())
 						setInterrupted(false);
 				}
 				else
 				{
 					currentAction = idle;
-					args.clear();
 				}
 			}
 		}
@@ -239,7 +236,6 @@ public class Innkeeper extends Agent
 				setInterrupted(true);
 				//queue current action and commence with interaction
 				heldActionStack.push(currentAction);
-				heldActionArgsStack.push(new ArrayList<String>(args));
 				beginInteraction(waitingInteractee, world);
 				setInterruptRequested(false);
 			}
@@ -249,7 +245,6 @@ public class Innkeeper extends Agent
 			if (currentAction.isFinished())
 			{
 				currentAction = heldActionStack.pop();
-				args = heldActionArgsStack.pop();
 				if (heldActionStack.isEmpty())
 					setInterrupted(false);
 			}
@@ -258,26 +253,19 @@ public class Innkeeper extends Agent
 		{
 			if (currentAction == idle)
 			{
-				args.clear();
 				if (pos.equals(testPos1))
 				{
-					args.add(testPos2.toString());
+					walkToPoint = new WalkToPoint(testPos2);
 				}
 				else
 				{
-					args.add(testPos1.toString());
+					walkToPoint = new WalkToPoint(testPos1);
 				}
+				
 				currentAction = walkToPoint;
-				/*
-				currentAction = followPath;
-				args.clear();
-				args.add(path);
-				args.add("30");
-				*/
 			}
 			else if (currentAction.isFinished())
 			{
-				args.clear();
 				currentAction = idle;
 			}
 		}

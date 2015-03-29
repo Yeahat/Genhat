@@ -33,9 +33,6 @@ public class Hero extends Agent {
 	protected void setActions()
 	{
 		super.setActions();
-		step = new Step();
-		turn = new Turn();
-		jump = new Jump();
 	}
 	
 	@Override
@@ -54,7 +51,6 @@ public class Hero extends Agent {
 		if (currentAction.isFinished())
 		{
 			currentAction = idle;
-			args.clear();
 		}
 	}
 
@@ -76,6 +72,11 @@ public class Hero extends Agent {
 		return step;
 	}
 	
+	public void setStepAction(Step step)
+	{
+		this.step = step;
+	}
+	
 	/**
 	 * Getter for the hero's turn action, this is required to allow the keyboard polling to set
 	 * the agent's action from outside of the scope of the class
@@ -86,6 +87,11 @@ public class Hero extends Agent {
 		return turn;
 	}
 	
+	public void setTurnAction(Turn turn)
+	{
+		this.turn = turn;
+	}
+	
 	/**
 	 * Getter for the hero's jump action, this is required to allow the keyboard polling to set
 	 * the agent's action from outside of the scope of the class
@@ -94,6 +100,11 @@ public class Hero extends Agent {
 	public Jump getJumpAction()
 	{
 		return jump;
+	}
+
+	public void setJumpAction(Jump jump)
+	{
+		this.jump = jump;
 	}
 	
 	/**

@@ -7,66 +7,76 @@ import world.Position;
 import world.World;
 import entities.Agent;
 
+import static entities.Agent.direction.*;
+
 public class Say implements Action 
 {
-	boolean started = false;
-	boolean finished = false;
-	boolean talkingToHero = false;
+	private boolean talkingToHero;
+	private boolean initialized;
+	private boolean finished;
+	private String name;
+	private String text;
+	private boolean turnFirst;
+	private Agent interactee;
 	
-	Turn turn = new Turn();
+	Turn turn;
+	
+	public Say(String name, String text, Agent interactee)
+	{
+		this.name = name;
+		this.text = text;
+		this.turnFirst = false;
+		this.interactee = interactee;
+		
+		talkingToHero = false;
+		initialized = false;
+		finished = false;
+	}
+	
+	public Say(String name, String text, Agent interactee, boolean turnFirst)
+	{
+		this.name = name;
+		this.text = text;
+		this.turnFirst = turnFirst;
+		this.interactee = interactee;
+
+		talkingToHero = false;
+		initialized = false;
+		finished = false;
+	}
 	
 	@Override
-	public void execute(Agent agent, World world, ArrayList<String> args)
+	public void execute(Agent agent, World world)
 	{
-		if (!started)
+		if (!initialized)
 		{
-			if (args.size() < 2)
-			{
-				System.out.println("Invalid arguments to action Say.");
-				System.out.println("Say must take 2 required argument denoting the speaker's name and the text, and an optional argment for whether the speaker should face the hero first as either: {true, false}");
-				return;
-			}
-			
-			if (agent == world.getPlayer())
+			if (interactee == world.getPlayer())
 				talkingToHero = true;
-			else
-				talkingToHero = false;
-			
-			String name = args.get(0);
-			String text = args.get(1);
-			boolean turnFirst = true;
-			if (args.size() > 2)
-			{
-				if (args.get(2).equals("false"))
-					turnFirst = false;
-				else
-					turnFirst = true;
-			}
 			
 			//turn to face hero
 			if (turnFirst)
 			{
-				ArrayList<String> turnArgs = new ArrayList<String>();
-				Position heroPos = world.getPlayer().getPos();
+				Position interacteePos = interactee.getPos();
 				Position agentPos = agent.getPos();
-				int xDiff = agentPos.x - heroPos.x;
-				int yDiff = agentPos.y - heroPos.y;
+				int xDiff = agentPos.x - interacteePos.x;
+				int yDiff = agentPos.y - interacteePos.y;
 				if (Math.abs(xDiff) > Math.abs(yDiff))
 				{
 					if (xDiff < 0)
-						turnArgs.add("right");
+						turn = new Turn(right);
 					else
-						turnArgs.add("left");
+						turn = new Turn(left);
 				}
 				else
 				{
 					if (yDiff < 0)
-						turnArgs.add("up");
+						turn = new Turn(up);
 					else
-						turnArgs.add("down");
+						turn = new Turn(down);
 				}
 				
-				turn.execute(agent, world, turnArgs);
+				
+				turn.execute(agent, world);
 			}
 			
 			//fill in the world text box
@@ -74,7 +84,7 @@ public class Say implements Action
 			box.setText(text);
 			world.setTextDisplay(box);
 			world.setTextBoxActive(true);
-			started = true;
+			initialized = true;
 			finished = false;
 		}
 		else
@@ -82,7 +92,7 @@ public class Say implements Action
 			if (!world.isTextBoxActive())
 			{
 				finished = true;
-				started = false;
+				initialized = false;
 			}
 		}
 		

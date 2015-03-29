@@ -2,205 +2,144 @@ package actions;
 
 import java.util.ArrayList;
 
-import utils.planners.PathPlanners;
+import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import entities.Agent;
+import entities.Agent.direction;
 import static entities.Agent.direction.*;
 
 public class Step implements Action {
 
-	boolean finishedStep = true;
-	SimpleStep simpleStep = new SimpleStep();
-	RampStep rampStep = new RampStep();
+	private final direction dir;
+	boolean finished;
+	SimpleStep simpleStep;
+	RampStep rampStep;
+	
+	public Step(direction dir)
+	{
+		this.dir = dir;
+		finished = false;
+	}
 	
 	@Override
-	public void execute(Agent agent, World world, ArrayList<String> args)
+	public void execute(Agent agent, World world)
 	{
-		//invalid arguments, do nothing
-		if (args.size() < 1)
+		switch (dir)
 		{
-			System.out.println("Invalid arguments to action Step.");
-			System.out.println("Step must take 1 argument denoting direction, as either: {up, down, left, right}");
-			return;
-		}
-			
-		String arg1 = args.get(0);
-		if (arg1.equals("up"))
-		{
-			if (!agent.isOnRamp())
+		case up:
+			if (!agent.isOnRamp() && agent.getDir() != up)
 				agent.setDir(up);
 			//if any steps are already in progress, continue them,
 			//otherwise determine new steps that should be started
-			if (!continueStepping(agent, world, args))
+			if (!continueStepping(agent, world))
 			{
-				finishedStep = false;
 				//check for ramps
 				Position pos = agent.getPos();
 				if (world.hasThing(pos.z, pos.y, pos.z) && world.getThingsAt(pos.z, pos.y, pos.z).hasRamp()
 						&& world.getThingsAt(pos.z, pos.y, pos.z).getRampDir() == down)
 				{
-					ArrayList<String> tempArgs = new ArrayList<String>();
-					tempArgs.addAll(args);
-					tempArgs.add("ascending");
-					rampStep.execute(agent, world, tempArgs);
-				}
-				else
-				{
-					if (!agent.isOnRamp())
-						simpleStep.execute(agent, world, args);
-				}
-			}
-			
-			finishedStep = simpleStep.isFinished() && rampStep.isFinished();
-		}
-		
-		
-		else if (arg1.equals("down"))
-		{
-			if (!agent.isOnRamp())
-				agent.setDir(down);
-			
-			//if any steps are already in progress, continue them,
-			//otherwise determine new steps that should be started
-			if (!continueStepping(agent, world, args))
-			{
-				finishedStep = false;
-				//check for ramps
-				Position pos = agent.getPos();
-				if (world.hasThing(pos.z, pos.y - 1, pos.z - 1) && world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).hasRamp()
-						&& world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).getRampDir() == down)
-				{
-					ArrayList<String> tempArgs = new ArrayList<String>();
-					tempArgs.addAll(args);
-					tempArgs.add("descending");
-					rampStep.execute(agent, world, tempArgs);
+					rampStep = new RampStep(dir, true);
+					rampStep.execute(agent, world);
 				}
 				else
 				{
 					if (!agent.isOnRamp())
 					{
-						simpleStep.execute(agent, world, args);
+						simpleStep = new SimpleStep(dir);
+						simpleStep.execute(agent, world);
 					}
 				}
 			}
-			
-			finishedStep = simpleStep.isFinished() && rampStep.isFinished();
-		}
+		break;
 		
-		
-		else if (arg1.equals("left"))
-		{
-			agent.setDir(left);
+		case down:
+			if (!agent.isOnRamp() && agent.getDir() != down)
+				agent.setDir(down);
 			
 			//if any steps are already in progress, continue them,
 			//otherwise determine new steps that should be started
-			if (!continueStepping(agent, world, args))
+			if (!continueStepping(agent, world))
 			{
-				finishedStep = false;
 				//check for ramps
 				Position pos = agent.getPos();
-				boolean[] rampStepCheck = PathPlanners.checkForRampStep(world, pos, left);
+				if (world.hasThing(pos.z, pos.y - 1, pos.z - 1) && world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).hasRamp()
+						&& world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).getRampDir() == down)
+				{
+					rampStep = new RampStep(dir, false);
+					rampStep.execute(agent, world);
+				}
+				else
+				{
+					if (!agent.isOnRamp())
+					{
+						simpleStep = new SimpleStep(dir);
+						simpleStep.execute(agent, world);
+					}
+				}
+			}
+		break;
+		
+		default:	//left or right step
+			if (agent.getDir() != dir)
+				agent.setDir(dir);
+			
+			//if any steps are already in progress, continue them,
+			//otherwise determine new steps that should be started
+			if (!continueStepping(agent, world))
+			{
+				//check for ramps
+				Position pos = agent.getPos();
+				boolean[] rampStepCheck = PathPlannerUtils.checkForRampStep(world, pos, dir);
 				//Ramp step
 				if (rampStepCheck[0])
 				{
-					ArrayList<String> tempArgs = new ArrayList<String>();
-					tempArgs.addAll(args);
 					if (rampStepCheck[1])
-						tempArgs.add("ascending");
+						rampStep = new RampStep(dir, true);
 					else
-						tempArgs.add("descending");
-					rampStep.execute(agent, world, tempArgs);
+						rampStep = new RampStep(dir, false);
+					rampStep.execute(agent, world);
 				}
 				//Normal step
 				else
 				{
-					simpleStep.execute(agent, world, args);
+					simpleStep = new SimpleStep(dir);
+					simpleStep.execute(agent, world);
 				}
 			}
 			
-			finishedStep = simpleStep.isFinished() && rampStep.isFinished();
+		break;
 		}
 		
-		
-		else if (arg1.equals("right"))
-		{
-			agent.setDir(right);
-			
-			//if any steps are already in progress, continue them,
-			//otherwise determine new steps that should be started
-			if (!continueStepping(agent, world, args))
-			{
-				finishedStep = false;
-				//check for ramps
-				Position pos = agent.getPos();
-				boolean[] rampStepCheck = PathPlanners.checkForRampStep(world, pos, right);
-				//Ramp step
-				if (rampStepCheck[0])
-				{
-					ArrayList<String> tempArgs = new ArrayList<String>();
-					tempArgs.addAll(args);
-					if (rampStepCheck[1])
-						tempArgs.add("ascending");
-					else
-						tempArgs.add("descending");
-					rampStep.execute(agent, world, tempArgs);
-				}
-				//Normal step
-				else
-				{
-					simpleStep.execute(agent, world, args);
-				}
-			}
-			
-			finishedStep = simpleStep.isFinished() && rampStep.isFinished();
-		}
-		else
-		{
-			System.out.println("Invalid arguments to action Step.");
-			System.out.println("Step must take 1 argument denoting direction, as either: {up, down, left, right}");
-			return; //invalid arguments, do nothing
-		}
+		finished = (simpleStep == null || simpleStep.isFinished()) && (rampStep == null || rampStep.isFinished());
 	}
 
 	@Override
 	public boolean isFinished() 
 	{
-		return finishedStep;
+		return finished;
 	}
 	
-	private boolean continueStepping(Agent agent, World world, ArrayList<String> args)
+	private boolean continueStepping(Agent agent, World world)
 	{
-		if (agent.isRampAscending())
+		if (agent.isRampAscending() || agent.isRampDescending())
 		{
-			ArrayList<String> tempArgs = new ArrayList<String>();
-			tempArgs.addAll(args);
-			tempArgs.add("ascending");
-			rampStep.execute(agent, world, tempArgs);
+			rampStep.execute(agent, world);
 			return true;
 		}
-		else if (agent.isRampDescending())
+		
+		if (agent.isStepping())
 		{
-			ArrayList<String> tempArgs = new ArrayList<String>();
-			tempArgs.addAll(args);
-			tempArgs.add("descending");
-			rampStep.execute(agent, world, tempArgs);
+			simpleStep.execute(agent, world);
 			return true;
 		}
-		else if (agent.isStepping())
-		{
-			simpleStep.execute(agent, world, args);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		
+		return false;
 	}
 
 	@Override
 	public boolean requestInterrupt() {
-		return finishedStep;
+		return finished;
 	}
 
 	@Override

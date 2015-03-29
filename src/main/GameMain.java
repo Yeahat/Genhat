@@ -9,6 +9,9 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import actions.Jump;
+import actions.Step;
+import actions.Turn;
 import entities.Agent;
 import entities.Hero;
 import entities.Innkeeper;
@@ -123,8 +126,7 @@ public class GameMain {
 							{
 								if (player.isIdle())
 								{
-									ArrayList<String> newArgs = new ArrayList<String>();
-									player.setArgs(newArgs);
+									player.setJumpAction(new Jump());
 									player.setCurrentAction(player.getJumpAction());
 								}
 							}
@@ -179,13 +181,16 @@ public class GameMain {
 					arrowKeyInputCount ++;
 					if (player.isIdle())
 					{
-						ArrayList<String> newArgs = new ArrayList<String>();
-						newArgs.add("down");
-						player.setArgs(newArgs);
 						if (arrowKeyInputCount < 3)
+						{
+							player.setTurnAction(new Turn(down));
 							player.setCurrentAction(player.getTurnAction());
+						}
 						else
+						{
+							player.setStepAction(new Step(down));
 							player.setCurrentAction(player.getStepAction());
+						}
 					}
 				}
 			}
@@ -197,13 +202,16 @@ public class GameMain {
 					arrowKeyInputCount ++;
 					if (player.isIdle())
 					{
-						ArrayList<String> newArgs = new ArrayList<String>();
-						newArgs.add("up");
-						player.setArgs(newArgs);
 						if (arrowKeyInputCount < 3)
+						{
+							player.setTurnAction(new Turn(up));
 							player.setCurrentAction(player.getTurnAction());
+						}
 						else
+						{
+							player.setStepAction(new Step(up));
 							player.setCurrentAction(player.getStepAction());
+						}
 					}
 				}
 			}
@@ -215,13 +223,16 @@ public class GameMain {
 					arrowKeyInputCount ++;
 					if (player.isIdle())
 					{
-						ArrayList<String> newArgs = new ArrayList<String>();
-						newArgs.add("right");
-						player.setArgs(newArgs);
 						if (arrowKeyInputCount < 3)
+						{
+							player.setTurnAction(new Turn(right));
 							player.setCurrentAction(player.getTurnAction());
+						}
 						else
+						{
+							player.setStepAction(new Step(right));
 							player.setCurrentAction(player.getStepAction());
+						}
 					}
 				}
 			}
@@ -233,13 +244,16 @@ public class GameMain {
 					arrowKeyInputCount ++;
 					if (player.isIdle())
 					{
-						ArrayList<String> newArgs = new ArrayList<String>();
-						newArgs.add("left");
-						player.setArgs(newArgs);
 						if (arrowKeyInputCount < 3)
+						{
+							player.setTurnAction(new Turn(left));
 							player.setCurrentAction(player.getTurnAction());
+						}
 						else
+						{
+							player.setStepAction(new Step(left));
 							player.setCurrentAction(player.getStepAction());
+						}
 					}
 				}
 			}
