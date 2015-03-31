@@ -11,6 +11,12 @@ import entities.Agent.direction;
 import static entities.Agent.direction.*;
 
 public class PathPlannerUtils {	
+	
+	public enum MovementType
+	{
+		SimpleStepping, Stepping, Jumping
+	}
+	
 	/**
 	 * Determine whether it is possible to step to the next location, incorporating bounds checking,
 	 * collision checking with things and objects, and ensuring that the next location either has
@@ -64,6 +70,25 @@ public class PathPlannerUtils {
 		return true;
 	}
 
+	public static boolean isContinuingDescent(Agent agent, World world, Position pos, direction dir)
+	{
+		Position posBelow = new Position(pos);
+		posBelow.z --;
+		
+		Position forwardPos = new Position(pos);
+		switch (dir)
+		{
+		case up:	forwardPos.y += 1;	break;
+		case down:	forwardPos.y -= 1;	break;
+		case left:	forwardPos.x -= 1;	break;
+		case right:	forwardPos.x += 1;	break;
+		}
+		forwardPos.z -= 2;
+		
+		return world.hasThing(posBelow) && world.hasThing(forwardPos)
+				&& world.getThingsAt(posBelow).hasRamp() && world.getThingsAt(forwardPos).hasRamp();
+	}
+	
 	/**
 	 * Determine whether it is possible to step to the next location, where that location is at the top
 	 * of a ramp, incorporating bounds checking,

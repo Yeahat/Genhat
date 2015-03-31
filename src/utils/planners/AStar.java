@@ -4,19 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
+import utils.planners.PathPlannerUtils.MovementType;
 import world.Position;
 import world.World;
 import entities.Agent;
 import entities.Agent.direction;
-
+import static utils.planners.PathPlannerUtils.MovementType.*;
 import static entities.Agent.direction.*;
 
 public class AStar {
-
-	public enum MovementType
-	{
-		SimpleStepping, Stepping, Jumpping
-	}
 	
 	private Node currentNode;
 	private PriorityQueue<Node> frontier;
@@ -58,7 +54,10 @@ public class AStar {
 		this.agent = agent;
 		this.world = world;
 		this.goal = goal;
-		currentNode = new Node(start, Distance.distance2D(start, goal), "");
+		if (movementType == SimpleStepping)
+			currentNode = new Node(start, Distance.distance2D(start, goal), "");
+		else
+			currentNode = new Node(start, Distance.distance3D(start, goal), "");
 		frontier.clear();
 		frontier.add(currentNode);
 		explored.clear();
@@ -114,10 +113,41 @@ public class AStar {
 				Collections.shuffle(actions); //randomize order of actions so that one equally useful direction will not be arbitrarily prioritized
 				for (int i = 0; i < actions.size(); i ++)
 				{
+					//check for a valid new position
 					direction dir = actions.get(i);
-					if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
+					Position newPos = null;
+					if (movementType == SimpleStepping)
 					{
-						Position newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, false, false);
+						if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
+							newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, false, false);
+					}
+					else if (movementType == Stepping)
+					{
+						
+						Position checkPos = new Position(currentNode.getPos());
+						checkPos.z --;
+						if ((dir == up || dir == down) && world.hasThing(checkPos) && world.getThingsAt(checkPos).hasRamp())
+						{
+							continue;
+						}
+						
+						boolean rampStepCheck[] = PathPlannerUtils.checkForRampStep(world, currentNode.getPos(), dir);
+						if (rampStepCheck[0]) //Ramp Step
+						{
+							boolean continuingDescent = !rampStepCheck[1] && PathPlannerUtils.isContinuingDescent(agent, world, currentNode.getPos(), dir);
+							if (PathPlannerUtils.canStepRamp(agent, world, currentNode.getPos(), dir, rampStepCheck[1], continuingDescent))
+								newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, true, rampStepCheck[1]);
+						}
+						else //Regular Step
+						{
+							if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
+								newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, false, false);
+						}
+					}
+					
+					//add new position if one was found
+					if (newPos != null)
+					{
 						//add any unexplored nodes to the frontier
 						if (!explored.contains(newPos))
 						{
@@ -129,7 +159,10 @@ public class AStar {
 							case left:	updatedPath += "L";	break;
 							case right:	updatedPath += "R";	break;
 							}
-							frontier.add(new Node(newPos, Distance.distance2D(newPos, goal), updatedPath));
+							if (movementType == SimpleStepping)
+								frontier.add(new Node(newPos, Distance.distance2D(newPos, goal), updatedPath));
+							else
+								frontier.add(new Node(newPos, Distance.distance3D(newPos, goal), updatedPath));
 						}
 					}
 				}

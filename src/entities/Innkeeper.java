@@ -16,13 +16,15 @@ import world.World;
 
 import static entities.Agent.direction.*;
 import static world.World.controlState.*;
+import static utils.planners.PathPlannerUtils.MovementType.*;
 
 public class Innkeeper extends Agent
 {
 	//testing
 	String path = "RRRLLLLLRR";
 	Position testPos1 = new Position(31, 36, 1);
-	Position testPos2 = new Position(29, 29, 1);
+	//Position testPos2 = new Position(29, 29, 1);
+	Position testPos2 = new Position(37, 35, 4);
 	
 	//state
 	int conversationNumber;
@@ -255,11 +257,11 @@ public class Innkeeper extends Agent
 			{
 				if (pos.equals(testPos1))
 				{
-					walkToPoint = new WalkToPoint(testPos2);
+					walkToPoint = new WalkToPoint(testPos2, Stepping);
 				}
 				else
 				{
-					walkToPoint = new WalkToPoint(testPos1);
+					walkToPoint = new WalkToPoint(testPos1, Stepping);
 				}
 				
 				currentAction = walkToPoint;
