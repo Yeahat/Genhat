@@ -1,7 +1,5 @@
 package actions;
 
-import java.util.ArrayList;
-
 import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;

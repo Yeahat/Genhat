@@ -1,10 +1,7 @@
 package actions;
 
-import java.util.ArrayList;
-
 import utils.planners.AStar;
 import utils.planners.PathPlannerUtils.MovementClass;
-import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import entities.Agent;

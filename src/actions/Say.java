@@ -1,7 +1,5 @@
 package actions;
 
-import java.util.ArrayList;
-
 import utils.display.DisplayText;
 import world.Position;
 import world.World;

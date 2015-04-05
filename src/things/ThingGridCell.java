@@ -2,7 +2,6 @@ package things;
 
 import java.util.ArrayList;
 
-import things.Thing.connectionContext;
 import world.World;
 import entities.Agent;
 import entities.Agent.direction;

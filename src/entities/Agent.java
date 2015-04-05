@@ -1,6 +1,5 @@
 package entities;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 import org.lwjgl.opengl.GL11;
@@ -47,7 +46,6 @@ public abstract class Agent {
 	private direction stance = right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
 	private Position homePos;
-	private String path; //current path of the agent
 	
 	//Actions: List all actions of this agent here
 	Idle idle;

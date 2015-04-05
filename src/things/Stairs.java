@@ -59,6 +59,7 @@ public class Stairs extends Thing {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void renderThing(int pixelSize, int terrainTextureSize)
 	{

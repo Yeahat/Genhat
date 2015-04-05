@@ -1,6 +1,5 @@
 package actions;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import utils.planners.Distance;

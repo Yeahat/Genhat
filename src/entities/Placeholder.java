@@ -1,9 +1,7 @@
 package entities;
 
-import static entities.Agent.direction.down;
 import static entities.Agent.direction.left;
 import static entities.Agent.direction.right;
-import static entities.Agent.direction.up;
 
 import org.lwjgl.opengl.GL11;
 

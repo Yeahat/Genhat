@@ -1,7 +1,5 @@
 package actions;
 
-import java.util.ArrayList;
-
 import entities.Agent;
 
 import world.World;
