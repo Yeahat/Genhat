@@ -249,6 +249,15 @@ public class PathPlannerUtils {
 	 */
 	public static boolean[] checkForHorizontalRampStep(World world, Position pos, direction dir)
 	{
+		//on ramp case will always require a horizontal ramp step
+		if (isOnRampHorizontal(world, pos))
+		{
+			boolean[] result = new boolean[2];
+			result[0] = true;
+			result[1] = (dir == world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir());
+			return result;
+		}
+		
 		int x = pos.x;
 		int y = pos.y;
 		int z = pos.z;
@@ -258,7 +267,7 @@ public class PathPlannerUtils {
 		{
 		case left:	xt = x - 1;	break;
 		case right:	xt = x + 1;	break;
-		default: boolean[] result = {false, false}; return result; //ramp steps are only for left/right directions, not up/down
+		default: boolean[] result = {false, false}; return result; //stepping on to a horizontal ramp can only happen with left/right steps
 		}
 		
 		boolean isRampStep = false;
@@ -267,18 +276,16 @@ public class PathPlannerUtils {
 		if (dir == right)
 			oppositeDir = left;
 		
-		if ((world.hasThing(xt, y, z) && world.getThingsAt(xt, y, z).hasRamp()
+		//check for ramp in front (starting ascent)
+		if (world.hasThing(xt, y, z) && world.getThingsAt(xt, y, z).hasRamp()
 				&& world.getThingsAt(xt, y, z).getRampDir() == dir)
-				|| (world.hasThing(x, y, z - 1) && world.getThingsAt(x, y, z - 1).hasRamp()
-						&& world.getThingsAt(x, y, z - 1).getRampDir() == dir))
 		{
 			isRampStep = true;
 			ascending = true;
 		}
-		else if ((world.hasThing(xt, y, z - 1) && world.getThingsAt(xt, y, z - 1).hasRamp()
+		//check for ramp in front and below (starting descent)
+		else if (world.hasThing(xt, y, z - 1) && world.getThingsAt(xt, y, z - 1).hasRamp()
 				&& world.getThingsAt(xt, y, z - 1).getRampDir() == oppositeDir)
-				|| (world.hasThing(x, y, z - 1) && world.getThingsAt(x, y, z - 1).hasRamp()
-						&& world.getThingsAt(x, y, z - 1).getRampDir() == oppositeDir))
 		{
 			isRampStep = true;
 		}
@@ -296,6 +303,7 @@ public class PathPlannerUtils {
 	 */
 	public static boolean checkForVerticalRampStep(World world, Position pos, direction dir)
 	{
+		//on ramp case will always require a vertical ramp step
 		if (isOnRampVertical(world, pos))
 			return true;
 	    
@@ -335,17 +343,16 @@ public class PathPlannerUtils {
 	}
 
 	/**
-	 * Calculates the resulting position if an agent were to take a step from a given position in a given direction.
+	 * Calculates the resulting position if an agent were to take a simple step from a given position in a given direction.
+	 * Note that this assumes the step type is valid (this method does no collision detection, etc.).
+	 * 
 	 * @param world the world in which the step is taking place
 	 * @param pos the position from which the step is initiated
 	 * @param dir the direction to step
-	 * @param rampStep true if the step involves a ramp (can be determined with PathPlanners.checkForRampStep())
-	 * @param ascending true if a ramp step is ascending, false if it's descending, unused if rampStep is false
 	 * @return the resulting Position at the step's conclusion
 	 */
-	public static Position resultingPosition(World world, Position pos, direction dir, boolean rampStep, boolean ascending)
+	public static Position simulateSimpleStep(World world, Position pos, direction dir)
 	{
-		//TODO: Update this to include vertical ramp steps
 		Position resultingPos = new Position(pos);
 		switch (dir)
 		{
@@ -355,22 +362,95 @@ public class PathPlannerUtils {
 		case right:	resultingPos.x ++;	break;
 		}
 		
-		if (rampStep)
+		return resultingPos;
+	}
+	
+	/**
+	 * Calculates the resulting position if an agent were to take a horizontal ramp step from a given position in a given direction.
+	 * Note that this assumes the step type is valid (this method does no collision detection, etc.).
+	 * 
+	 * @param world the world in which the step is taking place
+	 * @param pos the position from which the step is initiated
+	 * @param dir the direction to step
+	 * @param rampStep true if the step involves a ramp (can be determined with PathPlanners.checkForRampStep())
+	 * @param ascending true if a ramp step is ascending, false if it's descending, unused if rampStep is false
+	 * @return the resulting Position at the step's conclusion
+	 */
+	public static Position simulateHorizontalRampStep(World world, Position pos, direction dir, boolean ascending)
+	{
+		Position resultingPos = new Position(pos);
+		switch (dir)
 		{
-			if (ascending)
-			{
-				//Two cases: the final step that will leave the stairs does not change the height, everything else does.
-				if (world.hasThing(resultingPos) && world.getThingsAt(resultingPos).hasRamp())
-					resultingPos.z ++;
-			}
-			else
-			{
-				//Two cases: the first step that will get on a ramp does not change the height, everything else does.
-				if (world.hasThing(pos.x, pos.y, pos.z - 1) && world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp())
-					resultingPos.z --;
-			}
+		case up:	resultingPos.y ++;	break;
+		case down:	resultingPos.y --;	break;
+		case left:	resultingPos.x --;	break;
+		case right:	resultingPos.x ++;	break;
+		}
+		
+		if (ascending)
+		{
+			//Two cases: the final step that will leave the stairs does not change the height, everything else does.
+			if (world.hasThing(resultingPos) && world.getThingsAt(resultingPos).hasRamp())
+				resultingPos.z ++;
+		}
+		else
+		{
+			//Two cases: the first step that will get on a ramp does not change the height, everything else does.
+			if (world.hasThing(pos.x, pos.y, pos.z - 1) && world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp())
+				resultingPos.z --;
 		}
 		
 		return resultingPos;
+	}
+	
+	/**
+	 * Calculates the resulting position if an agent were to take a vertical ramp step from a given position in a given direction.
+	 * Note that this assumes the step type is valid (this method does no collision detection, etc.).
+	 * 
+	 * @param world the world in which the step is taking place
+	 * @param pos the position from which the step is initiated
+	 * @param dir the direction to step
+	 * @return the resulting Position at the step's conclusion
+	 */
+	public static Position simulateVerticalRampStep(World world, Position pos, direction dir)
+	{
+		Position resultingPosition = new Position(pos);
+		switch (dir)
+		{
+		case up:
+			//first case: climbing
+			if (world.hasThing(pos.x, pos.y + 1, pos.z) && world.getThingsAt(pos.x, pos.y + 1, pos.z).hasRamp()
+					&& world.getThingsAt(pos.x, pos.y + 1, pos.z).getRampDir() == up)
+			{
+				resultingPosition.z ++;
+			}
+			//second case: stepping off top of ramp
+			else
+			{
+				resultingPosition.y ++;
+			}
+		break;
+		case down:
+			//first case: stepping on to ramp
+			if (world.hasThing(pos.x, pos.y, pos.z - 1) && world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp()
+					&& world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == up)
+			{
+				resultingPosition.y --;
+			}
+			//second case: climbing down
+			else
+			{
+				resultingPosition.z --;
+			}
+		break;
+		case left:
+			resultingPosition.x --;
+		break;
+		case right:
+			resultingPosition.x ++;
+		break;
+		}
+		
+		return resultingPosition;
 	}
 }

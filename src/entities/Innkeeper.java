@@ -25,6 +25,7 @@ public class Innkeeper extends Agent
 	Position testPos1 = new Position(31, 36, 1);
 	//Position testPos2 = new Position(29, 29, 1);
 	Position testPos2 = new Position(37, 35, 4);
+	//Position testPos2 = new Position(7, 19, 4);
 	
 	//state
 	int conversationNumber;

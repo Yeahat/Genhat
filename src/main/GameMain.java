@@ -897,7 +897,7 @@ public class GameMain {
 		
 		Innkeeper innkeeper = new Innkeeper("char1", 0, 1);
 		innkeeper.setPos(new Position(31, 36, 1));
-		//agents.add(innkeeper);
+		agents.add(innkeeper);
 		
 		world.setTod(sunrise);
 		

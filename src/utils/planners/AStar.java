@@ -119,30 +119,31 @@ public class AStar {
 					if (movementType == SimpleStepping)
 					{
 						if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
-							newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, false, false);
+							newPos = PathPlannerUtils.simulateSimpleStep(world, currentNode.getPos(), dir);
 					}
 					else if (movementType == Stepping)
 					{
-						
-						Position checkPos = new Position(currentNode.getPos());
-						checkPos.z --;
-						if ((dir == up || dir == down) && world.hasThing(checkPos) && world.getThingsAt(checkPos).hasRamp())
-						{
-							continue;
-						}
-						
-						//TODO: check if onHorizontalRamp, then check if onVerticalRamp, then do this
+						//Horizontal Ramp Step
 						boolean rampStepCheck[] = PathPlannerUtils.checkForHorizontalRampStep(world, currentNode.getPos(), dir);
 						if (rampStepCheck[0]) //Ramp Step
 						{
 							boolean continuingDescent = !rampStepCheck[1] && PathPlannerUtils.isContinuingDescent(agent, world, currentNode.getPos(), dir);
 							if (PathPlannerUtils.canStepHorizontalRamp(agent, world, currentNode.getPos(), dir, rampStepCheck[1], continuingDescent))
-								newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, true, rampStepCheck[1]);
+								newPos = PathPlannerUtils.simulateHorizontalRampStep(world, currentNode.getPos(), dir, rampStepCheck[1]);
 						}
-						else //Regular Step
+						else
 						{
-							if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
-								newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, false, false);
+							//Vertical Ramp Step
+							if (PathPlannerUtils.checkForVerticalRampStep(world, currentNode.getPos(), dir))
+							{
+								if (PathPlannerUtils.canStepVerticalRamp(agent, world, currentNode.getPos(), dir))
+									newPos = PathPlannerUtils.simulateVerticalRampStep(world, currentNode.getPos(), dir);
+							}
+							else //Regular Step
+							{
+								if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
+									newPos = PathPlannerUtils.simulateSimpleStep(world, currentNode.getPos(), dir);
+							}
 						}
 					}
 					
