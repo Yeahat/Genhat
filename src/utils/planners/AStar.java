@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
-import utils.planners.PathPlannerUtils.MovementType;
+import utils.planners.PathPlannerUtils.MovementClass;
 import world.Position;
 import world.World;
 import entities.Agent;
 import entities.Agent.direction;
-import static utils.planners.PathPlannerUtils.MovementType.*;
+import static utils.planners.PathPlannerUtils.MovementClass.*;
 import static entities.Agent.direction.*;
 
 public class AStar {
@@ -23,7 +23,7 @@ public class AStar {
 	private Agent agent;
 	private World world;
 	
-	private MovementType movementType;
+	private MovementClass movementType;
 	private int loopsPerPlanningIteration;
 	private int maxPlanningLoops;
 	
@@ -32,7 +32,7 @@ public class AStar {
 	
 	private String path;
 	
-	public AStar(MovementType movementType)
+	public AStar(MovementClass movementType)
 	{
 		this.frontier = new PriorityQueue<Node>();
 		this.explored = new ArrayList<Position>();
@@ -131,11 +131,12 @@ public class AStar {
 							continue;
 						}
 						
-						boolean rampStepCheck[] = PathPlannerUtils.checkForRampStep(world, currentNode.getPos(), dir);
+						//TODO: check if onHorizontalRamp, then check if onVerticalRamp, then do this
+						boolean rampStepCheck[] = PathPlannerUtils.checkForHorizontalRampStep(world, currentNode.getPos(), dir);
 						if (rampStepCheck[0]) //Ramp Step
 						{
 							boolean continuingDescent = !rampStepCheck[1] && PathPlannerUtils.isContinuingDescent(agent, world, currentNode.getPos(), dir);
-							if (PathPlannerUtils.canStepRamp(agent, world, currentNode.getPos(), dir, rampStepCheck[1], continuingDescent))
+							if (PathPlannerUtils.canStepHorizontalRamp(agent, world, currentNode.getPos(), dir, rampStepCheck[1], continuingDescent))
 								newPos = PathPlannerUtils.resultingPosition(world, currentNode.getPos(), dir, true, rampStepCheck[1]);
 						}
 						else //Regular Step

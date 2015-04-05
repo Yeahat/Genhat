@@ -865,6 +865,27 @@ public class GameMain {
 			}
 		}
 		
+		//vertical stairs test
+		for (int i = 4; i < 10; i ++)
+		{
+			for (int j = 18; j < 20; j ++)
+			{
+				for (int k = 1; k < 4; k ++)
+				{
+					t[i][j][k] = new Terrain(dirt, grass);
+				}
+			}
+		}
+		for (int k = 1; k < 4; k ++)
+		{
+			Stairs tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).connection(start).build();
+			Stairs tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).connection(end).build();
+			Stairs tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).connection(standalone).build();
+			world.addThing(tempVStairs1, 5, 18, k);
+			world.addThing(tempVStairs2, 6, 18, k);
+			world.addThing(tempVStairs3, 8, 18, k);
+		}
+		
 		world.setTerrain(t);
 		
 		//agents
@@ -876,7 +897,7 @@ public class GameMain {
 		
 		Innkeeper innkeeper = new Innkeeper("char1", 0, 1);
 		innkeeper.setPos(new Position(31, 36, 1));
-		agents.add(innkeeper);
+		//agents.add(innkeeper);
 		
 		world.setTod(sunrise);
 		

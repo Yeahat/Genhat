@@ -45,6 +45,7 @@ public class Jump implements Action {
 					case up:
 						world.moveAgent(agent, 0, 1, 1);
 						agent.setOffsetY(-32);
+						pos = agent.getPos();
 						Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z - 1));
 						world.addAgent(h1);
 						break;
@@ -57,6 +58,7 @@ public class Jump implements Action {
 						world.moveAgent(agent, -1, 0, 1);
 						agent.setOffsetX(16);
 						agent.setOffsetY(-16);
+						pos = agent.getPos();
 						Placeholder h3 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z - 1));
 						world.addAgent(h3);
 						break;
@@ -64,6 +66,7 @@ public class Jump implements Action {
 						world.moveAgent(agent, 1, 0, 1);
 						agent.setOffsetX(-16);
 						agent.setOffsetY(-16);
+						pos = agent.getPos();
 						Placeholder h4 = new Placeholder(agent, new Position(pos.x - 1, pos.y, pos.z - 1));
 						world.addAgent(h4);
 						break;

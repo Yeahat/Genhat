@@ -10,9 +10,9 @@ import entities.Agent.direction;
 import entities.Hero;
 import entities.Placeholder;
 import static entities.Agent.direction.*;
-import static actions.RampStep.SteppingState.*;
+import static actions.HorizontalRampStep.SteppingState.*;
 
-public class RampStep implements Action {
+public class HorizontalRampStep implements Action {
 
 	private final direction dir;
 	private final boolean ascending;
@@ -25,7 +25,7 @@ public class RampStep implements Action {
 		On, Off, Cont
 	}
 	
-	public RampStep(direction dir, boolean ascending)
+	public HorizontalRampStep(direction dir, boolean ascending)
 	{
 		this.dir = dir;
 		this.ascending = ascending;
@@ -45,45 +45,12 @@ public class RampStep implements Action {
 			switch (dir)
 			{
 			case up:
-				//Ascending a down-facing ramp
-				if (ascending)
-				{
-					if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), up, true, false))
-					{
-						world.moveAgent(agent, 0, 1, 1);
-						agent.setOffsetY(-32);
-						Position pos = agent.getPos();
-						Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z - 1));
-						world.addAgent(h1);
-						agent.setRampAscending(true);
-					}
-					else
-					{
-						finished = true;
-						return;
-					}
-				}
-			break;
+				finished = true;
+				return;
 				
 			case down:
-				if (!ascending)
-				{
-					//Descending a down-facing ramp
-					Position pos = agent.getPos();
-					if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), down, false, false))
-					{
-						Placeholder holder = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z - 1));
-						world.addAgent(holder);
-						finished = false;
-						agent.setRampDescending(true);
-					}
-					else
-					{
-						finished = true;
-						return;
-					}
-				}
-			break;
+				finished = true;
+				return;
 				
 			case left:
 				//Ascending a right-facing ramp
@@ -94,7 +61,7 @@ public class RampStep implements Action {
 					//Case 1: stepping onto a ramp
 					if (!world.hasThing(pos.x, pos.y, pos.z - 1) || !world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), left, true, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), left, true, false))
 						{
 							steppingState = On;
 							agent.setOnRamp(true);
@@ -115,7 +82,7 @@ public class RampStep implements Action {
 					//Case 2: stepping off of a ramp
 					else if (!world.hasThing(pos.x - 1, pos.y, pos.z) || !world.getThingsAt(pos.x - 1, pos.y, pos.z).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), left, true, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), left, true, false))
 						{
 							steppingState = Off;
 							world.moveAgent(agent, -1, 0, 0);
@@ -134,7 +101,7 @@ public class RampStep implements Action {
 					//Case 3: stepping off of a ramp onto another ramp
 					else if (world.hasThing(pos.x - 1, pos.y, pos.z) && world.getThingsAt(pos.x - 1, pos.y, pos.z).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), left, true, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), left, true, false))
 						{
 							steppingState = Cont;
 							world.moveAgent(agent, -1, 0, 1);
@@ -161,7 +128,7 @@ public class RampStep implements Action {
 					//Case 1: stepping onto a ramp
 					if (!world.hasThing(pos.x, pos.y, pos.z - 1) || !world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), left, false, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), left, false, false))
 						{
 							steppingState = On;
 							agent.setOnRamp(true);
@@ -181,7 +148,7 @@ public class RampStep implements Action {
 					//Case 2: stepping off of a ramp
 					else if (!world.hasThing(pos.x - 1, pos.y, pos.z - 2) || !world.getThingsAt(pos.x - 1, pos.y, pos.z - 2).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), left, false, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), left, false, false))
 						{
 							steppingState = Off;
 							world.moveAgent(agent, -1, 0, -1);
@@ -201,7 +168,7 @@ public class RampStep implements Action {
 					//Case 3: stepping off of a ramp onto another ramp
 					else if (world.hasThing(pos.x - 1, pos.y, pos.z - 2) && world.getThingsAt(pos.x - 1, pos.y, pos.z - 2).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), left, false, true))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), left, false, true))
 						{
 							steppingState = Cont;
 							world.moveAgent(agent, -1, 0, -1);
@@ -230,7 +197,7 @@ public class RampStep implements Action {
 					//Case 1: stepping onto a ramp
 					if (!world.hasThing(pos.x, pos.y, pos.z - 1) || !world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), right, true, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), right, true, false))
 						{
 							steppingState = On;
 							agent.setOnRamp(true);
@@ -251,7 +218,7 @@ public class RampStep implements Action {
 					//Case 2: stepping off of a ramp
 					else if (!world.hasThing(pos.x + 1, pos.y, pos.z) || !world.getThingsAt(pos.x + 1, pos.y, pos.z).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), right, true, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), right, true, false))
 						{
 							steppingState = Off;
 							world.moveAgent(agent, 1, 0, 0);
@@ -270,7 +237,7 @@ public class RampStep implements Action {
 					//Case 3: stepping off of a ramp onto another ramp
 					else if (world.hasThing(pos.x + 1, pos.y, pos.z) && world.getThingsAt(pos.x + 1, pos.y, pos.z).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), right, true, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), right, true, false))
 						{
 							steppingState = Cont;
 							world.moveAgent(agent, 1, 0, 1);
@@ -297,7 +264,7 @@ public class RampStep implements Action {
 					//Case 1: stepping onto a ramp
 					if (!world.hasThing(pos.x, pos.y, pos.z - 1) || !world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), right, false, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), right, false, false))
 						{
 							steppingState = On;
 							agent.setOnRamp(true);
@@ -317,7 +284,7 @@ public class RampStep implements Action {
 					//Case 2: stepping off of a ramp
 					else if (!world.hasThing(pos.x + 1, pos.y, pos.z - 2) || !world.getThingsAt(pos.x + 1, pos.y, pos.z - 2).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), right, false, false))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), right, false, false))
 						{
 							steppingState = Off;
 							world.moveAgent(agent, 1, 0, -1);
@@ -337,7 +304,7 @@ public class RampStep implements Action {
 					//Case 3: stepping off of a ramp onto another ramp
 					else if (world.hasThing(pos.x + 1, pos.y, pos.z - 2) && world.getThingsAt(pos.x + 1, pos.y, pos.z - 2).hasRamp())
 					{
-						if (PathPlannerUtils.canStepRamp(agent, world, agent.getPos(), right, false, true))
+						if (PathPlannerUtils.canStepHorizontalRamp(agent, world, agent.getPos(), right, false, true))
 						{
 							steppingState = Cont;
 							world.moveAgent(agent, 1, 0, -1);

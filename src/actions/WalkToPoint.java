@@ -3,12 +3,12 @@ package actions;
 import java.util.ArrayList;
 
 import utils.planners.AStar;
-import utils.planners.PathPlannerUtils.MovementType;
+import utils.planners.PathPlannerUtils.MovementClass;
 import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import entities.Agent;
-import static utils.planners.PathPlannerUtils.MovementType.*;
+import static utils.planners.PathPlannerUtils.MovementClass.*;
 
 public class WalkToPoint implements Action {
 
@@ -29,7 +29,7 @@ public class WalkToPoint implements Action {
 		planner = new AStar(Stepping);
 	}
 	
-	public WalkToPoint(Position goal, MovementType movementType)
+	public WalkToPoint(Position goal, MovementClass movementType)
 	{
 		this.goal = goal;
 		planning = false;

@@ -16,7 +16,7 @@ import world.World;
 
 import static entities.Agent.direction.*;
 import static world.World.controlState.*;
-import static utils.planners.PathPlannerUtils.MovementType.*;
+import static utils.planners.PathPlannerUtils.MovementClass.*;
 
 public class Innkeeper extends Agent
 {

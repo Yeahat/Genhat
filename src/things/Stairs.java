@@ -18,7 +18,7 @@ public class Stairs extends Thing {
 	}
 	private final stairsType type;
 	private final connectionContext connection;
-	private final StairsBottom associatedBottom;	//an extra thing rendered for graphical consistancy
+	private final StairsBottom associatedBottom;	//an extra thing rendered for graphical consistency
 	
 	private Stairs(StairsBuilder builder)
 	{
@@ -92,8 +92,12 @@ public class Stairs extends Thing {
 		}
 		else if (type == indoorWooden)
 		{
-			if (dir == left)
-				texY += 1;
+			switch(dir)
+			{
+			case left:	texY += 1;	break;
+			case up:	texY += 3;	break;
+			}
+				
 			switch (connection)
 			{
 			case start:

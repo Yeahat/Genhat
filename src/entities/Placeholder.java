@@ -47,11 +47,15 @@ public class Placeholder extends Agent {
 			//make any necessary adjustments to offsets to account for difference between hero and placeholder
 			this.offset[0] = agent.offset[0];
 			this.offset[1] = agent.offset[1];
-			if (agent.pos.y > this.pos.y)
+			if (agent.pos.y > this.pos.y || agent.pos.z > this.pos.z)
 			{
 				this.offset[1] += 16;
 			}
 			
+			if (agent.pos.z < this.pos.z)
+			{
+				this.offset[1] -= 16;
+			}
 			//render the agent linked to this placeholder
 			GL11.glPushMatrix();
 			
@@ -79,83 +83,20 @@ public class Placeholder extends Agent {
 					break;
 				}
 				
-				//Special case footstep animations
-				//Set footstep animation for walking up ramps down-facing ramps
-				if (this.isRampAscending() && this.getDir() == up)
-				{
-					if ((Math.abs(this.offset[0]) <= 16 && Math.abs(this.offset[0]) > 7)
-						|| (Math.abs(this.offset[1]) <= 16 && Math.abs(this.offset[1]) > 7))
-					{
-						if (agent.getFootstep() == right)
-							texX += 0;
-						else
-							texX += 2;
-					}
-					else if ((Math.abs(this.offset[0]) <= 32 && Math.abs(this.offset[0]) > 23)
-					|| (Math.abs(this.offset[1]) <= 32 && Math.abs(this.offset[1]) > 23))
-					{
-						if (agent.getFootstep() == right)
-							texX += 2;
-						else
-							texX += 0;
-					}
-					else
-					{
-						texX += 1;
-					}
-				}
 				//Set footstep animation for jumping
-				else if (agent.isJumping())
+				if (agent.isJumping())
 				{
 					if (agent.getStance() == right)
 						texX += 2;
 					else
 						texX += 0;
 				}
-				//Set footstep animation for walking down down-facing ramps
-				else if (agent.isRampDescending() && agent.getDir() == down)
-				{
-					if ((Math.abs(this.offset[0]) <= 7 && Math.abs(this.offset[0]) > 0)
-						|| (Math.abs(this.offset[1]) <= 7 && Math.abs(this.offset[1]) > 0))
-					{
-						if (agent.getFootstep() == right)
-							texX += 2;
-						else
-							texX += 0;
-					}
-					else if ((Math.abs(this.offset[0]) <= 23 && Math.abs(this.offset[0]) > 16)
-					|| (Math.abs(this.offset[1]) <= 23 && Math.abs(this.offset[1]) > 16))
-					{
-						if (agent.getFootstep() == right)
-							texX += 0;
-						else
-							texX += 2;
-					}
-					else
-					{
-						texX += 1;
-					}
-				}
 				//Set footstep animation for regular stepping
 				else
 				{
 					if (agent.getDir() == left || agent.getDir() == right)
 					{
-						if (Math.abs(this.offset[0]) <= 16 && Math.abs(this.offset[0]) > 7)
-							{
-								if (agent.getFootstep() == right)
-									texX += 2;
-								else
-									texX += 0;
-							}
-							else
-							{
-								texX += 1;
-							}
-					}
-					else if (agent.getDir() == down)
-					{
-						if (Math.abs(this.offset[1]) <= 16 && Math.abs(this.offset[1]) > 7)
+						if (Math.abs(agent.offset[0]) <= 16 && Math.abs(agent.offset[0]) > 7)
 						{
 							if (agent.getFootstep() == right)
 								texX += 2;
@@ -169,7 +110,7 @@ public class Placeholder extends Agent {
 					}
 					else
 					{
-						if (Math.abs(this.offset[1]) <= 7 && Math.abs(this.offset[1]) > 0)
+						if (Math.abs(agent.offset[1]) <= 16 && Math.abs(agent.offset[1]) > 7)
 						{
 							if (agent.getFootstep() == right)
 								texX += 2;

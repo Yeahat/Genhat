@@ -214,62 +214,13 @@ public abstract class Agent {
 					break;
 				}
 				
-				//Special case footstep animations
-				//Set footstep animation for walking up ramps down-facing ramps
-				if (this.isRampAscending() && this.getDir() == up)
-				{
-					if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
-						|| (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7))
-					{
-						if (getFootstep() == right)
-							texX += 0;
-						else
-							texX += 2;
-					}
-					else if ((Math.abs(offset[0]) <= 32 && Math.abs(offset[0]) > 23)
-					|| (Math.abs(offset[1]) <= 32 && Math.abs(offset[1]) > 23))
-					{
-						if (getFootstep() == right)
-							texX += 2;
-						else
-							texX += 0;
-					}
-					else
-					{
-						texX += 1;
-					}
-				}
 				//Set footstep animation for jumping
-				else if (this.isJumping())
+				if (this.isJumping())
 				{
 					if (getStance() == right)
 						texX += 2;
 					else
 						texX += 0;
-				}
-				//Set footstep animation for walking down down-facing ramps
-				else if (this.isRampDescending() && this.getDir() == down)
-				{
-					if ((Math.abs(offset[0]) <= 7 && Math.abs(offset[0]) > 0)
-						|| (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0))
-					{
-						if (getFootstep() == right)
-							texX += 2;
-						else
-							texX += 0;
-					}
-					else if ((Math.abs(offset[0]) <= 23 && Math.abs(offset[0]) > 16)
-					|| (Math.abs(offset[1]) <= 23 && Math.abs(offset[1]) > 16))
-					{
-						if (getFootstep() == right)
-							texX += 0;
-						else
-							texX += 2;
-					}
-					else
-					{
-						texX += 1;
-					}
 				}
 				//Set footstep animation for regular stepping
 				else
@@ -277,20 +228,6 @@ public abstract class Agent {
 					if (getDir() == left || getDir() == right)
 					{
 						if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
-							{
-								if (getFootstep() == right)
-									texX += 2;
-								else
-									texX += 0;
-							}
-							else
-							{
-								texX += 1;
-							}
-					}
-					else if (getDir() == down)
-					{
-						if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
 						{
 							if (getFootstep() == right)
 								texX += 2;
@@ -304,7 +241,7 @@ public abstract class Agent {
 					}
 					else
 					{
-						if (Math.abs(offset[1]) <= 7 && Math.abs(offset[1]) > 0)
+						if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
 						{
 							if (getFootstep() == right)
 								texX += 2;

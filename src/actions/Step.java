@@ -14,7 +14,7 @@ public class Step implements Action {
 	private final direction dir;
 	boolean finished;
 	SimpleStep simpleStep;
-	RampStep rampStep;
+	Action rampStep;
 	
 	public Step(direction dir)
 	{
@@ -25,90 +25,37 @@ public class Step implements Action {
 	@Override
 	public void execute(Agent agent, World world)
 	{
-		switch (dir)
+		//begin a new step if one is not already in progress, otherwise continue executing the step in progress
+		if (!continueStepping(agent, world))
 		{
-		case up:
-			if (!agent.isOnRamp() && agent.getDir() != up)
-				agent.setDir(up);
-			//if any steps are already in progress, continue them,
-			//otherwise determine new steps that should be started
-			if (!continueStepping(agent, world))
+			//set direction if necessary
+			if (agent.getDir() != dir && (dir == left || dir == right || !PathPlannerUtils.isOnRampHorizontal(world, agent.getPos())))
 			{
-				//check for ramps
-				Position pos = agent.getPos();
-				if (world.hasThing(pos.z, pos.y, pos.z) && world.getThingsAt(pos.z, pos.y, pos.z).hasRamp()
-						&& world.getThingsAt(pos.z, pos.y, pos.z).getRampDir() == down)
-				{
-					rampStep = new RampStep(dir, true);
-					rampStep.execute(agent, world);
-				}
-				else
-				{
-					if (!agent.isOnRamp())
-					{
-						simpleStep = new SimpleStep(dir);
-						simpleStep.execute(agent, world);
-					}
-				}
-			}
-		break;
-		
-		case down:
-			if (!agent.isOnRamp() && agent.getDir() != down)
-				agent.setDir(down);
-			
-			//if any steps are already in progress, continue them,
-			//otherwise determine new steps that should be started
-			if (!continueStepping(agent, world))
-			{
-				//check for ramps
-				Position pos = agent.getPos();
-				if (world.hasThing(pos.z, pos.y - 1, pos.z - 1) && world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).hasRamp()
-						&& world.getThingsAt(pos.z, pos.y - 1, pos.z - 1).getRampDir() == down)
-				{
-					rampStep = new RampStep(dir, false);
-					rampStep.execute(agent, world);
-				}
-				else
-				{
-					if (!agent.isOnRamp())
-					{
-						simpleStep = new SimpleStep(dir);
-						simpleStep.execute(agent, world);
-					}
-				}
-			}
-		break;
-		
-		default:	//left or right step
-			if (agent.getDir() != dir)
 				agent.setDir(dir);
+			}
 			
-			//if any steps are already in progress, continue them,
-			//otherwise determine new steps that should be started
-			if (!continueStepping(agent, world))
+			//check for horizontal ramp steps
+			boolean horizontalRampCheck[] = PathPlannerUtils.checkForHorizontalRampStep(world, agent.getPos(), dir);
+			if (horizontalRampCheck[0])
 			{
-				//check for ramps
-				Position pos = agent.getPos();
-				boolean[] rampStepCheck = PathPlannerUtils.checkForRampStep(world, pos, dir);
-				//Ramp step
-				if (rampStepCheck[0])
+				rampStep = new HorizontalRampStep(dir, horizontalRampCheck[1]);
+				rampStep.execute(agent, world);
+			}
+			else
+			{
+				//check for vertical ramp steps
+				if (PathPlannerUtils.checkForVerticalRampStep(world, agent.getPos(), dir))
 				{
-					if (rampStepCheck[1])
-						rampStep = new RampStep(dir, true);
-					else
-						rampStep = new RampStep(dir, false);
+					rampStep = new VerticalRampStep(dir);
 					rampStep.execute(agent, world);
 				}
-				//Normal step
+				//all special cases checked for, use a simple step instead
 				else
 				{
 					simpleStep = new SimpleStep(dir);
 					simpleStep.execute(agent, world);
 				}
 			}
-			
-		break;
 		}
 		
 		finished = (simpleStep == null || simpleStep.isFinished()) && (rampStep == null || rampStep.isFinished());

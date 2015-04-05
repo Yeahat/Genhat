@@ -7,6 +7,7 @@ import static entities.Agent.direction.up;
 
 import java.util.ArrayList;
 
+import utils.planners.PathPlannerUtils;
 import world.World;
 import entities.Agent;
 import entities.Agent.direction;
@@ -23,9 +24,16 @@ public class Turn implements Action {
 	
 	@Override
 	public void execute(Agent agent, World world) {
+		
 		if (agent.getDir() != dir)
 		{
-			agent.setDir(dir);
+			if (dir == up || dir == down)
+			{
+				if (!PathPlannerUtils.isOnRampHorizontal(world, agent.getPos()))
+					agent.setDir(dir);
+			}
+			else
+				agent.setDir(dir);
 		}
 		finished = true;
 	}

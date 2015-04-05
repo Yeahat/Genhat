@@ -1125,6 +1125,11 @@ public class World {
 		return thingGrid[pos.x][pos.y][pos.z];
 	}
 	
+	public Terrain getTerrainAt(Position pos)
+	{
+		return terrainGrid[pos.x][pos.y][pos.z];
+	}
+	
 	public Terrain getTerrainAt(int x, int y, int z)
 	{
 		return terrainGrid[x][y][z];
