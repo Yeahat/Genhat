@@ -2,24 +2,26 @@ package actions;
 
 import world.World;
 import entities.Agent;
-
+import entities.Agent.direction;
+import utils.planners.PathPlannerUtils.MovementClass;
 import static entities.Agent.direction.*;
 
 public class FollowPath implements Action 
 {	
 	private String path;
 	private final int waitTime;
+	private final MovementClass movementClass;
 	private boolean executingStep;
 	private char currentStep;
 
-	Step step;
+	Action step;
 	Wait wait;
 	
-	public FollowPath(String path, int waitTime)
+	public FollowPath(String path, MovementClass movementClass, int waitTime)
 	{
 		this.path = path;
 		this.waitTime = waitTime;
-		
+		this.movementClass = movementClass;
 		executingStep = false;
 		currentStep = '-';
 	}
@@ -40,10 +42,10 @@ public class FollowPath implements Action
 			
 			switch (currentStep)
 			{
-			case 'U':	step = new Step(up);	break;
-			case 'D':	step = new Step(down);	break;
-			case 'L':	step = new Step(left);	break;
-			case 'R':	step = new Step(right);	break;
+			case 'U':	setStep(up);	break;
+			case 'D':	setStep(down);	break;
+			case 'L':	setStep(left);	break;
+			case 'R':	setStep(right);	break;
 			}
 			executingStep = false;
 
@@ -73,6 +75,14 @@ public class FollowPath implements Action
 		}
 	}
 
+	private void setStep(direction dir)
+	{
+		if (movementClass == MovementClass.SimpleStepping)
+			step = new SimpleStep(dir);
+		else
+			step = new Step(dir);
+	}
+	
 	@Override
 	public boolean isFinished() {
 		return currentStep == '-' && path.length() == 0;

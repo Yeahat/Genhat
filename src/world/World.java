@@ -851,7 +851,7 @@ public class World {
 						}
 					}
 				}
-				if (k < kMax)
+				if (k <= kMax)
 				{
 					//Render Agents
 					for (int i = iMin; i <= iMax; i ++)

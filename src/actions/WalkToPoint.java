@@ -13,6 +13,7 @@ public class WalkToPoint implements Action {
 	private boolean planning;
 	private boolean finished;
 	private final Position goal;
+	private final MovementClass movementClass;
 	private AStar planner;
 	
 	private FollowPath followPath;
@@ -20,19 +21,21 @@ public class WalkToPoint implements Action {
 	public WalkToPoint(Position goal)
 	{
 		this.goal = goal;
+		this.movementClass = Stepping;
 		planning = false;
 		finished = false;
 		initialized = false;
 		planner = new AStar(Stepping);
 	}
 	
-	public WalkToPoint(Position goal, MovementClass movementType)
+	public WalkToPoint(Position goal, MovementClass movementClass)
 	{
 		this.goal = goal;
+		this.movementClass = movementClass;
 		planning = false;
 		finished = false;
 		initialized = false;
-		planner = new AStar(movementType);
+		planner = new AStar(this.movementClass);
 	}
 	
 	@Override
@@ -57,7 +60,7 @@ public class WalkToPoint implements Action {
 			{
 				if (planner.isSolutionFound())
 				{
-					followPath = new FollowPath(planner.getPath(), 0);
+					followPath = new FollowPath(planner.getPath(), this.movementClass, 0);
 					planning = false;
 				}
 				else
