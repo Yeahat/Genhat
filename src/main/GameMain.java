@@ -883,7 +883,7 @@ public class GameMain {
 			Stairs tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).connection(standalone).build();
 			world.addThing(tempVStairs1, 5, 18, k);
 			world.addThing(tempVStairs2, 6, 18, k);
-			world.addThing(tempVStairs3, 8, 18, k);
+			world.addThing(tempVStairs3, 7, 18, k);
 		}
 		
 		world.setTerrain(t);

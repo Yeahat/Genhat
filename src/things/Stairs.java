@@ -41,8 +41,8 @@ public class Stairs extends Thing {
 			break;
 		}
 
-		if ((this.dir == left && (this.connection == middle || this.connection == connectionContext.start))
-				|| (this.dir == right && (this.connection == middle || this.connection == connectionContext.end)))
+		if ((this.dir == left && (this.getConnection() == middle || this.getConnection() == connectionContext.start))
+				|| (this.dir == right && (this.getConnection() == middle || this.getConnection() == connectionContext.end)))
 			associatedBottom = new StairsBottom(this.dir);
 		else
 			associatedBottom = null;
@@ -99,7 +99,7 @@ public class Stairs extends Thing {
 			case up:	texY += 3;	break;
 			}
 				
-			switch (connection)
+			switch (getConnection())
 			{
 			case start:
 				break;
@@ -144,6 +144,10 @@ public class Stairs extends Thing {
 	
 	public StairsBottom getAssociatedBottom() {
 		return associatedBottom;
+	}
+
+	public connectionContext getConnection() {
+		return connection;
 	}
 
 	public static class StairsBuilder

@@ -6,6 +6,7 @@ import world.World;
 import entities.Agent;
 import entities.Agent.direction;
 import static entities.Agent.direction.*;
+import static things.Thing.connectionContext.*;
 
 public class PathPlannerUtils {	
 	
@@ -168,7 +169,7 @@ public class PathPlannerUtils {
 			checkPos.y ++;
 
 			//climbing up case
-			if (world.hasThing(checkPos) && world.getThingsAt(checkPos).hasRamp() && world.getThingsAt(checkPos).getRampDir() == up)
+			if (hasRampWithDir(world, checkPos, up))
 			{
 				for (int k = z + 1; k < maxZ; k ++)
 				{
@@ -217,13 +218,31 @@ public class PathPlannerUtils {
 			Position rampPos = new Position(pos);
 			rampPos.y ++;
 			rampPos.z --;
-			//TODO: Change this to check connection contexts to prevent movement over railings?
+			
+			//first check connection context of ramp at starting position for blocking railings
+			if (world.getThingsAt(rampPos).getRampConnectionContext() == standalone
+					|| (dir == left && world.getThingsAt(rampPos).getRampConnectionContext() == start)
+					|| (dir == right && world.getThingsAt(rampPos).getRampConnectionContext() == end))
+			{
+				return false;
+			}
+			
+			//next check that there is a ramp at the target position
 			if (dir == left)
 				rampPos.x --;
 			else
 				rampPos.x ++;
-			if (world.hasThing(rampPos) && world.getThingsAt(rampPos).hasRamp() && world.getThingsAt(rampPos).getRampDir() == up)
+			if (hasRampWithDir(world, rampPos, up))
 			{
+				//check if the connection context for the target ramp has a blocking railing
+				if (world.getThingsAt(rampPos).getRampConnectionContext() == standalone
+						|| (dir == left && world.getThingsAt(rampPos).getRampConnectionContext() == end)
+						|| (dir == right && world.getThingsAt(rampPos).getRampConnectionContext() == start))
+				{
+					return false;
+				}
+				
+				//finally check to see if the space is blocked
 				int z = pos.z;
 				int maxZ = agent.getHeight();
 				for (int k = z; k < maxZ; k ++)
@@ -238,6 +257,11 @@ public class PathPlannerUtils {
 		}
 	}
 
+	private static boolean hasRampWithDir(World world, Position pos, direction dir)
+	{
+		return world.hasThing(pos) && world.getThingsAt(pos).hasRamp() && world.getThingsAt(pos).getRampDir() == up;
+	}
+	
 	/**
 	 * Determine if a step in a given direction should be treated as a horizontal ramp step or not, and if it is a horizontal ramp step, 
 	 * determine if it is ascent or descent

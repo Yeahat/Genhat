@@ -2,6 +2,7 @@ package things;
 
 import java.util.ArrayList;
 
+import things.Thing.connectionContext;
 import world.World;
 import entities.Agent;
 import entities.Agent.direction;
@@ -87,7 +88,7 @@ public class ThingGridCell {
 	
 	/**
 	 * Get the direction of a ramp (assuming there is a ramp in this cell)
-	 * @return the direction of the ramp in this cell
+	 * @return the direction of the first ramp in this cell
 	 */
 	public direction getRampDir()
 	{
@@ -97,6 +98,20 @@ public class ThingGridCell {
 				return thingList.get(i).getDir();
 		}
 		return direction.left;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+	}
+	
+	/**
+	 * Get the connection context of a ramp (assuming there is a ramp in this cell)
+	 * @return the connection context of the first ramp in this cell
+	 */
+	public connectionContext getRampConnectionContext()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).isRamp())
+				return ((Stairs)(thingList.get(i))).getConnection();
+		}
+		return connectionContext.standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
 	}
 	
 	public boolean isTransparent()
