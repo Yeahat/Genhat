@@ -793,9 +793,9 @@ public class GameMain {
 		world.addThing(c5, 42, 32, 1);
 		world.addThing(c6, 42, 34, 1);
 		
-		Stairs s1 = new Stairs.StairsBuilder(indoorWooden).dir(right).connection(start).build();
-		Stairs s2 = new Stairs.StairsBuilder(indoorWooden).dir(right).connection(middle).build();
-		Stairs s3 = new Stairs.StairsBuilder(indoorWooden).dir(right).connection(end).build();
+		Stairs s1 = new Stairs.StairsBuilder(indoorWooden).dir(right).horizontalConnection(start).build();
+		Stairs s2 = new Stairs.StairsBuilder(indoorWooden).dir(right).horizontalConnection(middle).build();
+		Stairs s3 = new Stairs.StairsBuilder(indoorWooden).dir(right).horizontalConnection(end).build();
 		world.addThing(s1, 40, 36, 1);
 		world.addThing(s2, 41, 36, 2);
 		world.addThing(s3, 42, 36, 3);
@@ -878,9 +878,29 @@ public class GameMain {
 		}
 		for (int k = 1; k < 4; k ++)
 		{
-			Stairs tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).connection(start).build();
-			Stairs tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).connection(end).build();
-			Stairs tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).connection(standalone).build();
+			Stairs tempVStairs1;
+			Stairs tempVStairs2;
+			Stairs tempVStairs3;
+			
+			if (k == 1)
+			{
+				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(start).verticalConnection(start).build();
+				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(end).verticalConnection(start).build();
+				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(standalone).verticalConnection(start).build();
+			}
+			else if (k == 3)
+			{
+				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(start).verticalConnection(end).build();
+				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(end).verticalConnection(end).build();
+				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(standalone).verticalConnection(end).build();
+			}
+			else
+			{
+				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(start).verticalConnection(middle).build();
+				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(end).verticalConnection(middle).build();
+				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(standalone).verticalConnection(middle).build();
+			}
+				
 			world.addThing(tempVStairs1, 5, 18, k);
 			world.addThing(tempVStairs2, 6, 18, k);
 			world.addThing(tempVStairs3, 7, 18, k);

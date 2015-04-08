@@ -16,7 +16,7 @@ public class StairsBottom extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 6;
+		texRow = 7;
 		texCol = 0;
 		setDir(left);
 		blocking = false;
@@ -28,7 +28,7 @@ public class StairsBottom extends Thing {
 	{
 		loadTextures();
 		
-		texRow = 6;
+		texRow = 7;
 		texCol = 0;
 		setDir(d);
 		blocking = false;

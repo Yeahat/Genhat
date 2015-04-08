@@ -21,8 +21,8 @@ public class Bar extends Thing {
 		this.dir = builder.dir;
 		this.connection = builder.connection;
 		
-		texRow = 2;
-		texCol = 0;
+		texRow = 5;
+		texCol = 1;
 		blocking = true;
 		
 		loadTextures();
@@ -31,7 +31,7 @@ public class Bar extends Thing {
 	@Override
 	public void loadTextures() {
 		try {
-			texture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/objects/thing1.png"));
+			texture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/objects/thing2.png"));
 		} catch (IOException e) {e.printStackTrace();}
 	}
 

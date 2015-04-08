@@ -17,13 +17,15 @@ public class Stairs extends Thing {
 		outdoorWooden, indoorWooden;
 	}
 	private final stairsType type;
-	private final connectionContext connection;
+	private final connectionContext horizontalConnection;
+	private final connectionContext verticalConnection;
 	private final StairsBottom associatedBottom;	//an extra thing rendered for graphical consistency
 	
 	private Stairs(StairsBuilder builder)
 	{
 		this.type = builder.type;
-		this.connection = builder.connection;
+		this.horizontalConnection = builder.horizontalConnection;
+		this.verticalConnection = builder.verticalConnection;
 		this.dir = builder.dir;
 		
 		this.crossable = true;
@@ -36,13 +38,13 @@ public class Stairs extends Thing {
 			this.texCol = 0;
 			break;
 		case indoorWooden:
-			this.texRow = 4;
+			this.texRow = 1;
 			this.texCol = 0;
 			break;
 		}
 
-		if ((this.dir == left && (this.getConnection() == middle || this.getConnection() == connectionContext.start))
-				|| (this.dir == right && (this.getConnection() == middle || this.getConnection() == connectionContext.end)))
+		if ((this.dir == left && (this.getHorizontalConnection() == middle || this.getHorizontalConnection() == connectionContext.start))
+				|| (this.dir == right && (this.getHorizontalConnection() == middle || this.getHorizontalConnection() == connectionContext.end)))
 			associatedBottom = new StairsBottom(this.dir);
 		else
 			associatedBottom = null;
@@ -95,11 +97,19 @@ public class Stairs extends Thing {
 		{
 			switch(dir)
 			{
-			case left:	texY += 1;	break;
-			case up:	texY += 3;	break;
+			case right: texY += 4;	break;
+			case left:	texY += 5;	break;
+			case up:
+				switch (verticalConnection)
+				{
+				case middle:		texY += 1;	break;
+				case start:			texY += 2;	break;
+				case standalone:	texY += 3;	break;
+				}
+			break;
 			}
 				
-			switch (getConnection())
+			switch (getHorizontalConnection())
 			{
 			case start:
 				break;
@@ -146,14 +156,15 @@ public class Stairs extends Thing {
 		return associatedBottom;
 	}
 
-	public connectionContext getConnection() {
-		return connection;
+	public connectionContext getHorizontalConnection() {
+		return horizontalConnection;
 	}
 
 	public static class StairsBuilder
 	{
 		private final stairsType type;
-		private connectionContext connection = standalone;
+		private connectionContext horizontalConnection = standalone;
+		private connectionContext verticalConnection = standalone;
 		private direction dir = right;
 		
 		
@@ -162,9 +173,15 @@ public class Stairs extends Thing {
 			this.type = type;
 		}
 		
-		public StairsBuilder connection(connectionContext connection)
+		public StairsBuilder horizontalConnection(connectionContext horizontalConnection)
 		{
-			this.connection = connection;
+			this.horizontalConnection = horizontalConnection;
+			return this;
+		}
+		
+		public StairsBuilder verticalConnection(connectionContext verticalConnection)
+		{
+			this.verticalConnection = verticalConnection;
 			return this;
 		}
 		
