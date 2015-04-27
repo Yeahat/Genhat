@@ -25,6 +25,8 @@ import things.FireplaceChimney;
 import things.FireplaceSide;
 import things.Firewood;
 import things.Bar;
+import things.Ladder;
+import things.Rope;
 import things.Stairs;
 import things.Table;
 import things.WallCandle;
@@ -905,6 +907,45 @@ public class GameMain {
 			world.addThing(tempVStairs2, 6, 18, k);
 			world.addThing(tempVStairs3, 7, 18, k);
 		}
+		
+		//rope and ladder test
+		for (int k = 1; k < 4; k ++)
+		{
+			Rope tempVStairs1;
+			Rope tempVStairs2;
+			Rope tempVStairs3;
+			
+			if (k == 1)
+			{
+				tempVStairs1 = new Rope.RopeBuilder().dir(up).horizontalConnection(start).verticalConnection(start).build();
+				tempVStairs2 = new Rope.RopeBuilder().dir(up).horizontalConnection(end).verticalConnection(start).build();
+				tempVStairs3 = new Rope.RopeBuilder().dir(up).horizontalConnection(standalone).verticalConnection(start).build();
+			}
+			else if (k == 3)
+			{
+				tempVStairs1 = new Rope.RopeBuilder().dir(up).horizontalConnection(start).verticalConnection(end).build();
+				tempVStairs2 = new Rope.RopeBuilder().dir(up).horizontalConnection(end).verticalConnection(end).build();
+				tempVStairs3 = new Rope.RopeBuilder().dir(up).horizontalConnection(standalone).verticalConnection(end).build();
+			}
+			else
+			{
+				tempVStairs1 = new Rope.RopeBuilder().dir(up).horizontalConnection(start).verticalConnection(middle).build();
+				tempVStairs2 = new Rope.RopeBuilder().dir(up).horizontalConnection(end).verticalConnection(middle).build();
+				tempVStairs3 = new Rope.RopeBuilder().dir(up).horizontalConnection(standalone).verticalConnection(middle).build();
+			}
+				
+			world.addThing(tempVStairs1, 15, 13, k);
+			world.addThing(tempVStairs2, 16, 13, k);
+			world.addThing(tempVStairs3, 17, 13, k);
+		}
+		
+		Ladder ladder1 = new Ladder(start);
+		Ladder ladder2 = new Ladder(middle);
+		Ladder ladder3 = new Ladder(end);
+		
+		world.addThing(ladder1, 14, 13, 1);
+		world.addThing(ladder2, 14, 13, 2);
+		world.addThing(ladder3, 14, 13, 3);
 		
 		world.setTerrain(t);
 		

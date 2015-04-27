@@ -21,7 +21,8 @@ public abstract class Thing {
 	//State
 	protected boolean blocking = true;
 	protected boolean crossable = false;
-	protected boolean ramp = false;
+	protected boolean ramp = false; //true if thing is a ramp, this should only be set by inheriting from the Ramp class
+	protected boolean climbingSurface = false; //true if thing is a climbing surface, this should only be set by inheriting from the ClimbingSurface class
 	protected boolean transparent = false; //true if thing should not block light sources
 	protected boolean fullBlock = false; //true if thing should be replaced with a black square when one space above the render level, as with terrain
 	protected boolean tallBlock = false; //set to true only if things is fullBlock and occupies two vertical spaces
@@ -253,6 +254,11 @@ public abstract class Thing {
 	public boolean isRamp()
 	{
 		return ramp;
+	}
+	
+	public boolean isClimbingSurface()
+	{
+		return climbingSurface;
 	}
 
 	public void setPos(Position pos) {

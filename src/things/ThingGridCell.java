@@ -109,7 +109,7 @@ public class ThingGridCell {
 		for (int i = 0; i < thingList.size(); i ++)
 		{
 			if (thingList.get(i).isRamp())
-				return ((Stairs)(thingList.get(i))).getHorizontalConnection();
+				return ((Ramp)(thingList.get(i))).getHorizontalConnection();
 		}
 		return connectionContext.standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
 	}

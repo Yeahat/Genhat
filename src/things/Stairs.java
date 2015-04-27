@@ -11,7 +11,7 @@ import static entities.Agent.direction.*;
 import static things.Thing.connectionContext.*;
 import static things.Stairs.stairsType.*;
 
-public class Stairs extends Thing {
+public class Stairs extends Ramp {
 	public enum stairsType
 	{
 		outdoorWooden, indoorWooden;
@@ -23,13 +23,14 @@ public class Stairs extends Thing {
 	
 	private Stairs(StairsBuilder builder)
 	{
+		super();
+		
 		this.type = builder.type;
 		this.horizontalConnection = builder.horizontalConnection;
 		this.verticalConnection = builder.verticalConnection;
 		this.dir = builder.dir;
 		
 		this.crossable = true;
-		this.ramp = true;
 		
 		switch (this.type)
 		{
