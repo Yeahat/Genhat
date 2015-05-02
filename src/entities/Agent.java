@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
 import static entities.Agent.direction.*;
+import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import actions.Action;
@@ -199,7 +200,7 @@ public abstract class Agent {
 				int texY = getTexRow();
 				if (isClimbing())
 				{
-					texY += 3;
+					texY += 4;
 				}
 				else
 				{
@@ -219,6 +220,29 @@ public abstract class Agent {
 						texX += 2;
 					else
 						texX += 0;
+				}
+				//Set footstep animation for climbing
+				if (this.isClimbing())
+				{
+					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+					{
+						if (getFootstep() == right)
+							texX += 2;
+						else
+							texX += 0;
+					}
+					else if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
+					{
+						if (getFootstep() == right)
+							texX += 2;
+						else
+							texX += 0;
+					}
+					else
+					{
+						texX += 1;
+					}
+					
 				}
 				//Set footstep animation for regular stepping
 				else

@@ -67,7 +67,7 @@ public class Placeholder extends Agent {
 				int texY = agent.getTexRow();
 				if (agent.isClimbing())
 				{
-					texY += 3;
+					texY += 4;
 				}
 				else
 				{
