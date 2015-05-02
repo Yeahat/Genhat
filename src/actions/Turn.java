@@ -21,7 +21,7 @@ public class Turn implements Action {
 	@Override
 	public void execute(Agent agent, World world) {
 		
-		if (agent.getDir() != dir)
+		if (agent.getDir() != dir && !PathPlannerUtils.isOnClimbingSurface(world, agent.getPos()))
 		{
 			if (dir == up || dir == down)
 			{

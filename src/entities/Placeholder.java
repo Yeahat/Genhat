@@ -65,20 +65,19 @@ public class Placeholder extends Agent {
 				
 				int texX = agent.getTexCol() * 3;
 				int texY = agent.getTexRow();
-				switch (agent.getDir())
+				if (agent.isClimbing())
 				{
-				case down:
-					texY += 0;
-					break;
-				case right:
-					texY += 1;
-					break;
-				case left:
-					texY += 2;
-					break;
-				case up:
-					texY += 3;				
-					break;
+					texY += 3;
+				}
+				else
+				{
+					switch (agent.getDir())
+					{
+					case down:	texY += 0;	break;
+					case right:	texY += 1;	break;
+					case left:	texY += 2;	break;
+					case up:	texY += 3;	break;
+					}
 				}
 				
 				//Set footstep animation for jumping

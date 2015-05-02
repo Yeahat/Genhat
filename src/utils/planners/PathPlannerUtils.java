@@ -101,7 +101,6 @@ public class PathPlannerUtils {
 	 * @param continuingDescent true for the special case of descending from a ramp onto another ramp, the z needs extra adjustment
 	 * @return true if the agent can step in the given direction, false otherwise
 	 */
-	@SuppressWarnings("incomplete-switch")
 	public static boolean canStepHorizontalRamp(Agent agent, World world, Position pos, direction dir, boolean ascending, boolean continuingDescent)
 	{
 		int x = pos.x;
@@ -112,6 +111,7 @@ public class PathPlannerUtils {
 		{
 		case left:	x -= 1;	break;
 		case right:	x += 1;	break;
+		default: return false;
 		}
 		
 		if (!ascending)
@@ -256,10 +256,114 @@ public class PathPlannerUtils {
 				return false;
 		}
 	}
+	
+	public static boolean canClimb(Agent agent, World world, Position pos, direction dir)
+	{
+		//ascending
+		if (dir == up)
+		{
+			int z = pos.z;
+			int maxZ = pos.z + agent.getHeight();
+			Position checkPos = new Position(pos);
+			checkPos.y ++;
+
+			//climbing up case
+			if (hasClimbingSurfaceWithDir(world, checkPos, up))
+			{
+				for (int k = z + 1; k < maxZ; k ++)
+				{
+					if (!world.isInBounds(pos.x, pos.y, k) || world.isBlocked(pos.x, pos.y, k))
+						return false;
+				}
+				return true;
+			}
+			
+			//top out case
+			else
+			{
+				return canStep(agent, world, pos, up);
+			}
+		}
+		
+		//descending
+		else if (dir == down)
+		{
+			Position checkPos = new Position(pos);
+			checkPos.z --;
+			//lower on edge case
+			if (world.isInBounds(checkPos) && (world.getTerrainAt(checkPos).isBlocking()
+					|| (world.hasThing(checkPos) && world.getThingsAt(checkPos).isCrossable())))
+			{
+				int z = pos.z;
+				int maxZ = pos.z + agent.getHeight();
+				for (int k = z; k < maxZ; k ++)
+				{
+					if (!world.isInBounds(pos.x, pos.y - 1, k) || world.isBlocked(pos.x, pos.y - 1, k))
+						return false;
+				}
+				return true;
+			}
+			
+			//climbing down case
+			else
+			{
+				return (world.isInBounds(pos.x, pos.y, pos.z - 1) && !world.isBlocked(pos.x, pos.y, pos.z - 1));
+			}
+		}
+		
+		//sidestepping
+		else
+		{
+			Position climbingSurfacePos = new Position(pos);
+			climbingSurfacePos.y ++;
+			climbingSurfacePos.z --;
+			
+			//first check connection context of climbing surface at starting position for uncrossable edges
+			if (world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == standalone
+					|| (dir == left && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == start)
+					|| (dir == right && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == end))
+			{
+				return false;
+			}
+			
+			//next check that there is a climbing surface at the target position
+			if (dir == left)
+				climbingSurfacePos.x --;
+			else
+				climbingSurfacePos.x ++;
+			if (hasClimbingSurfaceWithDir(world, climbingSurfacePos, up))
+			{
+				//check if the connection context for the target climbing surface has an uncrossable edge
+				if (world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == standalone
+						|| (dir == left && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == end)
+						|| (dir == right && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == start))
+				{
+					return false;
+				}
+				
+				//finally check to see if the space is blocked
+				int z = pos.z;
+				int maxZ = agent.getHeight();
+				for (int k = z; k < maxZ; k ++)
+				{
+					if (!world.isInBounds(climbingSurfacePos.x, pos.y, k) || world.isBlocked(climbingSurfacePos.x, pos.y, k))
+						return false;
+				}
+				return true;
+			}
+			else
+				return false;
+		}
+	}
 
 	private static boolean hasRampWithDir(World world, Position pos, direction dir)
 	{
-		return world.hasThing(pos) && world.getThingsAt(pos).hasRamp() && world.getThingsAt(pos).getRampDir() == up;
+		return world.hasThing(pos) && world.getThingsAt(pos).hasRamp() && world.getThingsAt(pos).getRampDir() == dir;
+	}
+	
+	private static boolean hasClimbingSurfaceWithDir(World world, Position pos, direction dir)
+	{
+		return world.hasThing(pos) && world.getThingsAt(pos).hasClimbingSurface() && world.getThingsAt(pos).getClimbingSurfaceDir() == dir;
 	}
 	
 	/**
@@ -352,6 +456,40 @@ public class PathPlannerUtils {
 	    }
 	}
 	
+	/**
+	 * Determine if a step in a given direction should be treated as climbing or not
+	 * @param world the world
+	 * @param pos starting position of the agent
+	 * @param dir the direction of the step
+	 * @return true if the agent should climb
+	 */
+	public static boolean checkForClimb(World world, Position pos, direction dir)
+	{
+		//on ramp case will always require a vertical ramp step
+		if (isOnClimbingSurface(world, pos))
+			return true;
+	    
+		switch (dir)
+	    {
+		case up:
+			//check for a climbing surface in front
+			Position frontPos = new Position(pos);
+			frontPos.y ++;
+			return world.isInBounds(frontPos) && world.hasThing(frontPos)
+					&& world.getThingsAt(frontPos).hasClimbingSurface() && world.getThingsAt(frontPos).getClimbingSurfaceDir() == up;
+		case down:
+			//check for a climbing surface below and a completely open space in front
+			Position belowPos = new Position(pos);
+			belowPos.z --;
+			return world.isInBounds(belowPos) && world.hasThing(belowPos)
+					&& world.getThingsAt(belowPos).hasClimbingSurface() && world.getThingsAt(belowPos).getClimbingSurfaceDir() == up
+					&& world.isInBounds(pos.x, pos.y - 1, pos.z - 1) && world.getTerrainAt(pos.x, pos.y - 1, pos.z - 1).getTerrainType() == terrainType.air
+					&& (!world.hasThing(pos.x, pos.y - 1, pos.z) || !world.getThingsAt(pos.x, pos.y - 1, pos.z).isCrossable());
+		default:
+			return false; //left/right step will never be climbing unless you're starting on a climbing surface
+	    }
+	}
+	
 	public static boolean isOnRampHorizontal(World world, Position pos)
 	{
 		return (world.hasThing(pos.x, pos.y, pos.z - 1) && world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp()
@@ -364,6 +502,14 @@ public class PathPlannerUtils {
 				&& (!world.hasThing(pos.x, pos.y, pos.z) || !world.getThingsAt(pos.x, pos.y, pos.z).isCrossable())
 				&& world.isInBounds(pos.x, pos.y + 1, pos.z - 1) && world.hasThing(pos.x, pos.y + 1, pos.z - 1)
 				&& world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).hasRamp() && world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).getRampDir() == up;
+	}
+	
+	public static boolean isOnClimbingSurface(World world, Position pos)
+	{
+		return world.isInBounds(pos.x, pos.y, pos.z - 1) && world.getTerrainAt(pos.x, pos.y, pos.z - 1).getTerrainType() == terrainType.air
+				&& (!world.hasThing(pos.x, pos.y, pos.z) || !world.getThingsAt(pos.x, pos.y, pos.z).isCrossable())
+				&& world.isInBounds(pos.x, pos.y + 1, pos.z - 1) && world.hasThing(pos.x, pos.y + 1, pos.z - 1)
+				&& world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).hasClimbingSurface() && world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).getClimbingSurfaceDir() == up;
 	}
 
 	/**

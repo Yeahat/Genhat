@@ -153,6 +153,7 @@ public abstract class Thing {
 	 * @param d the direction to check for blocking
 	 * @return true if blocked
 	 */
+	@SuppressWarnings("unused")
 	private boolean blockedInDirection(World world, direction d)
 	{
 		int x = pos.x, y = pos.y, z = pos.z;

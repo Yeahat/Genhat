@@ -52,6 +52,16 @@ public class ThingGridCell {
 		return false;
 	}
 	
+	public boolean hasClimbingSurface()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).isClimbingSurface())
+				return true;
+		}
+		return false;
+	}
+	
 	public boolean hasFullBlock()
 	{
 		for (int i = 0; i < thingList.size(); i ++)
@@ -87,7 +97,7 @@ public class ThingGridCell {
 	}
 	
 	/**
-	 * Get the direction of a ramp (assuming there is a ramp in this cell)
+	 * Get the direction of a ramp (assumes there is a ramp in this cell)
 	 * @return the direction of the first ramp in this cell
 	 */
 	public direction getRampDir()
@@ -101,7 +111,21 @@ public class ThingGridCell {
 	}
 	
 	/**
-	 * Get the connection context of a ramp (assuming there is a ramp in this cell)
+	 * Get the direction of a climbingSurface (assumes there is a ramp in this cell)
+	 * @return the direction of the first ramp in this cell
+	 */
+	public direction getClimbingSurfaceDir()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).isClimbingSurface())
+				return thingList.get(i).getDir();
+		}
+		return direction.up;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+	}
+	
+	/**
+	 * Get the (horizontal) connection context of a ramp (assumes there is a ramp in this cell)
 	 * @return the connection context of the first ramp in this cell
 	 */
 	public connectionContext getRampConnectionContext()
@@ -110,6 +134,20 @@ public class ThingGridCell {
 		{
 			if (thingList.get(i).isRamp())
 				return ((Ramp)(thingList.get(i))).getHorizontalConnection();
+		}
+		return connectionContext.standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+	}
+	
+	/**
+	 * Get the (horizontal) connection context of a climbing surface (assumes there is a climbing surface in this cell)
+	 * @return the connection context of the first climbing surface in this cell
+	 */
+	public connectionContext getClimbingSurfaceConnectionContext()
+	{
+		for (int i = 0; i < thingList.size(); i ++)
+		{
+			if (thingList.get(i).isClimbingSurface())
+				return ((ClimbingSurface)(thingList.get(i))).getHorizontalConnection();
 		}
 		return connectionContext.standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
 	}

@@ -10,7 +10,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 import actions.Jump;
-import actions.Step;
+import actions.StepOrClimb;
 import actions.Turn;
 import entities.Agent;
 import entities.Hero;
@@ -190,8 +190,8 @@ public class GameMain {
 						}
 						else
 						{
-							player.setStepAction(new Step(down));
-							player.setCurrentAction(player.getStepAction());
+							player.setStepOrClimbAction(new StepOrClimb(down));
+							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
 				}
@@ -211,8 +211,8 @@ public class GameMain {
 						}
 						else
 						{
-							player.setStepAction(new Step(up));
-							player.setCurrentAction(player.getStepAction());
+							player.setStepOrClimbAction(new StepOrClimb(up));
+							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
 				}
@@ -232,8 +232,8 @@ public class GameMain {
 						}
 						else
 						{
-							player.setStepAction(new Step(right));
-							player.setCurrentAction(player.getStepAction());
+							player.setStepOrClimbAction(new StepOrClimb(right));
+							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
 				}
@@ -253,8 +253,8 @@ public class GameMain {
 						}
 						else
 						{
-							player.setStepAction(new Step(left));
-							player.setCurrentAction(player.getStepAction());
+							player.setStepOrClimbAction(new StepOrClimb(left));
+							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
 				}

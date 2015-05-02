@@ -6,9 +6,8 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import static things.Stairs.stairsType.indoorWooden;
-import static things.Stairs.stairsType.outdoorWooden;
 import static things.Thing.connectionContext.*;
+import static entities.Agent.direction.*;
 
 public class Ladder extends ClimbingSurface {
 
@@ -19,6 +18,7 @@ public class Ladder extends ClimbingSurface {
 		this.horizontalConnection = standalone;
 		this.verticalConnection = standalone;
 		
+		this.dir = up;
 		this.texRow = 7;
 		this.texCol = 1;
 		
@@ -29,6 +29,7 @@ public class Ladder extends ClimbingSurface {
 	{
 		super();
 		
+		this.dir = up;
 		horizontalConnection = standalone;
 		this.verticalConnection = verticalConnection;
 		

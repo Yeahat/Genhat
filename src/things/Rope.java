@@ -6,13 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import things.Stairs.StairsBuilder;
-import things.Stairs.stairsType;
-import things.Thing.connectionContext;
 import entities.Agent.direction;
-import static entities.Agent.direction.right;
-import static things.Stairs.stairsType.indoorWooden;
-import static things.Stairs.stairsType.outdoorWooden;
 import static things.Thing.connectionContext.*;
 import static entities.Agent.direction.*;
 

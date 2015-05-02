@@ -39,6 +39,7 @@ public abstract class Agent {
 	private boolean jumping = false;	//true if the agent is currently jumping
 	private boolean rampAscending = false;	//true if the agent is currently taking a step up a ramp
 	private boolean rampDescending = false;	//true if the agent is currently taking a step down a ramp
+	private boolean climbing = false; //true if the agent is currently climbing on a climbingSurface
 	private boolean onRamp = false;	//true if the agent is currently standing on top of a ramp
 	private boolean transparent = false; //true if the agent should not block light sources
 	private boolean renderOnPlaceholder = false; //true if the agent should render on its placeholder's position while moving (for steps in +y direction)
@@ -196,20 +197,19 @@ public abstract class Agent {
 				
 				int texX = getTexCol() * 3;
 				int texY = getTexRow();
-				switch (getDir())
+				if (isClimbing())
 				{
-				case down:
-					texY += 0;
-					break;
-				case right:
-					texY += 1;
-					break;
-				case left:
-					texY += 2;
-					break;
-				case up:
-					texY += 3;				
-					break;
+					texY += 3;
+				}
+				else
+				{
+					switch (getDir())
+					{
+					case down:	texY += 0;	break;
+					case right:	texY += 1;	break;
+					case left:	texY += 2;	break;
+					case up:	texY += 3;	break;
+					}
 				}
 				
 				//Set footstep animation for jumping
@@ -480,5 +480,13 @@ public abstract class Agent {
 
 	public void setHomePos(Position homePos) {
 		this.homePos = homePos;
+	}
+
+	public boolean isClimbing() {
+		return climbing;
+	}
+
+	public void setClimbing(boolean climbing) {
+		this.climbing = climbing;
 	}
 }

@@ -6,16 +6,14 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import actions.Jump;
-import actions.Step;
+import actions.StepOrClimb;
 import actions.Turn;
-
 import world.World;
-
 import static entities.Agent.direction.*;
 
 public class Hero extends Agent {	
 	//Actions
-	Step step;
+	StepOrClimb stepOrClimb;
 	Turn turn;
 	Jump jump;
 	
@@ -63,18 +61,18 @@ public class Hero extends Agent {
 	}
 	
 	/**
-	 * Getter for the hero's step action, this is required to allow the keyboard polling to set
+	 * Getter for the hero's stepOrClimb action, this is required to allow the keyboard polling to set
 	 * the agent's action from outside of the scope of the class
 	 * @return the agent's step action
 	 */
-	public Step getStepAction()
+	public StepOrClimb getStepOrClimbAction()
 	{
-		return step;
+		return stepOrClimb;
 	}
 	
-	public void setStepAction(Step step)
+	public void setStepOrClimbAction(StepOrClimb stepOrClimb)
 	{
-		this.step = step;
+		this.stepOrClimb = stepOrClimb;
 	}
 	
 	/**
