@@ -79,8 +79,10 @@ public class FollowPath implements Action
 	{
 		if (movementClass == MovementClass.SimpleStepping)
 			step = new SimpleStep(dir);
-		else
+		else if (movementClass == MovementClass.Stepping)
 			step = new Step(dir);
+		else
+			step = new StepOrClimb(dir);
 	}
 	
 	@Override

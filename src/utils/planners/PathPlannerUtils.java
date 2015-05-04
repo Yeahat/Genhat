@@ -10,9 +10,17 @@ import static things.Thing.connectionContext.*;
 
 public class PathPlannerUtils {	
 	
+	/**
+	 * General movement classes, allowing movement as follows:
+	 * 
+	 * SimpleStepping: xy-planar movement only
+	 * Stepping: xy-planar stepping, with added movement up and down ramps
+	 * Climbing: all of Stepping, with added climbing on climbingSurfaces 
+	 * Jumping: all movement, with added jumping up or down one space in the z direction
+	 */
 	public enum MovementClass
 	{
-		SimpleStepping, Stepping, Jumping
+		SimpleStepping, Stepping, Climbing, Jumping
 	}
 	
 	/**
@@ -546,13 +554,12 @@ public class PathPlannerUtils {
 	 * @param ascending true if a ramp step is ascending, false if it's descending, unused if rampStep is false
 	 * @return the resulting Position at the step's conclusion
 	 */
+	@SuppressWarnings("incomplete-switch")
 	public static Position simulateHorizontalRampStep(World world, Position pos, direction dir, boolean ascending)
 	{
 		Position resultingPos = new Position(pos);
 		switch (dir)
 		{
-		case up:	resultingPos.y ++;	break;
-		case down:	resultingPos.y --;	break;
 		case left:	resultingPos.x --;	break;
 		case right:	resultingPos.x ++;	break;
 		}
@@ -589,8 +596,8 @@ public class PathPlannerUtils {
 		{
 		case up:
 			//first case: climbing
-			if (world.hasThing(pos.x, pos.y + 1, pos.z) && world.getThingsAt(pos.x, pos.y + 1, pos.z).hasRamp()
-					&& world.getThingsAt(pos.x, pos.y + 1, pos.z).getRampDir() == up)
+			Position checkPosUp = new Position(pos.x, pos.y + 1, pos.z);
+			if (hasRampWithDir(world, checkPosUp, up))
 			{
 				resultingPosition.z ++;
 			}
@@ -602,12 +609,63 @@ public class PathPlannerUtils {
 		break;
 		case down:
 			//first case: stepping on to ramp
-			if (world.hasThing(pos.x, pos.y, pos.z - 1) && world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp()
-					&& world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == up)
+			Position checkPosDown = new Position(pos.x, pos.y, pos.z - 1);
+			if (hasRampWithDir(world, checkPosDown, up))
 			{
 				resultingPosition.y --;
 			}
 			//second case: climbing down
+			else
+			{
+				resultingPosition.z --;
+			}
+		break;
+		case left:
+			resultingPosition.x --;
+		break;
+		case right:
+			resultingPosition.x ++;
+		break;
+		}
+		
+		return resultingPosition;
+	}
+	
+	/**
+	 * Calculates the resulting position if an agent were to climb from a given position in a given direction.
+	 * Note that this assumes that climbing is valid (this method does no collision detection, etc.).
+	 * 
+	 * @param world the world in which the climb action is taking place
+	 * @param pos the position from which the climb is initiated
+	 * @param dir the direction to climb
+	 * @return the resulting Position at the climb's conclusion
+	 */
+	public static Position simulateClimb(World world, Position pos, direction dir)
+	{
+		Position resultingPosition = new Position(pos);
+		switch (dir)
+		{
+		case up:
+			Position checkPosUp = new Position(pos.x, pos.y + 1, pos.z);
+			//first case: standard climbing
+			if (hasClimbingSurfaceWithDir(world, checkPosUp, up))
+			{
+				resultingPosition.z ++;
+			}
+			//second case: topping out
+			else
+			{
+				resultingPosition.y ++;
+			}
+		break;
+		case down:
+			//first case: lowering onto the climb
+			Position checkPosDown = new Position(pos.x, pos.y, pos.z - 1);
+			if (hasClimbingSurfaceWithDir(world, checkPosDown, up))
+			{
+				resultingPosition.y --;
+			}
+			//second case: standard climbing
 			else
 			{
 				resultingPosition.z --;

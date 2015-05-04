@@ -41,7 +41,7 @@ public class AStar {
 		
 		this.movementType = movementType;
 		loopsPerPlanningIteration = 30;
-		maxPlanningLoops = 300;
+		maxPlanningLoops = 2000;
 		
 		queryInProgress = false;
 		solutionFound = false;
@@ -116,12 +116,10 @@ public class AStar {
 					//check for a valid new position
 					direction dir = actions.get(i);
 					Position newPos = null;
-					if (movementType == SimpleStepping)
-					{
-						if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
-							newPos = PathPlannerUtils.simulateSimpleStep(world, currentNode.getPos(), dir);
-					}
-					else if (movementType == Stepping)
+					boolean moveExplored = false;
+					
+					//check for ramp steps
+					if (movementType == Stepping || movementType == Climbing || movementType == Jumping)
 					{
 						//Horizontal Ramp Step
 						boolean rampStepCheck[] = PathPlannerUtils.checkForHorizontalRampStep(world, currentNode.getPos(), dir);
@@ -130,21 +128,39 @@ public class AStar {
 							boolean continuingDescent = !rampStepCheck[1] && PathPlannerUtils.isContinuingDescent(agent, world, currentNode.getPos(), dir);
 							if (PathPlannerUtils.canStepHorizontalRamp(agent, world, currentNode.getPos(), dir, rampStepCheck[1], continuingDescent))
 								newPos = PathPlannerUtils.simulateHorizontalRampStep(world, currentNode.getPos(), dir, rampStepCheck[1]);
+							moveExplored = true;
 						}
-						else
+						//Vertical Ramp Step
+						else if (PathPlannerUtils.checkForVerticalRampStep(world, currentNode.getPos(), dir))
 						{
-							//Vertical Ramp Step
-							if (PathPlannerUtils.checkForVerticalRampStep(world, currentNode.getPos(), dir))
-							{
-								if (PathPlannerUtils.canStepVerticalRamp(agent, world, currentNode.getPos(), dir))
-									newPos = PathPlannerUtils.simulateVerticalRampStep(world, currentNode.getPos(), dir);
-							}
-							else //Regular Step
-							{
-								if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
-									newPos = PathPlannerUtils.simulateSimpleStep(world, currentNode.getPos(), dir);
-							}
+							if (PathPlannerUtils.canStepVerticalRamp(agent, world, currentNode.getPos(), dir))
+								newPos = PathPlannerUtils.simulateVerticalRampStep(world, currentNode.getPos(), dir);
+							moveExplored = true;
 						}
+					}
+					
+					//if nothing's found yet, check for climb
+					if (!moveExplored && (movementType == Climbing || movementType == Jumping))
+					{
+						if (PathPlannerUtils.checkForClimb(world, currentNode.getPos(), dir))
+						{
+							if (PathPlannerUtils.canClimb(agent, world, currentNode.getPos(), dir))
+								newPos = PathPlannerUtils.simulateClimb(world, currentNode.getPos(), dir);
+							moveExplored = true;
+						}
+					}
+					
+					//if nothing's still found, check for jump
+					if (!moveExplored && movementType == Jumping)
+					{
+						//TODO: implement jumping for A* path planning
+					}
+					
+					//if nothing's still found, check for simple step
+					if (!moveExplored)
+					{
+						if (PathPlannerUtils.canStep(agent, world, currentNode.getPos(), dir))
+							newPos = PathPlannerUtils.simulateSimpleStep(world, currentNode.getPos(), dir);
 					}
 					
 					//add new position if one was found

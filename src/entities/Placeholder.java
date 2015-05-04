@@ -88,6 +88,28 @@ public class Placeholder extends Agent {
 					else
 						texX += 0;
 				}
+				//Set footstep animation for climbing
+				else if (this.isClimbing())
+				{
+					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
+					{
+						if (getFootstep() == right)
+							texX += 2;
+						else
+							texX += 0;
+					}
+					else if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
+					{
+						if (getFootstep() == right)
+							texX += 2;
+						else
+							texX += 0;
+					}
+					else
+					{
+						texX += 1;
+					}
+				}
 				//Set footstep animation for regular stepping
 				else
 				{

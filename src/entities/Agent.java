@@ -222,7 +222,7 @@ public abstract class Agent {
 						texX += 0;
 				}
 				//Set footstep animation for climbing
-				if (this.isClimbing())
+				else if (this.isClimbing())
 				{
 					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
 					{
@@ -242,7 +242,6 @@ public abstract class Agent {
 					{
 						texX += 1;
 					}
-					
 				}
 				//Set footstep animation for regular stepping
 				else
