@@ -16,7 +16,7 @@ import entities.Hero;
 import entities.Placeholder;
 import static world.Terrain.terrainType.*;
 import static world.World.timeOfDay.*;
-import static world.World.controlState.*;
+import static world.World.ControlState.*;
 
 public class World {
 	Terrain[][][] terrainGrid;
@@ -47,7 +47,7 @@ public class World {
 	//Textures
 	private Texture hTerrainTexture;
 	private Texture vTerrainTexture;
-	private Texture textTexture;
+	public Texture textTexture;
 	
 	float[] displayCenter = new float[2];
 	private boolean cameraLockV = false;
@@ -58,11 +58,11 @@ public class World {
 	private DisplayText textDisplay;
 	
 	//control state
-	public enum controlState
+	public enum ControlState
 	{
 		walking, talking;
 	}
-	private controlState cs;
+	private ControlState cs;
 	
 	/**
 	 * Constructor, initializes display center to the center of the world
@@ -1492,11 +1492,11 @@ public class World {
 		return textDisplay;
 	}
 
-	public controlState getCs() {
+	public ControlState getCs() {
 		return cs;
 	}
 
-	public void setCs(controlState cs) {
+	public void setCs(ControlState cs) {
 		this.cs = cs;
 	}
 }

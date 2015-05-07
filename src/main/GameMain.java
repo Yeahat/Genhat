@@ -1,13 +1,22 @@
 package main;
 
+import java.awt.Font;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
+import loop.GameLoop;
+import loop.Timing;
+
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.util.ResourceLoader;
 
 import actions.Jump;
 import actions.StepOrClimb;
@@ -30,6 +39,7 @@ import things.Rope;
 import things.Stairs;
 import things.Table;
 import things.WallCandle;
+import utils.display.DisplayText;
 import world.Position;
 import world.Terrain;
 import world.World;
@@ -48,6 +58,12 @@ public class GameMain {
 	
 	int arrowKeyInputCount = 0;
 	
+	boolean devOn = false;
+	TrueTypeFont font;
+	long lastFPS = Timing.getTime();
+	int fps = 0;
+	int currentFPS = 0;
+	
 	/**
 	 * Main game loop, this is where everything happens
 	 */
@@ -58,6 +74,9 @@ public class GameMain {
 		initWorld();
 		loadTextures();
 		
+		Font awtFont = new Font("Times New Roman", Font.BOLD, 24);
+		font = new TrueTypeFont(awtFont, false);
+			
 		//Main game loop
 		while(!Display.isCloseRequested())	//exits when window is closed
 		{
@@ -76,6 +95,13 @@ public class GameMain {
 			//update the screen
 			Display.update();
 			Display.sync(32);
+
+			if (Timing.getTime() - lastFPS > 1000) {
+				currentFPS = fps;
+		        fps = 0; //reset the FPS counter
+		        lastFPS += 1000; //add one second
+		    }
+		    fps++;
 		}
 		
 		//Exit
@@ -97,6 +123,12 @@ public class GameMain {
 				if (Keyboard.getEventKey() == Keyboard.KEY_T)
 				{
 					world.cycleTimeOfDay();
+				}
+				
+				//Tilde key (without shift) loads up the debug overlay 
+				if (Keyboard.getEventKey() == Keyboard.KEY_GRAVE) 
+				{
+					devOn = !devOn;
 				}
 				
 				switch (world.getCs())
@@ -348,6 +380,15 @@ public class GameMain {
 		GL11.glPushMatrix();
 			world.renderOverlay();
 		GL11.glPopMatrix();
+		
+		
+		if(devOn) {
+			DisplayText dt = new DisplayText();
+			world.textTexture.bind();
+			String str = "FPS: " + currentFPS;
+			System.out.println(str);
+	        dt.overlayString(0, 0, str);
+		}
 	}
 	
 	/**

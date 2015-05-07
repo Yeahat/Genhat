@@ -9,7 +9,7 @@ public class DisplayText
 {
 	boolean waitingForInput = false;
 	boolean textBoxActive = false;
-	float[] textureCoordX = new float[64];
+	float[] textureCoordX = new float[74];
 	ArrayList<ArrayList<String>> text;
 	private String name; //name of speaking character
 	int currentRow = 0;
@@ -70,6 +70,16 @@ public class DisplayText
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Print the given text as an overlay, without regard for speed.
+	 */
+	public void overlayString(int i, int j, String str)
+	{
+		GL11.glPushMatrix();
+			renderString(str);
+		GL11.glPopMatrix();
 	}
 	
 	/**
@@ -336,6 +346,10 @@ public class DisplayText
 		case (' '): return 63;
 		}
 		
+		if (c >= 48 && c <= 57)
+			return c - 48 + 64;
+		
+		
 		//if unrecognized, return the index for ' '
 		return 63;
 	}
@@ -477,6 +491,14 @@ public class DisplayText
 		c = ' ';
 		offset = (18 - getPixelCount(c)) / 2;
 		textureCoordX[63] = (18*11 + offset)/1024f;
+		
+		// Numbers
+		c = '1';
+		for (int i = 64; i < 74; i ++)
+		{
+			offset = (18 - getPixelCount(c)) / 2;
+			textureCoordX[i] = (18*(i - 64 + 11) + offset) / 1024f;
+		}
 	}
 
 	/**
@@ -519,6 +541,12 @@ public class DisplayText
 			case 't':	return 12;
 			default:	return 14;
 			}
+		}
+		
+		// Numbers
+		if (c >= 48 && c <= 57)
+		{
+			return 18;
 		}
 		
 		//punctuation and spaces
