@@ -2,6 +2,13 @@ package world;
 
 import static world.Terrain.terrainType.*;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.util.ResourceLoader;
+
 public class Terrain {
 	public enum terrainType
 	{
@@ -18,6 +25,8 @@ public class Terrain {
 	int texCol;
 	int texRowTop;
 	int texColTop;
+	int vTexIndex;
+	int hTexIndex;
 	
 	public Terrain(terrainType t)
 	{
@@ -55,6 +64,7 @@ public class Terrain {
 	{
 		type = t;
 		top = t;
+		loadTextures();
 		updateAttributes();
 	}
 	
@@ -66,7 +76,31 @@ public class Terrain {
 	{
 		type = aType;
 		top = aTop;
+		loadTextures();
 		updateAttributes();
+	}
+	
+	public void bindVTexture(ArrayList<Texture> textures)
+	{
+		textures.get(vTexIndex).bind();
+	}
+	
+	public void bindHTexture(ArrayList<Texture> textures)
+	{
+		textures.get(hTexIndex).bind();
+	}
+	
+	private void loadTextures()
+	{
+		if (type == grass || type == dirt || type == rock || type == plaster || type == woodPlank || type == woodPlankWeathered)
+			vTexIndex = 0;
+		else if (type == woodSupport)
+			vTexIndex = 1;
+		else if (type == air || type == glass || type == windowProtruding || type == window)
+			vTexIndex = 2;
+		
+		if (top == grass || top == dirt || top == rock || top == thatch || top == woodPlank || top == air)
+			hTexIndex = 0;
 	}
 	
 	public int getTexRow()
@@ -76,7 +110,10 @@ public class Terrain {
 	
 	public int getTexCol()
 	{
-		return texCol * 4;
+		if (transparent)
+			return texCol * 4;
+		else
+			return texCol * 8;
 	}
 	
 	public int getTexRowTop()
@@ -87,23 +124,6 @@ public class Terrain {
 	public int getTexColTop()
 	{
 		return texColTop * 4;
-	}
-	
-	/**
-	 * Getter for a character representation of the terrain type
-	 * @return a char representing the terrain
-	 */
-	public char getChar()
-	{
-		switch (type)
-		{
-		case grass:
-			return ',';
-		case dirt:
-			return ':';
-		default:
-			return ' ';
-		}
 	}
 	
 	/**
@@ -209,21 +229,25 @@ public class Terrain {
 		case dirt: 
 			texRow = 0; texCol = 1; break;
 		case rock:
-			texRow = 0; texCol = 2; break;
-		case glass:
-			texRow = 0; texCol = 3; break;
-		case woodPlank:
 			texRow = 1; texCol = 0; break;
-		case woodSupport:
-			texRow = 1; texCol = 2; break;
 		case plaster:
+			texRow = 1; texCol = 1; break;
+		case woodPlank:
 			texRow = 2; texCol = 0; break;
 		case woodPlankWeathered:
 			texRow = 2; texCol = 1; break;
-		case windowProtruding: 
-			texRow = 2; texCol = 2; break;
 			
-		//Unset (blank)
+		case woodSupport:
+			texRow = 0; texCol = 0; break;
+			
+		case glass:
+			texRow = 0; texCol = 0; break;
+		case windowProtruding: 
+			texRow = 0; texCol = 1; break;
+		case window: 
+			texRow = 0; texCol = 2; break;
+
+		//Unset
 		default:
 			texRow = 2; texCol = 3; break;
 		}
@@ -246,5 +270,37 @@ public class Terrain {
 		default:
 			texRowTop = 2; texColTop = 3; break;
 		}
+	}
+	
+	public static void LoadVTextures(ArrayList<Texture> textures)
+	{
+		Texture v0 = null;
+		Texture v1 = null;
+		Texture v2 = null;
+		
+		try {
+			v0 = (TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/terrain/VTerrain1.png")));
+		} catch (IOException e) {e.printStackTrace();}
+		try {
+			v1 = (TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/terrain/VTerrain2.png")));
+		} catch (IOException e) {e.printStackTrace();}
+		try {
+			v2 = (TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/terrain/VTransparentTerrain1.png")));
+		} catch (IOException e) {e.printStackTrace();}
+		
+		textures.add(v0);
+		textures.add(v1);
+		textures.add(v2);
+	}
+	
+	public static void LoadHTextures(ArrayList<Texture> textures)
+	{
+		Texture h0 = null;
+		
+		try {
+			h0 = (TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/terrain/HTerrain.png")));
+		} catch (IOException e) {e.printStackTrace();}
+		
+		textures.add(h0);
 	}
 }

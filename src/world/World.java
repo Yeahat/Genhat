@@ -45,9 +45,9 @@ public class World {
 	private final int V_TEXTURE_SHEET_SIZE = 256;
 	
 	//Textures
-	private Texture hTerrainTexture;
-	private Texture vTerrainTexture;
 	public Texture textTexture;
+	public ArrayList<Texture> hTerrainTextures = new ArrayList<Texture>();
+	public ArrayList<Texture> vTerrainTextures = new ArrayList<Texture>();
 	
 	float[] displayCenter = new float[2];
 	private boolean cameraLockV = false;
@@ -121,10 +121,11 @@ public class World {
 	public void loadTextures()
 	{
 		try {
-			hTerrainTexture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/terrain/HTerrain.png"));
-			vTerrainTexture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/terrain/VTerrain.png"));
 			textTexture = TextureLoader.getTexture("png", ResourceLoader.getResourceAsStream("graphics/fonts/text.png"));
 		} catch (IOException e) {e.printStackTrace();}
+		
+		Terrain.LoadHTextures(hTerrainTextures);
+		Terrain.LoadVTextures(vTerrainTextures);
 	}
 	
 	/**
@@ -472,7 +473,7 @@ public class World {
 							GL11.glColor3f(1.0f, 1.0f, 1.0f);
 							GL11.glEnable(GL11.GL_TEXTURE_2D);
 							GL11.glTranslatef(x, y, 0);
-							vTerrainTexture.bind();
+							t.bindVTexture(vTerrainTextures);
 							GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 					    	
 							
@@ -567,12 +568,91 @@ public class World {
 								//if (terrainGrid[i][j][k-1].type != air || (this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()))
 								if (terrainGrid[i][j][k-1].type != air)
 								{
-									GL11.glColor3f(0, 0, 0);
+									//Determine which part of the texture to use based on how many neighbors are air
+							    	int texX = t.getTexCol();
+							    	int texY = t.getTexRow();
+							    	
+							    	boolean topEmpty, bottomEmpty, rightEmpty, leftEmpty;
+							    	if (t.isUnblendedVertical())
+							    	{
+										topEmpty = j + 1 >= terrainGrid[0].length
+												|| terrainGrid[i][j+1][k].getTerrainType() != t.getTerrainType()  || terrainGrid[i][j+1][k].isTransparent()
+												|| terrainGrid[i][j+1][k-1].getTerrainType() == air;
+						    			bottomEmpty = j - 1 < 0
+						    					|| terrainGrid[i][j-1][k].getTerrainType() != t.getTerrainType() || terrainGrid[i][j-1][k].isTransparent()
+						    					|| terrainGrid[i][j-1][k-1].getTerrainType() == air;;
+						    			rightEmpty = i + 1 >= terrainGrid.length
+						    					|| terrainGrid[i+1][j][k].getTerrainType() != t.getTerrainType() || terrainGrid[i+1][j][k].isTransparent()
+						    					|| terrainGrid[i+1][j][k-1].getTerrainType() == air;
+						    			leftEmpty = i - 1 < 0
+						    					|| terrainGrid[i-1][j][k].getTerrainType() != t.getTerrainType() | terrainGrid[i-1][j][k].isTransparent()
+						    					|| terrainGrid[i-1][j][k-1].getTerrainType() == air;
+							    	}
+							    	else
+							    	{
+										topEmpty = j + 1 >= terrainGrid[0].length
+												|| terrainGrid[i][j+1][k].getTerrainType() == air || terrainGrid[i][j+1][k].isTransparent()
+												|| terrainGrid[i][j+1][k-1].getTerrainType() == air;
+						    			bottomEmpty = j - 1 < 0
+						    					|| terrainGrid[i][j-1][k].getTerrainType() == air || terrainGrid[i][j-1][k].isTransparent()
+						    					|| terrainGrid[i][j-1][k-1].getTerrainType() == air;
+						    			rightEmpty = i + 1 >= terrainGrid.length
+						    					|| terrainGrid[i+1][j][k].getTerrainType() == air || terrainGrid[i+1][j][k].isTransparent()
+						    					|| terrainGrid[i+1][j][k-1].getTerrainType() == air;
+						    			leftEmpty = i - 1 < 0
+						    					|| terrainGrid[i-1][j][k].getTerrainType() == air || terrainGrid[i-1][j][k].isTransparent()
+						    					|| terrainGrid[i-1][j][k-1].getTerrainType() == air;
+							    	}
+					    		
+						    		if (topEmpty && bottomEmpty)
+						    		{
+						    			texY += 3;
+						    		}
+						    		else if (topEmpty)
+						    		{
+						    			//texY is unchanged, this case is required for the else case and organizational purposes
+						    		}
+						    		else if (bottomEmpty)
+						    		{
+						    			texY += 2;
+						    		}
+						    		else
+						    		{
+						    			texY += 1;
+						    		}
+						    		
+						    		if (leftEmpty && rightEmpty)
+						    		{
+						    			texX += 3;
+						    		}
+						    		else if (leftEmpty)
+						    		{
+						    			//texX is unchanged, this case is required for the else case and organizational purposes
+						    		}
+						    		else if (rightEmpty)
+						    		{
+						    			texX += 2;
+						    		}
+						    		else
+						    		{
+						    			texX += 1;
+						    		}
+							    	
+						    		//shift in x direction to cut-away textures
+						    		texX += 4;
+						    		
+						    		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
+									
+						    		setLighting(false, lightModGrid[i][j][k]);
 									GL11.glBegin(GL11.GL_QUADS);
-										GL11.glVertex2f(0, 0);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+									GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
+									GL11.glVertex2f(0, 0);
+									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
+									GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
+									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
+									GL11.glTexCoord2f(texX*tConv, texY * tConv);
+									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
 									GL11.glEnd();
 									GL11.glColor3f(1, 1, 1);
 								}
@@ -593,7 +673,7 @@ public class World {
 							GL11.glColor3f(1.0f, 1.0f, 1.0f);
 							GL11.glEnable(GL11.GL_TEXTURE_2D);
 							GL11.glTranslatef(x, y, 0);
-							hTerrainTexture.bind();
+							t.bindHTexture(hTerrainTextures);
 							GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
 							//Determine which part of the texture to use based on how many neighbors are air
@@ -656,7 +736,7 @@ public class World {
 								GL11.glColor3f(1.0f, 1.0f, 1.0f);
 								GL11.glEnable(GL11.GL_TEXTURE_2D);
 								GL11.glTranslatef(x, y, 0);
-								hTerrainTexture.bind();
+								t.bindHTexture(hTerrainTextures);
 								GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 						    	
 						    	//Determine which part of the texture to use based on how many neighbors are air
@@ -745,7 +825,7 @@ public class World {
 							GL11.glColor3f(1.0f, 1.0f, 1.0f);
 							GL11.glEnable(GL11.GL_TEXTURE_2D);
 							GL11.glTranslatef(x, y, 0);
-							vTerrainTexture.bind();
+							t.bindVTexture(vTerrainTextures);
 							GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 							
 							int texX = t.getTexCol();
