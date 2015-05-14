@@ -1005,8 +1005,5 @@ public class GameMain {
 		
 		world.addAgents(agents);
 		world.setPlayer(hero);
-		
-		Terrain check = world.getTerrainAt(25, 31, 3);
-		System.out.println("Terrain type, top: " + check.getTerrainType() + ", " + check.getTerrainTop());
 	}
 }

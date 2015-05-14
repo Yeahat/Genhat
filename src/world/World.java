@@ -957,7 +957,7 @@ public class World {
 			texX += 1;
 		}
     	
-		//shift in x direction to cut-away textures
+		//shift in x direction to cross section textures
 		texX += 4;
 		
 		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
@@ -973,6 +973,161 @@ public class World {
 			GL11.glTexCoord2f(texX*tConv, texY * tConv);
 			GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
 		GL11.glEnd();
+		
+		//corner rendering checks (four non-exclusive cases)
+		if (!topEmpty && !rightEmpty)
+		{
+			//only render corner if the diagonal cell is empty
+			boolean cornerEmpty;
+			if (toppedTerrain.isUnblendedVertical())
+	    	{
+				cornerEmpty = x + 1 >= terrainGrid.length || y + 1 >= terrainGrid[0].length
+						|| terrainGrid[x+1][y+1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x+1][y+1][z].isTransparent()
+						|| terrainGrid[x+1][y+1][z-1].getTerrainType() == air;
+	    	}
+	    	else
+	    	{
+	    		cornerEmpty = x + 1 >= terrainGrid.length || y + 1 >= terrainGrid[0].length
+						|| terrainGrid[x+1][y+1][z].getTerrainType() == air || terrainGrid[x+1][y+1][z].isTransparent()
+						|| terrainGrid[x+1][y+1][z-1].getTerrainType() == air;
+	    	}
+			
+			if (cornerEmpty)
+			{
+				texX = toppedTerrain.getTexCol();
+				texY = toppedTerrain.getTexRow();
+				
+				texX += 4; //shift to cross section textures
+				texY += 4; //shift to corner textures
+				float tConvAdjustment = tConv / 2.0f;
+				
+				GL11.glBegin(GL11.GL_QUADS);
+					GL11.glTexCoord2f(texX * tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
+					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE);
+				GL11.glEnd();
+			}
+		}
+		if (!rightEmpty && !bottomEmpty)
+		{
+			//only render corner if the diagonal cell is empty
+			boolean cornerEmpty;
+			if (toppedTerrain.isUnblendedVertical())
+	    	{
+				cornerEmpty = x + 1 >= terrainGrid.length || y - 1 < 0
+						|| terrainGrid[x+1][y-1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x+1][y-1][z].isTransparent()
+						|| terrainGrid[x+1][y-1][z-1].getTerrainType() == air;
+	    	}
+	    	else
+	    	{
+	    		cornerEmpty = x + 1 >= terrainGrid.length || y - 1 < 0
+						|| terrainGrid[x+1][y-1][z].getTerrainType() == air || terrainGrid[x+1][y-1][z].isTransparent()
+						|| terrainGrid[x+1][y-1][z-1].getTerrainType() == air;
+	    	}
+			
+			if (cornerEmpty)
+			{
+				texX = toppedTerrain.getTexCol();
+				texY = toppedTerrain.getTexRow();
+				
+				texX += 4; //shift to cross section textures
+				texY += 4; //shift to corner textures
+				float tConvAdjustment = tConv / 2.0f;
+				
+				GL11.glBegin(GL11.GL_QUADS);
+					GL11.glTexCoord2f(texX * tConv + tConvAdjustment, texY*tConv + tConv);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, 0);
+					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
+					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+				GL11.glEnd();
+			}
+		}
+		if (!bottomEmpty && !leftEmpty)
+		{
+			//only render corner if the diagonal cell is empty
+			boolean cornerEmpty;
+			if (toppedTerrain.isUnblendedVertical())
+	    	{
+				cornerEmpty = x - 1 < 0 || y - 1 < 0
+						|| terrainGrid[x-1][y-1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x-1][y-1][z].isTransparent()
+						|| terrainGrid[x-1][y-1][z-1].getTerrainType() == air;
+	    	}
+	    	else
+	    	{
+	    		cornerEmpty = x - 1 < 0 || y - 1 < 0
+						|| terrainGrid[x-1][y-1][z].getTerrainType() == air || terrainGrid[x-1][y-1][z].isTransparent()
+						|| terrainGrid[x-1][y-1][z-1].getTerrainType() == air;
+	    	}
+			
+			if (cornerEmpty)
+			{
+				texX = toppedTerrain.getTexCol();
+				texY = toppedTerrain.getTexRow();
+				
+				texX += 4; //shift to cross section textures
+				texY += 4; //shift to corner textures
+				float tConvAdjustment = tConv / 2.0f;
+				
+				GL11.glBegin(GL11.GL_QUADS);
+					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
+					GL11.glVertex2f(0, 0);
+					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConv);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, 0);
+					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glTexCoord2f(texX*tConv, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+				GL11.glEnd();
+			}
+		}
+		if (!leftEmpty && !topEmpty)
+		{
+			//only render corner if the diagonal cell is empty
+			boolean cornerEmpty;
+			if (toppedTerrain.isUnblendedVertical())
+	    	{
+				cornerEmpty = x - 1 < 0 || y + 1 >= terrainGrid[0].length
+						|| terrainGrid[x-1][y+1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x-1][y+1][z].isTransparent()
+						|| terrainGrid[x-1][y+1][z-1].getTerrainType() == air;
+	    	}
+	    	else
+	    	{
+	    		cornerEmpty = x - 1 < 0 || y + 1 >= terrainGrid[0].length
+						|| terrainGrid[x-1][y+1][z].getTerrainType() == air || terrainGrid[x-1][y+1][z].isTransparent()
+						|| terrainGrid[x-1][y+1][z-1].getTerrainType() == air;
+	    	}
+			
+			if (cornerEmpty)
+			{
+				texX = toppedTerrain.getTexCol();
+				texY = toppedTerrain.getTexRow();
+				
+				texX += 4; //shift to cross section textures
+				texY += 4; //shift to corner textures
+				float tConvAdjustment = tConv / 2.0f;
+				
+				GL11.glBegin(GL11.GL_QUADS);
+					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv);
+					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE);
+					GL11.glTexCoord2f(texX*tConv, texY*tConv);
+					GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+				GL11.glEnd();
+			}
+		}
+		
 		GL11.glColor3f(1, 1, 1);
 	}
 	
