@@ -6,9 +6,9 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import entities.Agent.direction;
-import static things.Thing.connectionContext.*;
-import static entities.Agent.direction.*;
+import entities.Agent.Direction;
+import static things.Thing.ConnectionContext.*;
+import static entities.Agent.Direction.*;
 
 public class Rope extends ClimbingSurface {
 
@@ -51,20 +51,20 @@ public class Rope extends ClimbingSurface {
 			
 			switch (getVerticalConnection())
 			{
-			case middle:		texY += 1;	break;
-			case start:			texY += 2;	break;
-			case standalone:	texY += 3;	break;
+			case Middle:		texY += 1;	break;
+			case Start:			texY += 2;	break;
+			case Standalone:	texY += 3;	break;
 			}
 				
 			switch (getHorizontalConnection())
 			{
-			case middle:
+			case Middle:
 				texX += 1;
 				break;
-			case end:
+			case End:
 				texX += 2;
 				break;
-			case standalone:
+			case Standalone:
 				texX += 3;
 				break;
 			}
@@ -90,23 +90,23 @@ public class Rope extends ClimbingSurface {
 	
 	public static class RopeBuilder
 	{
-		private connectionContext horizontalConnection = standalone;
-		private connectionContext verticalConnection = standalone;
-		private direction dir = up;
+		private ConnectionContext horizontalConnection = Standalone;
+		private ConnectionContext verticalConnection = Standalone;
+		private Direction dir = Up;
 		
-		public RopeBuilder horizontalConnection(connectionContext horizontalConnection)
+		public RopeBuilder horizontalConnection(ConnectionContext horizontalConnection)
 		{
 			this.horizontalConnection = horizontalConnection;
 			return this;
 		}
 		
-		public RopeBuilder verticalConnection(connectionContext verticalConnection)
+		public RopeBuilder verticalConnection(ConnectionContext verticalConnection)
 		{
 			this.verticalConnection = verticalConnection;
 			return this;
 		}
 		
-		public RopeBuilder dir(direction dir)
+		public RopeBuilder dir(Direction dir)
 		{
 			this.dir = dir;
 			return this;

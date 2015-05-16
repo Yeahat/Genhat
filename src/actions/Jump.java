@@ -5,7 +5,7 @@ import world.World;
 import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class Jump implements Action {
 	private boolean finished;
@@ -40,19 +40,19 @@ public class Jump implements Action {
 					Position pos = agent.getPos();
 					switch (agent.getDir())
 					{
-					case up:
+					case Up:
 						world.moveAgent(agent, 0, 1, 1);
 						agent.setOffsetY(-32);
 						pos = agent.getPos();
 						Placeholder h1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z - 1));
 						world.addAgent(h1);
 						break;
-					case down:
+					case Down:
 						switched = false;
 						Placeholder holder1 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z + 1));
 						world.addAgent(holder1);
 						break;
-					case left:
+					case Left:
 						world.moveAgent(agent, -1, 0, 1);
 						agent.setOffsetX(16);
 						agent.setOffsetY(-16);
@@ -60,7 +60,7 @@ public class Jump implements Action {
 						Placeholder h3 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z - 1));
 						world.addAgent(h3);
 						break;
-					case right:
+					case Right:
 						world.moveAgent(agent, 1, 0, 1);
 						agent.setOffsetX(-16);
 						agent.setOffsetY(-16);
@@ -75,20 +75,20 @@ public class Jump implements Action {
 					Position pos = agent.getPos();
 					switch (agent.getDir())
 					{
-					case up:
+					case Up:
 						switched = false;
 						Placeholder holder4 = new Placeholder(agent, new Position(pos.x, pos.y + 1, pos.z - 1));
 						world.addAgent(holder4);
 						break;
-					case down:
+					case Down:
 						Placeholder holder3 = new Placeholder(agent, new Position(pos.x, pos.y - 1, pos.z - 1));
 						world.addAgent(holder3);
 						break;
-					case left:
+					case Left:
 						Placeholder holder1 = new Placeholder(agent, new Position(pos.x - 1, pos.y, pos.z - 1));
 						world.addAgent(holder1);
 						break;
-					case right:
+					case Right:
 						Placeholder holder2 = new Placeholder(agent, new Position(pos.x + 1, pos.y, pos.z - 1));
 						world.addAgent(holder2);
 						break;
@@ -107,7 +107,7 @@ public class Jump implements Action {
 		{
 			switch (agent.getDir())
 			{
-			case up:
+			case Up:
 				float i3 = agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i3);
 				agent.setOffsetY(dstJumped + lookupHeight() - 32);
@@ -130,7 +130,7 @@ public class Jump implements Action {
 				}
 			break;
 			
-			case down:
+			case Down:
 				float i4 = -agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i4);
 				
@@ -168,7 +168,7 @@ public class Jump implements Action {
 					world.updateCamera();
 				}
 			break;
-			case left:
+			case Left:
 				float i1 = -agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i1);
 				agent.incrementXOffset(i1);
@@ -191,7 +191,7 @@ public class Jump implements Action {
 					world.updateCamera();
 				}
 			break;
-			case right:
+			case Right:
 				float i2 = agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i2);
 				agent.incrementXOffset(i2);
@@ -219,7 +219,7 @@ public class Jump implements Action {
 		{
 			switch (agent.getDir())
 			{
-			case up:
+			case Up:
 				float i4 = agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i4);
 				
@@ -256,7 +256,7 @@ public class Jump implements Action {
 					world.updateCamera();
 				}
 			break;
-			case down:
+			case Down:
 				//Add in placeholder, and setup the initial move above
 				float i3 = -agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i3);
@@ -279,7 +279,7 @@ public class Jump implements Action {
 					world.updateCamera();
 				}
 			break;
-			case left:
+			case Left:
 				float i1 = -agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i1);
 				agent.incrementXOffset(i1);
@@ -303,7 +303,7 @@ public class Jump implements Action {
 					world.updateCamera();
 				}
 			break;
-			case right:
+			case Right:
 				float i2 = agent.getSpeed() * 16.0f / 32.0f;
 				dstJumped += Math.abs(i2);
 				agent.incrementXOffset(i2);
@@ -344,10 +344,10 @@ public class Jump implements Action {
 		int yFinish = pos.y;
 		switch (agent.getDir())
 		{
-		case up:	yFinish ++;	break;
-		case down:	yFinish --;	break;
-		case left:	xFinish --;	break;
-		case right:	xFinish ++;	break;
+		case Up:	yFinish ++;	break;
+		case Down:	yFinish --;	break;
+		case Left:	xFinish --;	break;
+		case Right:	xFinish ++;	break;
 		default:	return false;
 		}
 		
@@ -399,10 +399,10 @@ public class Jump implements Action {
 	
 	private void swapFootstep(Agent agent)
 	{
-		if (agent.getStance() == left)
-			agent.setFootstep(right);
+		if (agent.getStance() == Left)
+			agent.setFootstep(Right);
 		else
-			agent.setFootstep(left);
+			agent.setFootstep(Left);
 	}
 	
 	private int lookupHeight()

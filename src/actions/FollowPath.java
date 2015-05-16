@@ -2,9 +2,9 @@ package actions;
 
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 import utils.planners.PathPlannerUtils.MovementClass;
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class FollowPath implements Action 
 {	
@@ -42,10 +42,10 @@ public class FollowPath implements Action
 			
 			switch (currentStep)
 			{
-			case 'U':	setStep(up);	break;
-			case 'D':	setStep(down);	break;
-			case 'L':	setStep(left);	break;
-			case 'R':	setStep(right);	break;
+			case 'U':	setStep(Up);	break;
+			case 'D':	setStep(Down);	break;
+			case 'L':	setStep(Left);	break;
+			case 'R':	setStep(Right);	break;
 			}
 			executingStep = false;
 
@@ -75,7 +75,7 @@ public class FollowPath implements Action
 		}
 	}
 
-	private void setStep(direction dir)
+	private void setStep(Direction dir)
 	{
 		if (movementClass == MovementClass.SimpleStepping)
 			step = new SimpleStep(dir);

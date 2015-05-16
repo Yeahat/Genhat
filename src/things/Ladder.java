@@ -6,8 +6,8 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import static things.Thing.connectionContext.*;
-import static entities.Agent.direction.*;
+import static things.Thing.ConnectionContext.*;
+import static entities.Agent.Direction.*;
 
 public class Ladder extends ClimbingSurface {
 
@@ -15,22 +15,22 @@ public class Ladder extends ClimbingSurface {
 	{
 		super();
 		
-		this.horizontalConnection = standalone;
-		this.verticalConnection = standalone;
+		this.horizontalConnection = Standalone;
+		this.verticalConnection = Standalone;
 		
-		this.dir = up;
+		this.dir = Up;
 		this.texRow = 7;
 		this.texCol = 1;
 		
 		loadTextures();
 	}
 	
-	public Ladder(connectionContext verticalConnection)
+	public Ladder(ConnectionContext verticalConnection)
 	{
 		super();
 		
-		this.dir = up;
-		horizontalConnection = standalone;
+		this.dir = Up;
+		horizontalConnection = Standalone;
 		this.verticalConnection = verticalConnection;
 		
 		this.texRow = 7;
@@ -62,16 +62,16 @@ public class Ladder extends ClimbingSurface {
 			int texY = texRow;
 			switch (getVerticalConnection())
 			{
-			case start:
+			case Start:
 				texX += 0;
 				break;
-			case middle:
+			case Middle:
 				texX += 1;
 				break;
-			case end:
+			case End:
 				texX += 2;
 				break;
-			case standalone:
+			case Standalone:
 				texX += 3;				
 				break;
 			}

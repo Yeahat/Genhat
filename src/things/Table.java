@@ -8,8 +8,8 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
 
 public class Table extends Thing {
 
@@ -20,10 +20,10 @@ public class Table extends Thing {
 		texRow = 0;
 		texCol = 0;
 		blocking = true;
-		setDir(left);
+		setDir(Left);
 	}
 	
-	public Table(direction d)
+	public Table(Direction d)
 	{
 		loadTextures();
 		
@@ -68,16 +68,16 @@ public class Table extends Thing {
 			int texY = texRow;
 			switch (getDir())
 			{
-			case left:
+			case Left:
 				texX += 0;
 				break;
-			case down:
+			case Down:
 				texX += 1;
 				break;
-			case right:
+			case Right:
 				texX += 2;
 				break;
-			case up:
+			case Up:
 				texX += 3;				
 				break;
 			}

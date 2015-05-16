@@ -2,10 +2,10 @@ package things;
 
 import java.util.ArrayList;
 
-import things.Thing.connectionContext;
+import things.Thing.ConnectionContext;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 
 public class ThingGridCell {
 	private ArrayList<Thing> thingList;
@@ -100,56 +100,56 @@ public class ThingGridCell {
 	 * Get the direction of a ramp (assumes there is a ramp in this cell)
 	 * @return the direction of the first ramp in this cell
 	 */
-	public direction getRampDir()
+	public Direction getRampDir()
 	{
 		for (int i = 0; i < thingList.size(); i ++)
 		{
 			if (thingList.get(i).isRamp())
 				return thingList.get(i).getDir();
 		}
-		return direction.left;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+		return Direction.Left;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
 	}
 	
 	/**
 	 * Get the direction of a climbingSurface (assumes there is a ramp in this cell)
 	 * @return the direction of the first ramp in this cell
 	 */
-	public direction getClimbingSurfaceDir()
+	public Direction getClimbingSurfaceDir()
 	{
 		for (int i = 0; i < thingList.size(); i ++)
 		{
 			if (thingList.get(i).isClimbingSurface())
 				return thingList.get(i).getDir();
 		}
-		return direction.up;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+		return Direction.Up;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
 	}
 	
 	/**
 	 * Get the (horizontal) connection context of a ramp (assumes there is a ramp in this cell)
 	 * @return the connection context of the first ramp in this cell
 	 */
-	public connectionContext getRampConnectionContext()
+	public ConnectionContext getRampConnectionContext()
 	{
 		for (int i = 0; i < thingList.size(); i ++)
 		{
 			if (thingList.get(i).isRamp())
 				return ((Ramp)(thingList.get(i))).getHorizontalConnection();
 		}
-		return connectionContext.standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+		return ConnectionContext.Standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
 	}
 	
 	/**
 	 * Get the (horizontal) connection context of a climbing surface (assumes there is a climbing surface in this cell)
 	 * @return the connection context of the first climbing surface in this cell
 	 */
-	public connectionContext getClimbingSurfaceConnectionContext()
+	public ConnectionContext getClimbingSurfaceConnectionContext()
 	{
 		for (int i = 0; i < thingList.size(); i ++)
 		{
 			if (thingList.get(i).isClimbingSurface())
 				return ((ClimbingSurface)(thingList.get(i))).getHorizontalConnection();
 		}
-		return connectionContext.standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
+		return ConnectionContext.Standalone;	//this will return if there is no ramp, in which case the function shouldn't have been called anyway
 	}
 	
 	public boolean isTransparent()

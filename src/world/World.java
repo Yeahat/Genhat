@@ -15,7 +15,7 @@ import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
 import static world.Terrain.terrainType.*;
-import static world.World.timeOfDay.*;
+import static world.World.TimeOfDay.*;
 import static world.World.ControlState.*;
 
 public class World {
@@ -33,16 +33,18 @@ public class World {
 	
 	//TODO: refactor this stuff to a new Game State class
 	Hero player;
-	public enum timeOfDay
+	public enum TimeOfDay
 	{
-		sunrise, morning, midday, afternoon, sunset, night;
+		Sunrise, Morning, Midday, Afternoon, Sunset, Night;
 	}
-	private timeOfDay tod;
+	private TimeOfDay tod;
 	
-	private final int PIXEL_SIZE = 2;
-	private final int TEXTURE_SIZE = 16;
-	private final int H_TEXTURE_SHEET_SIZE = 256;
-	private final int V_TEXTURE_SHEET_SIZE = 256;
+	private final int pixelSize = 2;
+	private final int textureSize = 16;
+	private final int textureSheetSize = 256;
+	private final int quadVertexMax = pixelSize*textureSize;
+	private final float tConv = ((float)textureSize)/((float)textureSheetSize);
+	private final float tConvQuarterAdjustment = tConv/2.0f;
 	
 	//Textures
 	public Texture textTexture;
@@ -114,7 +116,7 @@ public class World {
 		textBoxActive = false;
 		textDisplay = new DisplayText();
 		
-		setTod(midday);
+		setTod(Midday);
 		setCs(walking);
 	}
 	
@@ -288,24 +290,24 @@ public class World {
 		boolean longShadows = false;
 		switch (tod)
 		{
-		case sunrise:
+		case Sunrise:
 			longShadows = true;
 			break;
-		case morning:
+		case Morning:
 			shadowLength = 3;
 			break;
-		case midday: 
+		case Midday: 
 			shadowDirection = 0;
 			break;
-		case afternoon: 
+		case Afternoon: 
 			shadowLength = 3;
 			shadowDirection = -1;
 			break;
-		case sunset: 
+		case Sunset: 
 			shadowDirection = -1;
 			longShadows = true;
 			break;
-		case night: 
+		case Night: 
 			//no shadows
 			return false;
 		default: 
@@ -353,6 +355,13 @@ public class World {
 			int i = lightPos.x;
 			int j = lightPos.y;
 			int k = lightPos.z;
+			
+			//special case: wall light sources, which should instead have the light source pushed up in the y direction
+			if (this.getTerrainAt(i, j, k).isBlocking())
+			{
+				j -= 1;
+			}
+			
 			if ((i >= xMin && i <= xMax) || (j >= yMin && j <= yMax) || (k >= zMin && k <= zMax))
 			{
 				//TODO: Update this to distinguish between point and directed lights
@@ -464,8 +473,8 @@ public class World {
 					if (t.getTerrainType() != air)
 					{
 						//Determine position on screen
-						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
+						int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
 						
 						GL11.glPushMatrix();
 						
@@ -543,22 +552,10 @@ public class World {
 					    			texX += 1;
 					    		}
 						    	
-					    		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
-						    	
-						    	GL11.glBegin(GL11.GL_QUADS);
-						    		if (k == kMax && t.isTransparent())
-						    			setLighting(false, lightModGrid[i][j][k], .75f);
-						    		else
-						    			setLighting(false, lightModGrid[i][j][k]);
-									GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-									GL11.glVertex2f(0, 0);
-									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-									GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-									GL11.glTexCoord2f(texX*tConv, texY * tConv);
-									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-								GL11.glEnd();
+					    		if (k == kMax && t.isTransparent())
+					    			renderCell(texX, texY, false, lightModGrid[i][j][k], .75f);
+					    		else
+					    			renderCell(texX, texY, false, lightModGrid[i][j][k]);
 							}
 							else
 							{
@@ -578,8 +575,8 @@ public class World {
 						{
 							t = terrainGrid[i][j][k];
 							//Determine position on screen
-							x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
+							y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
 							GL11.glPushMatrix();
 							
 							//Translate to screen position and bind appropriate texture
@@ -592,7 +589,6 @@ public class World {
 							//Determine which part of the texture to use based on how many neighbors are air
 					    	int texX = t.getTexColTop();
 					    	int texY = t.getTexRowTop();
-					    	float tConv;
 						
 							boolean rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air,
 			    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air;
@@ -616,19 +612,7 @@ public class World {
 				    			texX += 1;
 				    		}
 				    		
-				    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
-				    		
-				    		GL11.glBegin(GL11.GL_QUADS);
-				    			setLighting(isShadowed(i, j, k+1), lightModGrid[i][j][k+1]);
-				    			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-								GL11.glVertex2f(0, 0);
-								GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-								GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-								GL11.glTexCoord2f(texX*tConv, texY * tConv);
-								GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-							GL11.glEnd();
+				    		renderCell(texX, texY, isShadowed(i, j, k+1), lightModGrid[i][j][k+1]);
 						
 						GL11.glPopMatrix();
 						}
@@ -640,8 +624,8 @@ public class World {
 						{							
 							t = terrainGrid[i][j][k-1];
 							//Determine position on screen
-							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
+							int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
 							
 							GL11.glPushMatrix();
 								
@@ -655,7 +639,6 @@ public class World {
 						    	//Determine which part of the texture to use based on how many neighbors are air
 						    	int texX = t.getTexColTop();
 						    	int texY = t.getTexRowTop();
-						    	float tConv;
 							
 						    	boolean topEmpty, bottomEmpty, rightEmpty, leftEmpty;
 						    	if (t.isUnblendedHorizontal())
@@ -707,19 +690,7 @@ public class World {
 					    			texX += 1;
 					    		}
 					    		
-					    		tConv = ((float)TEXTURE_SIZE)/((float)H_TEXTURE_SHEET_SIZE);	//width and height of texture sheet
-					    		
-					    		GL11.glBegin(GL11.GL_QUADS);
-					    			setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
-					    			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-									GL11.glVertex2f(0, 0);
-									GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-									GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-									GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-									GL11.glTexCoord2f(texX*tConv, texY * tConv);
-									GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-								GL11.glEnd();
+					    		renderCell(texX, texY, isShadowed(i, j, k), lightModGrid[i][j][k]);
 							
 							GL11.glPopMatrix();
 						}
@@ -731,8 +702,8 @@ public class World {
 					{
 						t = terrainGrid[i][j][k+1];
 						//Determine position on screen
-						int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-						int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+						int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
+						int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
 						
 						GL11.glPushMatrix();
 							GL11.glColor3f(1.0f, 1.0f, 1.0f);
@@ -776,20 +747,7 @@ public class World {
 				    			texX += 1;
 				    		}
 					    	
-				    		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
-					    	
-				    		
-					    	GL11.glBegin(GL11.GL_QUADS);
-					    		setLighting(false, lightModGrid[i][j][k+1]);
-								GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-								GL11.glVertex2f(0, 0);
-								GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-								GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-								GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-								GL11.glTexCoord2f(texX*tConv, texY * tConv);
-								GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-							GL11.glEnd();
+				    		renderCell(texX, texY, false, lightModGrid[i][j][k+1]);
 							
 						GL11.glPopMatrix();
 					}
@@ -804,8 +762,8 @@ public class World {
 					{
 						if (k < kMax)
 						{
-							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
+							int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
 							
 							GL11.glPushMatrix();
 								//don't shadow if the thing is in (i.e. on) a vertical wall
@@ -814,7 +772,7 @@ public class World {
 								else
 									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
 								GL11.glTranslatef(x, y, 0);
-								thingGrid[i][j][k].renderThings(PIXEL_SIZE, TEXTURE_SIZE);
+								thingGrid[i][j][k].renderThings(pixelSize, textureSize);
 							GL11.glPopMatrix();
 						}
 						else
@@ -824,19 +782,19 @@ public class World {
 							//if (terrainGrid[i][j][k-1].type != air || (this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()))
 							if (this.getThingsAt(i, j, k).hasFullBlock() && ((this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()) || this.hasThing(i, j, k-2) && this.getThingsAt(i, j, k-2).hasTallBlock()))
 							{
-								int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-								int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+								int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
+								int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
 								
-								int adjustment = (this.getThingsAt(i, j, k).getBlockingWidth() - TEXTURE_SIZE) / 2;
+								int adjustment = (this.getThingsAt(i, j, k).getBlockingWidth() - textureSize) / 2;
 								
 								GL11.glPushMatrix();
 									GL11.glColor3f(0, 0, 0);
-									GL11.glTranslatef(x - (PIXEL_SIZE*adjustment), y, 0);
+									GL11.glTranslatef(x - (pixelSize*adjustment), y, 0);
 									GL11.glBegin(GL11.GL_QUADS);
 										GL11.glVertex2f(0, 0);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE + (PIXEL_SIZE*adjustment*2), 0);
-										GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE + (PIXEL_SIZE*adjustment*2), PIXEL_SIZE*TEXTURE_SIZE);
-										GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+										GL11.glVertex2f(quadVertexMax + (pixelSize*adjustment*2), 0);
+										GL11.glVertex2f(quadVertexMax + (pixelSize*adjustment*2), quadVertexMax);
+										GL11.glVertex2f(0, quadVertexMax);
 									GL11.glEnd();
 									GL11.glColor3f(1, 1, 1);
 								GL11.glPopMatrix();
@@ -852,8 +810,8 @@ public class World {
 						Agent agent = agentGrid[i][j][k];
 						if (agent != null)
 						{
-							int x = PIXEL_SIZE*(TEXTURE_SIZE*i - (int)(displayCenter[0]*TEXTURE_SIZE)) + 400 - (PIXEL_SIZE*TEXTURE_SIZE)/2;
-							int y = (PIXEL_SIZE*(TEXTURE_SIZE*j - (int)(displayCenter[1]*TEXTURE_SIZE)) + 300) + PIXEL_SIZE*TEXTURE_SIZE*k - (PIXEL_SIZE*TEXTURE_SIZE)/2;
+							int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
+							int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
 							
 							GL11.glPushMatrix();
 								if (agent.getClass() == Placeholder.class)
@@ -864,7 +822,7 @@ public class World {
 								else
 									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
 								GL11.glTranslatef(x, y, 0);
-								agent.renderAgent(PIXEL_SIZE, TEXTURE_SIZE);
+								agent.renderAgent(pixelSize, textureSize);
 							GL11.glPopMatrix();
 						}
 					}
@@ -960,19 +918,7 @@ public class World {
 		//shift in x direction to cross section textures
 		texX += 4;
 		
-		float tConv = ((float)TEXTURE_SIZE)/((float)V_TEXTURE_SHEET_SIZE);
-		
-		setLighting(false, lightModGrid[x][y][z]);
-		GL11.glBegin(GL11.GL_QUADS);
-			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
-			GL11.glVertex2f(0, 0);
-			GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-			GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-			GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
-			GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-			GL11.glTexCoord2f(texX*tConv, texY * tConv);
-			GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
-		GL11.glEnd();
+		renderCell(texX, texY, false, lightModGrid[x][y][z]);
 		
 		//corner rendering checks (four non-exclusive cases)
 		if (!topEmpty && !rightEmpty)
@@ -999,17 +945,17 @@ public class World {
 				
 				texX += 4; //shift to cross section textures
 				texY += 4; //shift to corner textures
-				float tConvAdjustment = tConv / 2.0f;
 				
 				GL11.glBegin(GL11.GL_QUADS);
-					GL11.glTexCoord2f(texX * tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
-					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+				setLighting(false, lightModGrid[x][y][z]);
+					GL11.glTexCoord2f(texX * tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(quadVertexMax, quadVertexMax/2.0f);
 					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE);
-					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE);
+					GL11.glVertex2f(quadVertexMax, quadVertexMax);
+					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv);
+					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax);
 				GL11.glEnd();
 			}
 		}
@@ -1037,17 +983,17 @@ public class World {
 				
 				texX += 4; //shift to cross section textures
 				texY += 4; //shift to corner textures
-				float tConvAdjustment = tConv / 2.0f;
 				
 				GL11.glBegin(GL11.GL_QUADS);
-					GL11.glTexCoord2f(texX * tConv + tConvAdjustment, texY*tConv + tConv);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, 0);
+				setLighting(false, lightModGrid[x][y][z]);
+					GL11.glTexCoord2f(texX * tConv + tConvQuarterAdjustment, texY*tConv + tConv);
+					GL11.glVertex2f(quadVertexMax/2.0f, 0);
 					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, 0);
-					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
-					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glVertex2f(quadVertexMax, 0);
+					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(quadVertexMax, quadVertexMax/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax/2.0f);
 				GL11.glEnd();
 			}
 		}
@@ -1075,17 +1021,17 @@ public class World {
 				
 				texX += 4; //shift to cross section textures
 				texY += 4; //shift to corner textures
-				float tConvAdjustment = tConv / 2.0f;
 				
 				GL11.glBegin(GL11.GL_QUADS);
+				setLighting(false, lightModGrid[x][y][z]);
 					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 					GL11.glVertex2f(0, 0);
-					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConv);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, 0);
-					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
-					GL11.glTexCoord2f(texX*tConv, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConv);
+					GL11.glVertex2f(quadVertexMax/2.0f, 0);
+					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax/2.0f);
+					GL11.glTexCoord2f(texX*tConv, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(0, quadVertexMax/2.0f);
 				GL11.glEnd();
 			}
 		}
@@ -1113,22 +1059,20 @@ public class World {
 				
 				texX += 4; //shift to cross section textures
 				texY += 4; //shift to corner textures
-				float tConvAdjustment = tConv / 2.0f;
 				
 				GL11.glBegin(GL11.GL_QUADS);
-					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
-					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv + tConvAdjustment);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE/2.0f);
-					GL11.glTexCoord2f(texX*tConv + tConvAdjustment, texY*tConv);
-					GL11.glVertex2f(PIXEL_SIZE*TEXTURE_SIZE/2.0f, PIXEL_SIZE*TEXTURE_SIZE);
+				setLighting(false, lightModGrid[x][y][z]);
+					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(0, quadVertexMax/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
+					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax/2.0f);
+					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv);
+					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax);
 					GL11.glTexCoord2f(texX*tConv, texY*tConv);
-					GL11.glVertex2f(0, PIXEL_SIZE*TEXTURE_SIZE);
+					GL11.glVertex2f(0, quadVertexMax);
 				GL11.glEnd();
 			}
 		}
-		
-		GL11.glColor3f(1, 1, 1);
 	}
 	
 	/**
@@ -1144,6 +1088,26 @@ public class World {
 			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 			getTextDisplay().renderText();
 		}
+	}
+	
+	private void renderCell(float texX, float texY, boolean isShadowed, float lightMod)
+	{
+		renderCell(texX, texY, isShadowed, lightMod, 1.0f);
+	}
+	
+	private void renderCell(float texX, float texY, boolean isShadowed, float lightMod, float transparency)
+	{
+		GL11.glBegin(GL11.GL_QUADS);
+			setLighting(isShadowed, lightMod, transparency);
+			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
+			GL11.glVertex2f(0, 0);
+			GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
+			GL11.glVertex2f(quadVertexMax, 0);
+			GL11.glTexCoord2f(texX*tConv + tConv, texY * tConv);
+			GL11.glVertex2f(quadVertexMax, quadVertexMax);
+			GL11.glTexCoord2f(texX*tConv, texY * tConv);
+			GL11.glVertex2f(0, quadVertexMax);
+		GL11.glEnd();
 	}
 	
 	/**
@@ -1166,7 +1130,7 @@ public class World {
 		float r, g, b;
 		switch (tod)
 		{
-		case sunrise:
+		case Sunrise:
 			if (shadowed)
 			{
 				r = .5f;
@@ -1180,7 +1144,7 @@ public class World {
 				b = .8f;
 			}
 		break;
-		case morning:
+		case Morning:
 			if (shadowed)
 			{
 				r = .7f;
@@ -1194,7 +1158,7 @@ public class World {
 				b = 1f;
 			}
 		break;
-		case midday: 
+		case Midday: 
 			if (shadowed)
 			{
 				r = .8f;
@@ -1208,7 +1172,7 @@ public class World {
 				b = 1f;
 			}
 		break;
-		case afternoon: 
+		case Afternoon: 
 			if (shadowed)
 			{
 				r = .7f;
@@ -1222,7 +1186,7 @@ public class World {
 				b = 1f;
 			}
 		break;
-		case sunset: 
+		case Sunset: 
 			if (shadowed)
 			{
 				r = .5f;
@@ -1236,7 +1200,7 @@ public class World {
 				b = .85f;
 			}
 		break;
-		case night: 
+		case Night: 
 			if (shadowed)
 			{
 				r = .3f;
@@ -1433,12 +1397,12 @@ public class World {
 	{
 		switch (tod)
 		{
-		case sunrise: tod = morning; break;
-		case morning: tod = midday; break;
-		case midday: tod = afternoon; break;
-		case afternoon: tod = sunset; break;
-		case sunset: tod = night; break;
-		case night: tod = sunrise; break;
+		case Sunrise: tod = Morning; break;
+		case Morning: tod = Midday; break;
+		case Midday: tod = Afternoon; break;
+		case Afternoon: tod = Sunset; break;
+		case Sunset: tod = Night; break;
+		case Night: tod = Sunrise; break;
 		}
 	}
 	
@@ -1695,11 +1659,11 @@ public class World {
 		player = hero;
 	}
 
-	public void setTod(timeOfDay tod) {
+	public void setTod(TimeOfDay tod) {
 		this.tod = tod;
 	}
 
-	public timeOfDay getTod() {
+	public TimeOfDay getTod() {
 		return tod;
 	}
 

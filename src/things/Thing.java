@@ -5,17 +5,17 @@ import org.newdawn.slick.opengl.Texture;
 import world.Position;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 
 public abstract class Thing {
-	public enum connectionContext
+	public enum ConnectionContext
 	{
-		start, middle, end, standalone
+		Start, Middle, End, Standalone
 	}
 	
 	public enum Orientation
 	{
-		horizontal, vertical, diagonal
+		Horizontal, Vertical, Diagonal
 	}
 	
 	//State
@@ -33,7 +33,7 @@ public abstract class Thing {
 	protected Position pos = new Position(); //Position (x, y, z)
 	protected float[] realOffset = new float[3]; //sub-grid offset from the current position (x, y, z) measured in pixels (default is 16 pixels per grid space)
 	protected float[] pixelOffset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
-	protected direction dir;	//direction the thing is facing
+	protected Direction dir;	//direction the thing is facing
 	protected float terminalVelocity = 8.0f; //maximum change in offset allowed
 	protected float[] velocity = new float[3]; //frame-by-frame changes in (x, y, z) position of the thing
 	
@@ -154,16 +154,16 @@ public abstract class Thing {
 	 * @return true if blocked
 	 */
 	@SuppressWarnings("unused")
-	private boolean blockedInDirection(World world, direction d)
+	private boolean blockedInDirection(World world, Direction d)
 	{
 		int x = pos.x, y = pos.y, z = pos.z;
 		
 		switch (d)
 		{
-		case left: x -= 1; break;
-		case right: x += 1; break;
-		case up: y += 1; break;
-		case down: y -= 1; break;
+		case Left: x -= 1; break;
+		case Right: x += 1; break;
+		case Up: y += 1; break;
+		case Down: y -= 1; break;
 		}
 		
 		if (!world.isInBounds(x, y, z) || world.isBlocked(x, y, z))
@@ -270,11 +270,11 @@ public abstract class Thing {
 		return pos;
 	}
 
-	public void setDir(direction dir) {
+	public void setDir(Direction dir) {
 		this.dir = dir;
 	}
 
-	public direction getDir() {
+	public Direction getDir() {
 		return dir;
 	}
 

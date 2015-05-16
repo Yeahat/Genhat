@@ -6,8 +6,8 @@ import utils.planners.Distance;
 import world.Position;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
 
 public class Wander implements Action {
 
@@ -69,16 +69,16 @@ public class Wander implements Action {
 		return step.isFinished();
 	}
 
-	private direction setTurnDirection()
+	private Direction setTurnDirection()
 	{
 		Random rand = new Random();
 		int n = rand.nextInt(4);
 		switch (n)
 		{
-		case 0:		return up;
-		case 1:		return down;
-		case 2:		return left;
-		default:	return right;
+		case 0:		return Up;
+		case 1:		return Down;
+		case 2:		return Left;
+		default:	return Right;
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class Wander implements Action {
 		Position pos2;
 		int loopCount = 0;
 		boolean success = true;
-		direction dir = left;
+		Direction dir = Left;
 		
 		//loop until a direction is found that allows the agent to wander within the distance limit,
 		//or stop if a suitable direction is not found within a number of attempts
@@ -104,9 +104,9 @@ public class Wander implements Action {
 			dir = setTurnDirection();
 			switch (dir)
 			{
-			case up:	pos2.y += 1;	break;
-			case down:	pos2.y -= 1;	break;
-			case right:	pos2.x += 1;	break;
+			case Up:	pos2.y += 1;	break;
+			case Down:	pos2.y -= 1;	break;
+			case Right:	pos2.x += 1;	break;
 			default:	pos2.x -= 1;	break;
 			}
 			

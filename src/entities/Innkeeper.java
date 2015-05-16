@@ -14,7 +14,7 @@ import actions.WalkToPoint;
 import world.Position;
 import world.World;
 
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 import static world.World.ControlState.*;
 import static utils.planners.PathPlannerUtils.MovementClass.*;
 
@@ -169,16 +169,16 @@ public class Innkeeper extends Agent
 			if (Math.abs(xDiff) > Math.abs(yDiff))
 			{
 				if (xDiff < 0)
-					turn = new Turn(right);
+					turn = new Turn(Right);
 				else
-					turn = new Turn(left);
+					turn = new Turn(Left);
 			}
 			else
 			{
 				if (yDiff < 0)
-					turn = new Turn(up);
+					turn = new Turn(Up);
 				else
-					turn = new Turn(down);
+					turn = new Turn(Down);
 			}
 			currentAction = turn;
 		}
@@ -194,9 +194,9 @@ public class Innkeeper extends Agent
 	public void initState()
 	{
 		super.initState();
-		setDir(down);
+		setDir(Down);
 		setSpeed(2);
-		setFootstep(left);
+		setFootstep(Left);
 		setHeight(2);
 		conversationNumber = 0;
 	}

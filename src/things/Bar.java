@@ -8,13 +8,13 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
-import static things.Thing.connectionContext.standalone;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
+import static things.Thing.ConnectionContext.Standalone;
 
 public class Bar extends Thing {
 
-	private final connectionContext connection;
+	private final ConnectionContext connection;
 	
 	private Bar(BarBuilder builder)
 	{
@@ -61,21 +61,21 @@ public class Bar extends Thing {
 			
 			int texX = texCol * 4;
 			int texY = texRow;
-			if (dir == up || dir == down)
+			if (dir == Up || dir == Down)
 			{
 				texY += 1;
 			}
 			switch (connection)
 			{
-			case start:
+			case Start:
 				break;
-			case middle:
+			case Middle:
 				texX += 1;
 				break;
-			case end:
+			case End:
 				texX += 2;
 				break;
-			case standalone:
+			case Standalone:
 				texX += 3;				
 				break;
 			}
@@ -101,18 +101,18 @@ public class Bar extends Thing {
 
 	public static class BarBuilder
 	{
-		private connectionContext connection = standalone;
-		private direction dir = left;
+		private ConnectionContext connection = Standalone;
+		private Direction dir = Left;
 		
 		public BarBuilder(){}
 		
-		public BarBuilder connection(connectionContext connection)
+		public BarBuilder connection(ConnectionContext connection)
 		{
 			this.connection = connection;
 			return this;
 		}
 		
-		public BarBuilder dir(direction dir)
+		public BarBuilder dir(Direction dir)
 		{
 			this.dir = dir;
 			return this;

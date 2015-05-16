@@ -6,9 +6,9 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
-import static things.Thing.connectionContext.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
+import static things.Thing.ConnectionContext.*;
 import static things.Stairs.stairsType.*;
 
 public class Stairs extends Ramp {
@@ -17,8 +17,8 @@ public class Stairs extends Ramp {
 		outdoorWooden, indoorWooden;
 	}
 	private final stairsType type;
-	private final connectionContext horizontalConnection;
-	private final connectionContext verticalConnection;
+	private final ConnectionContext horizontalConnection;
+	private final ConnectionContext verticalConnection;
 	private final StairsBottom associatedBottom;	//an extra thing rendered for graphical consistency
 	
 	private Stairs(StairsBuilder builder)
@@ -44,8 +44,8 @@ public class Stairs extends Ramp {
 			break;
 		}
 
-		if ((this.dir == left && (this.getHorizontalConnection() == middle || this.getHorizontalConnection() == connectionContext.start))
-				|| (this.dir == right && (this.getHorizontalConnection() == middle || this.getHorizontalConnection() == connectionContext.end)))
+		if ((this.dir == Left && (this.getHorizontalConnection() == Middle || this.getHorizontalConnection() == ConnectionContext.Start))
+				|| (this.dir == Right && (this.getHorizontalConnection() == Middle || this.getHorizontalConnection() == ConnectionContext.End)))
 			associatedBottom = new StairsBottom(this.dir);
 		else
 			associatedBottom = null;
@@ -80,16 +80,16 @@ public class Stairs extends Ramp {
 		{
 			switch (getDir())
 			{
-			case down:
+			case Down:
 				texX += 0;
 				break;
-			case right:
+			case Right:
 				texX += 1;
 				break;
-			case up:
+			case Up:
 				texX += 2;
 				break;
-			case left:
+			case Left:
 				texX += 3;				
 				break;
 			}
@@ -98,29 +98,29 @@ public class Stairs extends Ramp {
 		{
 			switch(dir)
 			{
-			case right: texY += 4;	break;
-			case left:	texY += 5;	break;
-			case up:
+			case Right: texY += 4;	break;
+			case Left:	texY += 5;	break;
+			case Up:
 				switch (verticalConnection)
 				{
-				case middle:		texY += 1;	break;
-				case start:			texY += 2;	break;
-				case standalone:	texY += 3;	break;
+				case Middle:		texY += 1;	break;
+				case Start:			texY += 2;	break;
+				case Standalone:	texY += 3;	break;
 				}
 			break;
 			}
 				
 			switch (getHorizontalConnection())
 			{
-			case start:
+			case Start:
 				break;
-			case middle:
+			case Middle:
 				texX += 1;
 				break;
-			case end:
+			case End:
 				texX += 2;
 				break;
-			case standalone:
+			case Standalone:
 				texX += 3;
 				break;
 			}
@@ -157,16 +157,16 @@ public class Stairs extends Ramp {
 		return associatedBottom;
 	}
 
-	public connectionContext getHorizontalConnection() {
+	public ConnectionContext getHorizontalConnection() {
 		return horizontalConnection;
 	}
 
 	public static class StairsBuilder
 	{
 		private final stairsType type;
-		private connectionContext horizontalConnection = standalone;
-		private connectionContext verticalConnection = standalone;
-		private direction dir = right;
+		private ConnectionContext horizontalConnection = Standalone;
+		private ConnectionContext verticalConnection = Standalone;
+		private Direction dir = Right;
 		
 		
 		public StairsBuilder(stairsType type)
@@ -174,19 +174,19 @@ public class Stairs extends Ramp {
 			this.type = type;
 		}
 		
-		public StairsBuilder horizontalConnection(connectionContext horizontalConnection)
+		public StairsBuilder horizontalConnection(ConnectionContext horizontalConnection)
 		{
 			this.horizontalConnection = horizontalConnection;
 			return this;
 		}
 		
-		public StairsBuilder verticalConnection(connectionContext verticalConnection)
+		public StairsBuilder verticalConnection(ConnectionContext verticalConnection)
 		{
 			this.verticalConnection = verticalConnection;
 			return this;
 		}
 		
-		public StairsBuilder dir(direction dir)
+		public StairsBuilder dir(Direction dir)
 		{
 			this.dir = dir;
 			return this;

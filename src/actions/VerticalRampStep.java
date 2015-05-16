@@ -4,19 +4,19 @@ import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 import entities.Hero;
 import entities.Placeholder;
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class VerticalRampStep implements Action {
 
-	private final direction dir;
+	private final Direction dir;
 	private boolean initialized;
 	private boolean finished;
 	private boolean specialCase; //tracks special cases (step off for ascending, step on for descending)
 
-	public VerticalRampStep(direction dir)
+	public VerticalRampStep(Direction dir)
 	{
 		this.dir = dir;
 		this.initialized = false;
@@ -35,14 +35,14 @@ public class VerticalRampStep implements Action {
 			Position pos;
 			switch (dir)
 			{
-			case up:
+			case Up:
 				//Ascending a vertical ramp
-				if (PathPlannerUtils.canStepVerticalRamp(agent, world, agent.getPos(), up))
+				if (PathPlannerUtils.canStepVerticalRamp(agent, world, agent.getPos(), Up))
 				{
 					Position checkPos = new Position(agent.getPos());
 					checkPos.y ++;
 					//Regular case: moving upwards
-					if (world.hasThing(checkPos) && world.getThingsAt(checkPos).hasRamp() && world.getThingsAt(checkPos).getRampDir() == up)
+					if (world.hasThing(checkPos) && world.getThingsAt(checkPos).hasRamp() && world.getThingsAt(checkPos).getRampDir() == Up)
 					{
 						world.moveAgent(agent, 0, 0, 1);
 						agent.setOffsetY(-16);
@@ -74,10 +74,10 @@ public class VerticalRampStep implements Action {
 				}
 			break;
 				
-			case down:
+			case Down:
 				//Descending a vertical ramp
 				pos = agent.getPos();
-				if (PathPlannerUtils.canStepVerticalRamp(agent, world, pos, down))
+				if (PathPlannerUtils.canStepVerticalRamp(agent, world, pos, Down))
 				{
 					//Special case: stepping on
 					if (world.getTerrainAt(pos.x, pos.y, pos.z - 1).isBlocking() || (world.hasThing(pos) && world.getThingsAt(pos).isCrossable()))
@@ -112,9 +112,9 @@ public class VerticalRampStep implements Action {
 				}
 			break;
 				
-			case left:
+			case Left:
 				pos = agent.getPos();
-				if (PathPlannerUtils.canStepVerticalRamp(agent, world, pos, left))
+				if (PathPlannerUtils.canStepVerticalRamp(agent, world, pos, Left))
 				{
 					world.moveAgent(agent, -1, 0, 0);
 					agent.setOffsetX(16);
@@ -130,9 +130,9 @@ public class VerticalRampStep implements Action {
 				}
 			break;
 				
-			case right:
+			case Right:
 				pos = agent.getPos();
-				if (PathPlannerUtils.canStepVerticalRamp(agent, world, pos, right))
+				if (PathPlannerUtils.canStepVerticalRamp(agent, world, pos, Right))
 				{
 					world.moveAgent(agent, 1, 0, 0);
 					agent.setOffsetX(-16);
@@ -156,7 +156,7 @@ public class VerticalRampStep implements Action {
 		//Execute step (many cases...)
 		switch (dir)
 		{
-		case up:
+		case Up:
 			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() >= 0)
 			{
@@ -182,7 +182,7 @@ public class VerticalRampStep implements Action {
 				world.updateCamera();
 			}
 		break;
-		case down:
+		case Down:
 			agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() <= 0)
 			{
@@ -209,7 +209,7 @@ public class VerticalRampStep implements Action {
 			}
 		break;
 			
-		case left:
+		case Left:
 			agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() <= 0)
 			{
@@ -229,7 +229,7 @@ public class VerticalRampStep implements Action {
 				world.updateCamera();
 			}
 		break;
-		case right:
+		case Right:
 			agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() >= 0)
 			{
@@ -260,13 +260,13 @@ public class VerticalRampStep implements Action {
 	
 	private void swapFootstep(Agent agent)
 	{
-		if (agent.getFootstep() == right)
+		if (agent.getFootstep() == Right)
 		{	
-			agent.setFootstep(left);
+			agent.setFootstep(Left);
 		}
 		else
 		{
-			agent.setFootstep(right);
+			agent.setFootstep(Right);
 		}
 	}
 

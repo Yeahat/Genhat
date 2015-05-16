@@ -5,8 +5,7 @@ import java.util.Stack;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
-import static entities.Agent.direction.*;
-import utils.planners.PathPlannerUtils;
+import static entities.Agent.Direction.*;
 import world.Position;
 import world.World;
 import actions.Action;
@@ -15,9 +14,9 @@ import actions.Idle;
 public abstract class Agent {
 	//Enumerations
 	//Note: use "import static entities.Agent.(enum name).*;" to use these directly in different files
-	public enum direction
+	public enum Direction
 	{
-		left, right, up, down
+		Left, Right, Up, Down
 	}
 	
 	//State information
@@ -34,7 +33,7 @@ public abstract class Agent {
 	Agent waitingInteractee; //the character who initiated an interaction and interrupt request
 	private int texCol = 0; //texture row
 	private int texRow = 0; //texture column
-	private direction dir = down;	//direction the agent is facing
+	private Direction dir = Down;	//direction the agent is facing
 	private int speed = 2;	//speed that the agent is walking at, must be a power of 2 (measured in pixels per second)
 	boolean stepping = false;	//true if the agent is currently taking a step
 	private boolean jumping = false;	//true if the agent is currently jumping
@@ -44,8 +43,8 @@ public abstract class Agent {
 	private boolean onRamp = false;	//true if the agent is currently standing on top of a ramp
 	private boolean transparent = false; //true if the agent should not block light sources
 	private boolean renderOnPlaceholder = false; //true if the agent should render on its placeholder's position while moving (for steps in +y direction)
-	private direction footstep = left; //whether the next step is the left or right foot
-	private direction stance = right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
+	private Direction footstep = Left; //whether the next step is the left or right foot
+	private Direction stance = Right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
 	private Position homePos;
 	
@@ -206,17 +205,17 @@ public abstract class Agent {
 				{
 					switch (getDir())
 					{
-					case down:	texY += 0;	break;
-					case right:	texY += 1;	break;
-					case left:	texY += 2;	break;
-					case up:	texY += 3;	break;
+					case Down:	texY += 0;	break;
+					case Right:	texY += 1;	break;
+					case Left:	texY += 2;	break;
+					case Up:	texY += 3;	break;
 					}
 				}
 				
 				//Set footstep animation for jumping
 				if (this.isJumping())
 				{
-					if (getStance() == right)
+					if (getStance() == Right)
 						texX += 2;
 					else
 						texX += 0;
@@ -226,14 +225,14 @@ public abstract class Agent {
 				{
 					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
 					{
-						if (getFootstep() == right)
+						if (getFootstep() == Right)
 							texX += 2;
 						else
 							texX += 0;
 					}
 					else if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
 					{
-						if (getFootstep() == right)
+						if (getFootstep() == Right)
 							texX += 2;
 						else
 							texX += 0;
@@ -246,11 +245,11 @@ public abstract class Agent {
 				//Set footstep animation for regular stepping
 				else
 				{
-					if (getDir() == left || getDir() == right)
+					if (getDir() == Left || getDir() == Right)
 					{
 						if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
 						{
-							if (getFootstep() == right)
+							if (getFootstep() == Right)
 								texX += 2;
 							else
 								texX += 0;
@@ -264,7 +263,7 @@ public abstract class Agent {
 					{
 						if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
 						{
-							if (getFootstep() == right)
+							if (getFootstep() == Right)
 								texX += 2;
 							else
 								texX += 0;
@@ -377,19 +376,19 @@ public abstract class Agent {
 		return currentAction;
 	}
 
-	public void setDir(direction dir) {
+	public void setDir(Direction dir) {
 		this.dir = dir;
 	}
 
-	public direction getDir() {
+	public Direction getDir() {
 		return dir;
 	}
 
-	public void setFootstep(direction footstep) {
+	public void setFootstep(Direction footstep) {
 		this.footstep = footstep;
 	}
 
-	public direction getFootstep() {
+	public Direction getFootstep() {
 		return footstep;
 	}
 
@@ -433,11 +432,11 @@ public abstract class Agent {
 		return jumping;
 	}
 
-	public void setStance(direction stance) {
+	public void setStance(Direction stance) {
 		this.stance = stance;
 	}
 
-	public direction getStance() {
+	public Direction getStance() {
 		return stance;
 	}
 

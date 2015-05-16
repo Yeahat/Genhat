@@ -1,18 +1,18 @@
 package actions;
 
-import static entities.Agent.direction.down;
-import static entities.Agent.direction.up;
+import static entities.Agent.Direction.Down;
+import static entities.Agent.Direction.Up;
 
 import utils.planners.PathPlannerUtils;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 
 public class Turn implements Action {
-	private final direction dir;
+	private final Direction dir;
 	private boolean finished;
 	
-	public Turn(direction dir)
+	public Turn(Direction dir)
 	{
 		this.dir = dir;
 		this.finished = false;
@@ -23,7 +23,7 @@ public class Turn implements Action {
 		
 		if (agent.getDir() != dir && !PathPlannerUtils.isOnClimbingSurface(world, agent.getPos()))
 		{
-			if (dir == up || dir == down)
+			if (dir == Up || dir == Down)
 			{
 				if (!PathPlannerUtils.isOnRampHorizontal(world, agent.getPos()))
 					agent.setDir(dir);

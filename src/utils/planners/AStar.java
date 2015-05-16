@@ -8,16 +8,16 @@ import utils.planners.PathPlannerUtils.MovementClass;
 import world.Position;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 import static utils.planners.PathPlannerUtils.MovementClass.*;
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class AStar {
 	
 	private Node currentNode;
 	private PriorityQueue<Node> frontier;
 	private ArrayList<Position> explored;
-	private ArrayList<direction> actions;
+	private ArrayList<Direction> actions;
 	private Position goal;
 	private int loopCounter;
 	private Agent agent;
@@ -36,7 +36,7 @@ public class AStar {
 	{
 		this.frontier = new PriorityQueue<Node>();
 		this.explored = new ArrayList<Position>();
-		this.actions = new ArrayList<direction>();
+		this.actions = new ArrayList<Direction>();
 		this.loopCounter = 0;
 		
 		this.movementType = movementType;
@@ -62,10 +62,10 @@ public class AStar {
 		frontier.add(currentNode);
 		explored.clear();
 		actions.clear();
-		actions.add(up);
-		actions.add(down);
-		actions.add(left);
-		actions.add(right);
+		actions.add(Up);
+		actions.add(Down);
+		actions.add(Left);
+		actions.add(Right);
 		loopCounter = 0;
 		
 		solutionFound = false;
@@ -114,7 +114,7 @@ public class AStar {
 				for (int i = 0; i < actions.size(); i ++)
 				{
 					//check for a valid new position
-					direction dir = actions.get(i);
+					Direction dir = actions.get(i);
 					Position newPos = null;
 					boolean moveExplored = false;
 					
@@ -172,10 +172,10 @@ public class AStar {
 							String updatedPath = new String(currentNode.getPath());
 							switch (dir)
 							{
-							case up:	updatedPath += "U";	break;
-							case down:	updatedPath += "D";	break;
-							case left:	updatedPath += "L";	break;
-							case right:	updatedPath += "R";	break;
+							case Up:	updatedPath += "U";	break;
+							case Down:	updatedPath += "D";	break;
+							case Left:	updatedPath += "L";	break;
+							case Right:	updatedPath += "R";	break;
 							}
 							if (movementType == SimpleStepping)
 								frontier.add(new Node(newPos, Distance.distance2D(newPos, goal), updatedPath));

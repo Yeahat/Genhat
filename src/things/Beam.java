@@ -6,14 +6,14 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
-import static things.Thing.connectionContext.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
+import static things.Thing.ConnectionContext.*;
 import static things.Thing.Orientation.*;
 
 public class Beam extends Thing {
 
-	private final connectionContext connection;
+	private final ConnectionContext connection;
 	private final Orientation orientation;
 	
 	private Beam(BeamBuilder builder)
@@ -45,41 +45,41 @@ public class Beam extends Thing {
 		
 		this.transparent = true;
 		
-		if (this.orientation == vertical)
+		if (this.orientation == Vertical)
 		{
 			this.blocking = false;
 		}
 		
 		switch (orientation)
 		{
-		case horizontal:
+		case Horizontal:
 			texCol = 1;
 			switch (dir)
 			{
-			case up: texRow = 0; break;
-			case down: texRow = 1; break;
-			case left: texRow = 2; break;
-			case right: texRow = 3; break;
+			case Up: texRow = 0; break;
+			case Down: texRow = 1; break;
+			case Left: texRow = 2; break;
+			case Right: texRow = 3; break;
 			}
 			break;
-		case vertical:
+		case Vertical:
 			texCol = 1;
 			switch (dir)
 			{
-			case left: texRow = 4; break;
-			case right: texRow = 5; break;
-			case down: texRow = 6; break;
-			case up: texRow = 7; break;
+			case Left: texRow = 4; break;
+			case Right: texRow = 5; break;
+			case Down: texRow = 6; break;
+			case Up: texRow = 7; break;
 			}
 			break;
-		case diagonal:
+		case Diagonal:
 			texCol = 0;
 			switch (dir)
 			{
-			case left: texRow = 0; break;
-			case right: texRow = 1; break;
-			case up: texRow = 2; break;
-			case down: texRow = 3; break;
+			case Left: texRow = 0; break;
+			case Right: texRow = 1; break;
+			case Up: texRow = 2; break;
+			case Down: texRow = 3; break;
 			}
 			break;
 		}
@@ -90,7 +90,7 @@ public class Beam extends Thing {
 	@Override
 	public void loadTextures() {
 		String sheet;
-		if (orientation == diagonal)
+		if (orientation == Diagonal)
 			sheet = "graphics/objects/thing3.png";
 		else
 			sheet = "graphics/objects/thing1.png";
@@ -114,10 +114,10 @@ public class Beam extends Thing {
 			
 			switch (connection)
 			{
-			case start: break;
-			case middle: texX += 1; break;
-			case end: texX += 2; break;
-			case standalone: texX += 3; break;
+			case Start: break;
+			case Middle: texX += 1; break;
+			case End: texX += 2; break;
+			case Standalone: texX += 3; break;
 			}
 			
 			int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2);
@@ -141,13 +141,13 @@ public class Beam extends Thing {
 
 	public static class BeamBuilder
 	{
-		private connectionContext connection = standalone;
-		private Orientation orientation = horizontal;
-		private direction dir = down;
+		private ConnectionContext connection = Standalone;
+		private Orientation orientation = Horizontal;
+		private Direction dir = Down;
 		
 		public BeamBuilder(){}
 		
-		public BeamBuilder connection(connectionContext connection)
+		public BeamBuilder connection(ConnectionContext connection)
 		{
 			this.connection = connection;
 			return this;
@@ -159,7 +159,7 @@ public class Beam extends Thing {
 			return this;
 		}
 		
-		public BeamBuilder dir(direction dir)
+		public BeamBuilder dir(Direction dir)
 		{
 			this.dir = dir;
 			return this;

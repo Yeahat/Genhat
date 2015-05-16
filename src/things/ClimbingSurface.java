@@ -2,20 +2,20 @@ package things;
 
 public abstract class ClimbingSurface extends Thing {
 
-	protected connectionContext horizontalConnection;
-	protected connectionContext verticalConnection;
+	protected ConnectionContext horizontalConnection;
+	protected ConnectionContext verticalConnection;
 	
 	public ClimbingSurface()
 	{
 		climbingSurface = true;
 	}
 	
-	public connectionContext getHorizontalConnection()
+	public ConnectionContext getHorizontalConnection()
 	{
 		return horizontalConnection;
 	}
 	
-	public connectionContext getVerticalConnection()
+	public ConnectionContext getVerticalConnection()
 	{
 		return verticalConnection;
 	}

@@ -9,7 +9,7 @@ import actions.Jump;
 import actions.StepOrClimb;
 import actions.Turn;
 import world.World;
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class Hero extends Agent {	
 	//Actions
@@ -37,9 +37,9 @@ public class Hero extends Agent {
 	public void initState()
 	{
 		super.initState();
-		setDir(down);
+		setDir(Down);
 		setSpeed(2);
-		setFootstep(left);
+		setFootstep(Left);
 		setHeight(2);
 	}
 	

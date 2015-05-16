@@ -4,17 +4,17 @@ package actions;
 import utils.planners.PathPlannerUtils;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
 
 public class Step implements Action {
 
-	private final direction dir;
+	private final Direction dir;
 	boolean finished;
 	SimpleStep simpleStep;
 	Action rampStep;
 	
-	public Step(direction dir)
+	public Step(Direction dir)
 	{
 		this.dir = dir;
 		finished = false;
@@ -27,7 +27,7 @@ public class Step implements Action {
 		if (!continueStepping(agent, world))
 		{
 			//set direction if necessary
-			if (agent.getDir() != dir && (dir == left || dir == right || !PathPlannerUtils.isOnRampHorizontal(world, agent.getPos())))
+			if (agent.getDir() != dir && (dir == Left || dir == Right || !PathPlannerUtils.isOnRampHorizontal(world, agent.getPos())))
 			{
 				agent.setDir(dir);
 			}

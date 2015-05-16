@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
-import loop.GameLoop;
-import loop.Timing;
+//import loop.GameLoop;
+//import loop.Timing;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -25,7 +25,7 @@ import entities.Agent;
 import entities.Hero;
 import entities.Innkeeper;
 import entities.Wanderer;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 import things.Beam;
 import things.Candle;
 import things.Chair;
@@ -44,10 +44,10 @@ import world.Position;
 import world.Terrain;
 import world.World;
 import static world.Terrain.terrainType.*;
-import static entities.Agent.direction.*;
-import static world.World.timeOfDay.*;
+import static entities.Agent.Direction.*;
+import static world.World.TimeOfDay.*;
 import static things.Chair.chairType.*;
-import static things.Thing.connectionContext.*;
+import static things.Thing.ConnectionContext.*;
 import static things.Thing.Orientation.*;
 import static things.Stairs.stairsType.*;
 
@@ -60,7 +60,7 @@ public class GameMain {
 	
 	boolean devOn = false;
 	TrueTypeFont font;
-	long lastFPS = Timing.getTime();
+	//long lastFPS = Timing.getTime();
 	int fps = 0;
 	int currentFPS = 0;
 	
@@ -96,12 +96,12 @@ public class GameMain {
 			Display.update();
 			Display.sync(32);
 
-			if (Timing.getTime() - lastFPS > 1000) {
+			/*if (Timing.getTime() - lastFPS > 1000) {
 				currentFPS = fps;
 		        fps = 0; //reset the FPS counter
 		        lastFPS += 1000; //add one second
 		    }
-		    fps++;
+		    fps++;*/
 		}
 		
 		//Exit
@@ -140,17 +140,17 @@ public class GameMain {
 						Hero player = world.getPlayer();
 						if (player != null)
 						{
-							direction d = player.getDir();
+							Direction d = player.getDir();
 							Position pos = player.getPos();
 							int x = pos.x;
 							int y = pos.y;
 							int z = pos.z;
 							switch (d)
 							{
-							case up: y++; break;
-							case down: y--; break;
-							case left: x--; break;
-							case right: x++; break;
+							case Up: y++; break;
+							case Down: y--; break;
+							case Left: x--; break;
+							case Right: x++; break;
 							}
 							if (world.getAgentAt(x, y, z) != null)
 								world.getAgentAt(x, y, z).interact(player, world);
@@ -217,12 +217,12 @@ public class GameMain {
 					{
 						if (arrowKeyInputCount < 3)
 						{
-							player.setTurnAction(new Turn(down));
+							player.setTurnAction(new Turn(Down));
 							player.setCurrentAction(player.getTurnAction());
 						}
 						else
 						{
-							player.setStepOrClimbAction(new StepOrClimb(down));
+							player.setStepOrClimbAction(new StepOrClimb(Down));
 							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
@@ -238,12 +238,12 @@ public class GameMain {
 					{
 						if (arrowKeyInputCount < 3)
 						{
-							player.setTurnAction(new Turn(up));
+							player.setTurnAction(new Turn(Up));
 							player.setCurrentAction(player.getTurnAction());
 						}
 						else
 						{
-							player.setStepOrClimbAction(new StepOrClimb(up));
+							player.setStepOrClimbAction(new StepOrClimb(Up));
 							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
@@ -259,12 +259,12 @@ public class GameMain {
 					{
 						if (arrowKeyInputCount < 3)
 						{
-							player.setTurnAction(new Turn(right));
+							player.setTurnAction(new Turn(Right));
 							player.setCurrentAction(player.getTurnAction());
 						}
 						else
 						{
-							player.setStepOrClimbAction(new StepOrClimb(right));
+							player.setStepOrClimbAction(new StepOrClimb(Right));
 							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
@@ -280,12 +280,12 @@ public class GameMain {
 					{
 						if (arrowKeyInputCount < 3)
 						{
-							player.setTurnAction(new Turn(left));
+							player.setTurnAction(new Turn(Left));
 							player.setCurrentAction(player.getTurnAction());
 						}
 						else
 						{
-							player.setStepOrClimbAction(new StepOrClimb(left));
+							player.setStepOrClimbAction(new StepOrClimb(Left));
 							player.setCurrentAction(player.getStepOrClimbAction());
 						}
 					}
@@ -562,7 +562,7 @@ public class GameMain {
 		world = new World(xs, ys, zs);
 		world.setTerrain(t);
 		
-		world.setTod(sunrise);
+		world.setTod(Sunrise);
 		
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
@@ -708,35 +708,35 @@ public class GameMain {
 		t[42][37][5] = new Terrain(window, air);
 		
 		//exterior wood beams
-		Beam dbeam1 = new Beam.BeamBuilder().orientation(diagonal).connection(start).dir(right).build();
-		Beam dbeam2 = new Beam.BeamBuilder().orientation(diagonal).connection(middle).dir(right).build();
-		Beam dbeam3 = new Beam.BeamBuilder().orientation(diagonal).connection(end).dir(right).build();
+		Beam dbeam1 = new Beam.BeamBuilder().orientation(Diagonal).connection(Start).dir(Right).build();
+		Beam dbeam2 = new Beam.BeamBuilder().orientation(Diagonal).connection(Middle).dir(Right).build();
+		Beam dbeam3 = new Beam.BeamBuilder().orientation(Diagonal).connection(End).dir(Right).build();
 		world.addThing(dbeam1, 28, 30, 4);
 		world.addThing(dbeam2, 29, 30, 5);
 		world.addThing(dbeam3, 30, 30, 6);
-		Beam dbeam4 = new Beam.BeamBuilder().orientation(diagonal).connection(start).dir(left).build();
-		Beam dbeam5 = new Beam.BeamBuilder().orientation(diagonal).connection(middle).dir(left).build();
-		Beam dbeam6 = new Beam.BeamBuilder().orientation(diagonal).connection(end).dir(left).build();
+		Beam dbeam4 = new Beam.BeamBuilder().orientation(Diagonal).connection(Start).dir(Left).build();
+		Beam dbeam5 = new Beam.BeamBuilder().orientation(Diagonal).connection(Middle).dir(Left).build();
+		Beam dbeam6 = new Beam.BeamBuilder().orientation(Diagonal).connection(End).dir(Left).build();
 		world.addThing(dbeam4, 39, 30, 6);
 		world.addThing(dbeam5, 40, 30, 5);
 		world.addThing(dbeam6, 41, 30, 4);
-		Beam dbeam7 = new Beam.BeamBuilder().orientation(diagonal).connection(standalone).dir(right).build();
-		Beam dbeam8 = new Beam.BeamBuilder().orientation(diagonal).connection(standalone).dir(left).build();
+		Beam dbeam7 = new Beam.BeamBuilder().orientation(Diagonal).connection(Standalone).dir(Right).build();
+		Beam dbeam8 = new Beam.BeamBuilder().orientation(Diagonal).connection(Standalone).dir(Left).build();
 		world.addThing(dbeam7, 45, 30, 4);
 		world.addThing(dbeam8, 24, 30, 4);
-		Beam vbeam1 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
-		Beam vbeam2 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
-		Beam vbeam3 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
-		Beam vbeam4 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
-		Beam vbeam5 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
-		Beam vbeam6 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
-		Beam vbeam7 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
-		Beam vbeam8 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
-		Beam vbeam9 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
-		Beam vbeam10 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(right).build();
-		Beam vbeam11 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(right).build();
-		Beam vbeam12 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(right).build();
-		Beam vbeam14 = new Beam.BeamBuilder().orientation(vertical).connection(standalone).dir(right).build();
+		Beam vbeam1 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Right).build();
+		Beam vbeam2 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Right).build();
+		Beam vbeam3 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Right).build();
+		Beam vbeam4 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Right).build();
+		Beam vbeam5 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Right).build();
+		Beam vbeam6 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Right).build();
+		Beam vbeam7 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Right).build();
+		Beam vbeam8 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Right).build();
+		Beam vbeam9 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Right).build();
+		Beam vbeam10 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Right).build();
+		Beam vbeam11 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Right).build();
+		Beam vbeam12 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Right).build();
+		Beam vbeam14 = new Beam.BeamBuilder().orientation(Vertical).connection(Standalone).dir(Right).build();
 		world.addThing(vbeam1, 26, 30, 4);
 		world.addThing(vbeam2, 26, 30, 5);
 		world.addThing(vbeam3, 26, 30, 6);
@@ -750,19 +750,19 @@ public class GameMain {
 		world.addThing(vbeam11, 41, 30, 5);
 		world.addThing(vbeam12, 41, 30, 6);
 		world.addThing(vbeam14, 45, 30, 4);
-		Beam vbeam15 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
-		Beam vbeam16 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
-		Beam vbeam17 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
-		Beam vbeam18 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
-		Beam vbeam19 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
-		Beam vbeam20 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
-		Beam vbeam21 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
-		Beam vbeam22 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
-		Beam vbeam23 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
-		Beam vbeam24 = new Beam.BeamBuilder().orientation(vertical).connection(start).dir(left).build();
-		Beam vbeam25 = new Beam.BeamBuilder().orientation(vertical).connection(middle).dir(left).build();
-		Beam vbeam26 = new Beam.BeamBuilder().orientation(vertical).connection(end).dir(left).build();
-		Beam vbeam27 = new Beam.BeamBuilder().orientation(vertical).connection(standalone).dir(left).build();
+		Beam vbeam15 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Left).build();
+		Beam vbeam16 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Left).build();
+		Beam vbeam17 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Left).build();
+		Beam vbeam18 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Left).build();
+		Beam vbeam19 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Left).build();
+		Beam vbeam20 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Left).build();
+		Beam vbeam21 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Left).build();
+		Beam vbeam22 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Left).build();
+		Beam vbeam23 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Left).build();
+		Beam vbeam24 = new Beam.BeamBuilder().orientation(Vertical).connection(Start).dir(Left).build();
+		Beam vbeam25 = new Beam.BeamBuilder().orientation(Vertical).connection(Middle).dir(Left).build();
+		Beam vbeam26 = new Beam.BeamBuilder().orientation(Vertical).connection(End).dir(Left).build();
+		Beam vbeam27 = new Beam.BeamBuilder().orientation(Vertical).connection(Standalone).dir(Left).build();
 		world.addThing(vbeam27, 24, 30, 4);
 		world.addThing(vbeam15, 28, 30, 4);
 		world.addThing(vbeam16, 28, 30, 5);
@@ -776,40 +776,40 @@ public class GameMain {
 		world.addThing(vbeam24, 43, 30, 4);
 		world.addThing(vbeam25, 43, 30, 5);
 		world.addThing(vbeam26, 43, 30, 6);
-		Beam hbeam1 = new Beam.BeamBuilder().orientation(horizontal).connection(start).dir(right).build();
-		Beam hbeam2 = new Beam.BeamBuilder().orientation(horizontal).connection(start).dir(left).build();
+		Beam hbeam1 = new Beam.BeamBuilder().orientation(Horizontal).connection(Start).dir(Right).build();
+		Beam hbeam2 = new Beam.BeamBuilder().orientation(Horizontal).connection(Start).dir(Left).build();
 		world.addThing(hbeam1, 24, 30, 3);
 		world.addThing(hbeam2, 24, 30, 4);
-		Beam hbeam3 = new Beam.BeamBuilder().orientation(horizontal).connection(end).dir(right).build();
-		Beam hbeam4 = new Beam.BeamBuilder().orientation(horizontal).connection(end).dir(left).build();
+		Beam hbeam3 = new Beam.BeamBuilder().orientation(Horizontal).connection(End).dir(Right).build();
+		Beam hbeam4 = new Beam.BeamBuilder().orientation(Horizontal).connection(End).dir(Left).build();
 		world.addThing(hbeam3, 45, 30, 3);
 		world.addThing(hbeam4, 45, 30, 4);
 		for (int i = 25; i <= 44; i ++)
 		{
-			Beam botBeam = new Beam.BeamBuilder().orientation(horizontal).connection(middle).dir(right).build();
-			Beam topBeam = new Beam.BeamBuilder().orientation(horizontal).connection(middle).dir(left).build();
+			Beam botBeam = new Beam.BeamBuilder().orientation(Horizontal).connection(Middle).dir(Right).build();
+			Beam topBeam = new Beam.BeamBuilder().orientation(Horizontal).connection(Middle).dir(Left).build();
 			world.addThing(botBeam, i, 30, 3);
 			world.addThing(topBeam, i, 30, 4);
 		}
 		
 		
 		//house objects
-		Bar b1 = new Bar.BarBuilder().connection(start).build();
+		Bar b1 = new Bar.BarBuilder().connection(Start).build();
 		world.addThing(b1, 27, 35, 1);
 		for (int i = 0; i < 3; i ++)
 		{
-			Bar bar = new Bar.BarBuilder().connection(middle).build();
+			Bar bar = new Bar.BarBuilder().connection(Middle).build();
 			world.addThing(bar, 28+i, 35, 1);
 		}
-		Bar b2 = new Bar.BarBuilder().connection(end).build();
+		Bar b2 = new Bar.BarBuilder().connection(End).build();
 		world.addThing(b2, 31, 35, 1);
-		Bar b3 = new Bar.BarBuilder().connection(start).build();
+		Bar b3 = new Bar.BarBuilder().connection(Start).build();
 		world.addThing(b3, 33, 35, 1);
-		Bar b4 = new Bar.BarBuilder().connection(end).build();
+		Bar b4 = new Bar.BarBuilder().connection(End).build();
 		world.addThing(b4, 34, 35, 1);
-		Bar b5 = new Bar.BarBuilder().dir(up).connection(end).build();
+		Bar b5 = new Bar.BarBuilder().dir(Up).connection(End).build();
 		world.addThing(b5, 27, 36, 1);
-		Bar b6 = new Bar.BarBuilder().dir(up).connection(end).build();
+		Bar b6 = new Bar.BarBuilder().dir(Up).connection(End).build();
 		world.addThing(b6, 34, 36, 1);
 		
 		Chair stool1 = new Chair.ChairBuilder(stoolWooden).build();
@@ -823,12 +823,12 @@ public class GameMain {
 		Table t2 = new Table();
 		world.addThing(t1, 38, 33, 1);
 		world.addThing(t2, 42, 33, 1);
-		Chair c1 = new Chair.ChairBuilder(chairWooden).dir(left).build();
-		Chair c2 = new Chair.ChairBuilder(chairWooden).dir(right).build();
-		Chair c3 = new Chair.ChairBuilder(chairWooden).dir(left).build();
-		Chair c4 = new Chair.ChairBuilder(chairWooden).dir(right).build();
-		Chair c5 = new Chair.ChairBuilder(chairWooden).dir(up).build();
-		Chair c6 = new Chair.ChairBuilder(chairWooden).dir(down).build();
+		Chair c1 = new Chair.ChairBuilder(chairWooden).dir(Left).build();
+		Chair c2 = new Chair.ChairBuilder(chairWooden).dir(Right).build();
+		Chair c3 = new Chair.ChairBuilder(chairWooden).dir(Left).build();
+		Chair c4 = new Chair.ChairBuilder(chairWooden).dir(Right).build();
+		Chair c5 = new Chair.ChairBuilder(chairWooden).dir(Up).build();
+		Chair c6 = new Chair.ChairBuilder(chairWooden).dir(Down).build();
 		world.addThing(c1, 39, 33, 1);
 		world.addThing(c2, 37, 33, 1);
 		world.addThing(c3, 43, 33, 1);
@@ -836,9 +836,9 @@ public class GameMain {
 		world.addThing(c5, 42, 32, 1);
 		world.addThing(c6, 42, 34, 1);
 		
-		Stairs s1 = new Stairs.StairsBuilder(indoorWooden).dir(right).horizontalConnection(start).build();
-		Stairs s2 = new Stairs.StairsBuilder(indoorWooden).dir(right).horizontalConnection(middle).build();
-		Stairs s3 = new Stairs.StairsBuilder(indoorWooden).dir(right).horizontalConnection(end).build();
+		Stairs s1 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(Start).build();
+		Stairs s2 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(Middle).build();
+		Stairs s3 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(End).build();
 		world.addThing(s1, 40, 36, 1);
 		world.addThing(s2, 41, 36, 2);
 		world.addThing(s3, 42, 36, 3);
@@ -862,13 +862,13 @@ public class GameMain {
 		world.addThing(candle6, 34, 35, 1);
 		
 		Fireplace fp = new Fireplace(true, 3);
-		FireplaceSide fpside1 = new FireplaceSide(left);
-		FireplaceSide fpside2 = new FireplaceSide(right);
-		FireplaceChimney chimney1 = new FireplaceChimney(down);
-		FireplaceChimney chimney2 = new FireplaceChimney(down);
-		FireplaceChimney chimney3 = new FireplaceChimney(down);
-		FireplaceChimney chimney4 = new FireplaceChimney(down);
-		FireplaceChimney chimneytop = new FireplaceChimney(up);
+		FireplaceSide fpside1 = new FireplaceSide(Left);
+		FireplaceSide fpside2 = new FireplaceSide(Right);
+		FireplaceChimney chimney1 = new FireplaceChimney(Down);
+		FireplaceChimney chimney2 = new FireplaceChimney(Down);
+		FireplaceChimney chimney3 = new FireplaceChimney(Down);
+		FireplaceChimney chimney4 = new FireplaceChimney(Down);
+		FireplaceChimney chimneytop = new FireplaceChimney(Up);
 		world.addThing(fp, 37, 36, 1);
 		world.addThing(fpside1, 36, 36, 1);
 		world.addThing(fpside2, 38, 36, 1);
@@ -927,21 +927,21 @@ public class GameMain {
 			
 			if (k == 1)
 			{
-				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(start).verticalConnection(start).build();
-				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(end).verticalConnection(start).build();
-				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(standalone).verticalConnection(start).build();
+				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(Start).verticalConnection(Start).build();
+				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(End).verticalConnection(Start).build();
+				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(Standalone).verticalConnection(Start).build();
 			}
 			else if (k == 3)
 			{
-				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(start).verticalConnection(end).build();
-				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(end).verticalConnection(end).build();
-				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(standalone).verticalConnection(end).build();
+				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(Start).verticalConnection(End).build();
+				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(End).verticalConnection(End).build();
+				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(Standalone).verticalConnection(End).build();
 			}
 			else
 			{
-				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(start).verticalConnection(middle).build();
-				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(end).verticalConnection(middle).build();
-				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(up).horizontalConnection(standalone).verticalConnection(middle).build();
+				tempVStairs1 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(Start).verticalConnection(Middle).build();
+				tempVStairs2 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(End).verticalConnection(Middle).build();
+				tempVStairs3 = new Stairs.StairsBuilder(indoorWooden).dir(Up).horizontalConnection(Standalone).verticalConnection(Middle).build();
 			}
 				
 			world.addThing(tempVStairs1, 5, 18, k);
@@ -958,21 +958,21 @@ public class GameMain {
 			
 			if (k == 1)
 			{
-				tempVStairs1 = new Rope.RopeBuilder().dir(up).horizontalConnection(start).verticalConnection(start).build();
-				tempVStairs2 = new Rope.RopeBuilder().dir(up).horizontalConnection(end).verticalConnection(start).build();
-				tempVStairs3 = new Rope.RopeBuilder().dir(up).horizontalConnection(standalone).verticalConnection(start).build();
+				tempVStairs1 = new Rope.RopeBuilder().dir(Up).horizontalConnection(Start).verticalConnection(Start).build();
+				tempVStairs2 = new Rope.RopeBuilder().dir(Up).horizontalConnection(End).verticalConnection(Start).build();
+				tempVStairs3 = new Rope.RopeBuilder().dir(Up).horizontalConnection(Standalone).verticalConnection(Start).build();
 			}
 			else if (k == 3)
 			{
-				tempVStairs1 = new Rope.RopeBuilder().dir(up).horizontalConnection(start).verticalConnection(end).build();
-				tempVStairs2 = new Rope.RopeBuilder().dir(up).horizontalConnection(end).verticalConnection(end).build();
-				tempVStairs3 = new Rope.RopeBuilder().dir(up).horizontalConnection(standalone).verticalConnection(end).build();
+				tempVStairs1 = new Rope.RopeBuilder().dir(Up).horizontalConnection(Start).verticalConnection(End).build();
+				tempVStairs2 = new Rope.RopeBuilder().dir(Up).horizontalConnection(End).verticalConnection(End).build();
+				tempVStairs3 = new Rope.RopeBuilder().dir(Up).horizontalConnection(Standalone).verticalConnection(End).build();
 			}
 			else
 			{
-				tempVStairs1 = new Rope.RopeBuilder().dir(up).horizontalConnection(start).verticalConnection(middle).build();
-				tempVStairs2 = new Rope.RopeBuilder().dir(up).horizontalConnection(end).verticalConnection(middle).build();
-				tempVStairs3 = new Rope.RopeBuilder().dir(up).horizontalConnection(standalone).verticalConnection(middle).build();
+				tempVStairs1 = new Rope.RopeBuilder().dir(Up).horizontalConnection(Start).verticalConnection(Middle).build();
+				tempVStairs2 = new Rope.RopeBuilder().dir(Up).horizontalConnection(End).verticalConnection(Middle).build();
+				tempVStairs3 = new Rope.RopeBuilder().dir(Up).horizontalConnection(Standalone).verticalConnection(Middle).build();
 			}
 				
 			world.addThing(tempVStairs1, 15, 13, k);
@@ -980,9 +980,9 @@ public class GameMain {
 			world.addThing(tempVStairs3, 17, 13, k);
 		}
 		
-		Ladder ladder1 = new Ladder(start);
-		Ladder ladder2 = new Ladder(middle);
-		Ladder ladder3 = new Ladder(end);
+		Ladder ladder1 = new Ladder(Start);
+		Ladder ladder2 = new Ladder(Middle);
+		Ladder ladder3 = new Ladder(End);
 		
 		world.addThing(ladder1, 14, 13, 1);
 		world.addThing(ladder2, 14, 13, 2);
@@ -1001,7 +1001,7 @@ public class GameMain {
 		innkeeper.setPos(new Position(31, 36, 1));
 		agents.add(innkeeper);
 		
-		world.setTod(sunrise);
+		world.setTod(Sunrise);
 		
 		world.addAgents(agents);
 		world.setPlayer(hero);

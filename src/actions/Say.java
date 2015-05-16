@@ -5,7 +5,7 @@ import world.Position;
 import world.World;
 import entities.Agent;
 
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class Say implements Action 
 {
@@ -61,16 +61,16 @@ public class Say implements Action
 				if (Math.abs(xDiff) > Math.abs(yDiff))
 				{
 					if (xDiff < 0)
-						turn = new Turn(right);
+						turn = new Turn(Right);
 					else
-						turn = new Turn(left);
+						turn = new Turn(Left);
 				}
 				else
 				{
 					if (yDiff < 0)
-						turn = new Turn(up);
+						turn = new Turn(Up);
 					else
-						turn = new Turn(down);
+						turn = new Turn(Down);
 				}
 				
 				

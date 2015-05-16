@@ -6,9 +6,9 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import entities.Agent.direction;
+import entities.Agent.Direction;
 
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class StairsBottom extends Thing {
 
@@ -18,13 +18,13 @@ public class StairsBottom extends Thing {
 		
 		texRow = 7;
 		texCol = 0;
-		setDir(left);
+		setDir(Left);
 		blocking = false;
 		crossable = true;
 		ramp = false;
 	}
 	
-	public StairsBottom(direction d)
+	public StairsBottom(Direction d)
 	{
 		loadTextures();
 		
@@ -58,7 +58,7 @@ public class StairsBottom extends Thing {
 		int texX = texCol * 4;
 		int texY = texRow;
 		
-		if (getDir() == left)
+		if (getDir() == Left)
 			texX += 1;
 		
 		int xMin = pixelSize * ((terrainTextureSize - TEXTURE_SIZE_X) / 2);

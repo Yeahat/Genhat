@@ -4,18 +4,18 @@ import utils.planners.PathPlannerUtils;
 import world.Position;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
+import entities.Agent.Direction;
 import entities.Hero;
 import entities.Placeholder;
-import static entities.Agent.direction.*;
+import static entities.Agent.Direction.*;
 
 public class SimpleStep implements Action {
 
-	private final direction dir;
+	private final Direction dir;
 	private boolean initialized;
 	private boolean finished;
 	
-	public SimpleStep(direction dir)
+	public SimpleStep(Direction dir)
 	{
 		this.dir = dir;
 		initialized = false;
@@ -33,9 +33,9 @@ public class SimpleStep implements Action {
 			Placeholder h1;
 			switch (dir)
 			{
-			case up:
-				agent.setDir(up);
-				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), up))
+			case Up:
+				agent.setDir(Up);
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), Up))
 				{
 					world.moveAgent(agent, 0, 1, 0);
 					agent.setOffsetY(-16);
@@ -51,9 +51,9 @@ public class SimpleStep implements Action {
 					return;
 				}
 			break;
-			case down:
-				agent.setDir(down);
-				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), down))
+			case Down:
+				agent.setDir(Down);
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), Down))
 				{
 					world.moveAgent(agent, 0, -1, 0);
 					agent.setOffsetY(16);
@@ -66,9 +66,9 @@ public class SimpleStep implements Action {
 					return;
 				}
 			break;
-			case left:
-				agent.setDir(left);
-				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), left))
+			case Left:
+				agent.setDir(Left);
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), Left))
 				{
 					world.moveAgent(agent, -1, 0, 0);
 					agent.setOffsetX(16);
@@ -81,9 +81,9 @@ public class SimpleStep implements Action {
 					return;
 				}
 			break;
-			case right:
-				agent.setDir(right);
-				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), right))
+			case Right:
+				agent.setDir(Right);
+				if(PathPlannerUtils.canStep(agent, world, agent.getPos(), Right))
 				{
 					world.moveAgent(agent, 1, 0, 0);
 					agent.setOffsetX(-16);
@@ -107,7 +107,7 @@ public class SimpleStep implements Action {
 		
 		switch (dir)
 		{
-		case up:
+		case Up:
 			agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() >= 0)
 			{
@@ -128,7 +128,7 @@ public class SimpleStep implements Action {
 				world.updateCamera();
 			}
 		break;
-		case down:
+		case Down:
 			agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetY() <= 0)
 			{
@@ -148,7 +148,7 @@ public class SimpleStep implements Action {
 				world.updateCamera();
 			}
 		break;
-		case left:
+		case Left:
 			agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() <= 0)
 			{
@@ -168,7 +168,7 @@ public class SimpleStep implements Action {
 				world.updateCamera();
 			}
 		break;
-		case right:
+		case Right:
 			agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
 			if (agent.getOffsetX() >= 0)
 			{
@@ -201,13 +201,13 @@ public class SimpleStep implements Action {
 		
 	private void swapFootstep(Agent agent)
 	{
-		if (agent.getFootstep() == right)
+		if (agent.getFootstep() == Right)
 		{	
-			agent.setFootstep(left);
+			agent.setFootstep(Left);
 		}
 		else
 		{
-			agent.setFootstep(right);
+			agent.setFootstep(Right);
 		}
 	}
 

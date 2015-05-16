@@ -1,8 +1,8 @@
 package entities;
 
-import static entities.Agent.direction.down;
-import static entities.Agent.direction.left;
-import static entities.Agent.direction.right;
+import static entities.Agent.Direction.Down;
+import static entities.Agent.Direction.Left;
+import static entities.Agent.Direction.Right;
 
 import java.io.IOException;
 
@@ -47,10 +47,10 @@ public class Wanderer extends Agent {
 	public void initState()
 	{
 		super.initState();
-		setDir(down);
+		setDir(Down);
 		setSpeed(2);
 		setStepping(false);
-		setFootstep(left);
+		setFootstep(Left);
 		setHeight(2);
 	}
 	
@@ -83,16 +83,16 @@ public class Wanderer extends Agent {
 			int texX = 0, texY = 0;
 			switch (getDir())
 			{
-			case down:
+			case Down:
 				texY = 0;
 				break;
-			case right:
+			case Right:
 				texY = 1;
 				break;
-			case left:
+			case Left:
 				texY = 2;
 				break;
-			case up:
+			case Up:
 				texY = 3;				
 				break;
 			}
@@ -100,7 +100,7 @@ public class Wanderer extends Agent {
 			if ((Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7) 
 				|| (Math.abs(offset[1]) <= 16) && Math.abs(offset[1]) > 7)
 			{
-				if (getFootstep() == right)
+				if (getFootstep() == Right)
 					texX = 2;
 				else
 					texX = 0;

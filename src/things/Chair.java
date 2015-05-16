@@ -9,8 +9,8 @@ import org.newdawn.slick.util.ResourceLoader;
 import world.World;
 
 import entities.Agent;
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
 import static things.Chair.chairType.*;
 
 public class Chair extends Thing {
@@ -87,26 +87,26 @@ public class Chair extends Thing {
 			int texY = texRow;
 			switch (getDir())
 			{
-			case up:
+			case Up:
 				if (pushedIn)
 					texX += 1;
 				else
 					texX += 0;
 				break;
-			case down:
+			case Down:
 				if (pushedIn)
 					texX += 3;
 				else
 					texX += 2;
 				break;
-			case right:
+			case Right:
 				texY += 1;
 				if (pushedIn)
 					texX += 1;
 				else
 					texX += 0;
 				break;
-			case left:
+			case Left:
 				texY += 1;
 				if (pushedIn)
 					texX += 3;
@@ -137,7 +137,7 @@ public class Chair extends Thing {
 	public static class ChairBuilder
 	{
 		private final chairType type;
-		private direction dir = up;
+		private Direction dir = Up;
 		private boolean pushedIn = true;
 		
 		public ChairBuilder(chairType type)
@@ -145,7 +145,7 @@ public class Chair extends Thing {
 			this.type = type;
 		}
 		
-		public ChairBuilder dir(direction dir)
+		public ChairBuilder dir(Direction dir)
 		{
 			this.dir = dir;
 			return this;

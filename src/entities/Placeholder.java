@@ -1,7 +1,7 @@
 package entities;
 
-import static entities.Agent.direction.left;
-import static entities.Agent.direction.right;
+import static entities.Agent.Direction.Left;
+import static entities.Agent.Direction.Right;
 
 import org.lwjgl.opengl.GL11;
 
@@ -73,17 +73,17 @@ public class Placeholder extends Agent {
 				{
 					switch (agent.getDir())
 					{
-					case down:	texY += 0;	break;
-					case right:	texY += 1;	break;
-					case left:	texY += 2;	break;
-					case up:	texY += 3;	break;
+					case Down:	texY += 0;	break;
+					case Right:	texY += 1;	break;
+					case Left:	texY += 2;	break;
+					case Up:	texY += 3;	break;
 					}
 				}
 				
 				//Set footstep animation for jumping
 				if (agent.isJumping())
 				{
-					if (agent.getStance() == right)
+					if (agent.getStance() == Right)
 						texX += 2;
 					else
 						texX += 0;
@@ -93,14 +93,14 @@ public class Placeholder extends Agent {
 				{
 					if (Math.abs(offset[0]) <= 16 && Math.abs(offset[0]) > 7)
 					{
-						if (getFootstep() == right)
+						if (getFootstep() == Right)
 							texX += 2;
 						else
 							texX += 0;
 					}
 					else if (Math.abs(offset[1]) <= 16 && Math.abs(offset[1]) > 7)
 					{
-						if (getFootstep() == right)
+						if (getFootstep() == Right)
 							texX += 2;
 						else
 							texX += 0;
@@ -113,11 +113,11 @@ public class Placeholder extends Agent {
 				//Set footstep animation for regular stepping
 				else
 				{
-					if (agent.getDir() == left || agent.getDir() == right)
+					if (agent.getDir() == Left || agent.getDir() == Right)
 					{
 						if (Math.abs(agent.offset[0]) <= 16 && Math.abs(agent.offset[0]) > 7)
 						{
-							if (agent.getFootstep() == right)
+							if (agent.getFootstep() == Right)
 								texX += 2;
 							else
 								texX += 0;
@@ -131,7 +131,7 @@ public class Placeholder extends Agent {
 					{
 						if (Math.abs(agent.offset[1]) <= 16 && Math.abs(agent.offset[1]) > 7)
 						{
-							if (agent.getFootstep() == right)
+							if (agent.getFootstep() == Right)
 								texX += 2;
 							else
 								texX += 0;

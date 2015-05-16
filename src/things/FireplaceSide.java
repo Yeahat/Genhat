@@ -6,8 +6,8 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
 
 public class FireplaceSide extends Thing {
 
@@ -18,10 +18,10 @@ public class FireplaceSide extends Thing {
 		texRow = 4;
 		texCol = 1;
 		blocking = true;
-		setDir(left);
+		setDir(Left);
 	}
 	
-	public FireplaceSide(direction d)
+	public FireplaceSide(Direction d)
 	{
 		loadTextures();
 		
@@ -52,16 +52,16 @@ public class FireplaceSide extends Thing {
 			int texY = texRow;
 			switch (getDir())
 			{
-			case left:
+			case Left:
 				texX += 0;
 				break;
-			case down:
+			case Down:
 				texX += 1;
 				break;
-			case right:
+			case Right:
 				texX += 2;
 				break;
-			case up:
+			case Up:
 				texX += 3;				
 				break;
 			}

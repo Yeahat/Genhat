@@ -4,9 +4,9 @@ import world.Position;
 import world.Terrain.terrainType;
 import world.World;
 import entities.Agent;
-import entities.Agent.direction;
-import static entities.Agent.direction.*;
-import static things.Thing.connectionContext.*;
+import entities.Agent.Direction;
+import static entities.Agent.Direction.*;
+import static things.Thing.ConnectionContext.*;
 
 public class PathPlannerUtils {	
 	
@@ -33,23 +33,23 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return true if the agent can step in the given direction, false otherwise
 	 */
-	public static boolean canStep(Agent agent, World world, Position pos, direction dir)
+	public static boolean canStep(Agent agent, World world, Position pos, Direction dir)
 	{
 		int x = pos.x;
 		int y = pos.y;
 		
 		switch (dir)
 		{
-		case up:
+		case Up:
 			y += 1;
 		break;
-		case down:
+		case Down:
 			y -= 1;
 		break;
-		case left:
+		case Left:
 			x -= 1;
 		break;
-		case right:
+		case Right:
 			x += 1;
 		break;
 		}
@@ -76,7 +76,7 @@ public class PathPlannerUtils {
 		return true;
 	}
 
-	public static boolean isContinuingDescent(Agent agent, World world, Position pos, direction dir)
+	public static boolean isContinuingDescent(Agent agent, World world, Position pos, Direction dir)
 	{
 		Position posBelow = new Position(pos);
 		posBelow.z --;
@@ -84,10 +84,10 @@ public class PathPlannerUtils {
 		Position forwardPos = new Position(pos);
 		switch (dir)
 		{
-		case up:	forwardPos.y += 1;	break;
-		case down:	forwardPos.y -= 1;	break;
-		case left:	forwardPos.x -= 1;	break;
-		case right:	forwardPos.x += 1;	break;
+		case Up:	forwardPos.y += 1;	break;
+		case Down:	forwardPos.y -= 1;	break;
+		case Left:	forwardPos.x -= 1;	break;
+		case Right:	forwardPos.x += 1;	break;
 		}
 		forwardPos.z -= 2;
 		
@@ -109,7 +109,7 @@ public class PathPlannerUtils {
 	 * @param continuingDescent true for the special case of descending from a ramp onto another ramp, the z needs extra adjustment
 	 * @return true if the agent can step in the given direction, false otherwise
 	 */
-	public static boolean canStepHorizontalRamp(Agent agent, World world, Position pos, direction dir, boolean ascending, boolean continuingDescent)
+	public static boolean canStepHorizontalRamp(Agent agent, World world, Position pos, Direction dir, boolean ascending, boolean continuingDescent)
 	{
 		int x = pos.x;
 		int y = pos.y;
@@ -117,8 +117,8 @@ public class PathPlannerUtils {
 		
 		switch (dir)
 		{
-		case left:	x -= 1;	break;
-		case right:	x += 1;	break;
+		case Left:	x -= 1;	break;
+		case Right:	x += 1;	break;
 		default: return false;
 		}
 		
@@ -144,7 +144,7 @@ public class PathPlannerUtils {
 			
 			//collision check
 			//NOTE: added k==z as test to prevent stacked ramps from allowing passage
-			if (k == z && world.hasThing(x, y, k) && (world.getThingsAt(x, y, k).hasRamp() && (world.getThingsAt(x, y, k).getRampDir() == left || world.getThingsAt(x, y, k).getRampDir() == right)))
+			if (k == z && world.hasThing(x, y, k) && (world.getThingsAt(x, y, k).hasRamp() && (world.getThingsAt(x, y, k).getRampDir() == Left || world.getThingsAt(x, y, k).getRampDir() == Right)))
 			{
 				if (world.getAgentAt(x, y, k) != null)
 				{
@@ -166,10 +166,10 @@ public class PathPlannerUtils {
 		return true;
 	}
 	
-	public static boolean canStepVerticalRamp(Agent agent, World world, Position pos, direction dir)
+	public static boolean canStepVerticalRamp(Agent agent, World world, Position pos, Direction dir)
 	{
 		//ascending
-		if (dir == up)
+		if (dir == Up)
 		{
 			int z = pos.z;
 			int maxZ = pos.z + agent.getHeight();
@@ -177,7 +177,7 @@ public class PathPlannerUtils {
 			checkPos.y ++;
 
 			//climbing up case
-			if (hasRampWithDir(world, checkPos, up))
+			if (hasRampWithDir(world, checkPos, Up))
 			{
 				for (int k = z + 1; k < maxZ; k ++)
 				{
@@ -190,12 +190,12 @@ public class PathPlannerUtils {
 			//stepping off case
 			else
 			{
-				return canStep(agent, world, pos, up);
+				return canStep(agent, world, pos, Up);
 			}
 		}
 		
 		//descending
-		else if (dir == down)
+		else if (dir == Down)
 		{
 			Position checkPos = new Position(pos);
 			checkPos.z --;
@@ -228,24 +228,24 @@ public class PathPlannerUtils {
 			rampPos.z --;
 			
 			//first check connection context of ramp at starting position for blocking railings
-			if (world.getThingsAt(rampPos).getRampConnectionContext() == standalone
-					|| (dir == left && world.getThingsAt(rampPos).getRampConnectionContext() == start)
-					|| (dir == right && world.getThingsAt(rampPos).getRampConnectionContext() == end))
+			if (world.getThingsAt(rampPos).getRampConnectionContext() == Standalone
+					|| (dir == Left && world.getThingsAt(rampPos).getRampConnectionContext() == Start)
+					|| (dir == Right && world.getThingsAt(rampPos).getRampConnectionContext() == End))
 			{
 				return false;
 			}
 			
 			//next check that there is a ramp at the target position
-			if (dir == left)
+			if (dir == Left)
 				rampPos.x --;
 			else
 				rampPos.x ++;
-			if (hasRampWithDir(world, rampPos, up))
+			if (hasRampWithDir(world, rampPos, Up))
 			{
 				//check if the connection context for the target ramp has a blocking railing
-				if (world.getThingsAt(rampPos).getRampConnectionContext() == standalone
-						|| (dir == left && world.getThingsAt(rampPos).getRampConnectionContext() == end)
-						|| (dir == right && world.getThingsAt(rampPos).getRampConnectionContext() == start))
+				if (world.getThingsAt(rampPos).getRampConnectionContext() == Standalone
+						|| (dir == Left && world.getThingsAt(rampPos).getRampConnectionContext() == End)
+						|| (dir == Right && world.getThingsAt(rampPos).getRampConnectionContext() == Start))
 				{
 					return false;
 				}
@@ -265,10 +265,10 @@ public class PathPlannerUtils {
 		}
 	}
 	
-	public static boolean canClimb(Agent agent, World world, Position pos, direction dir)
+	public static boolean canClimb(Agent agent, World world, Position pos, Direction dir)
 	{
 		//ascending
-		if (dir == up)
+		if (dir == Up)
 		{
 			int z = pos.z;
 			int maxZ = pos.z + agent.getHeight();
@@ -276,7 +276,7 @@ public class PathPlannerUtils {
 			checkPos.y ++;
 
 			//climbing up case
-			if (hasClimbingSurfaceWithDir(world, checkPos, up))
+			if (hasClimbingSurfaceWithDir(world, checkPos, Up))
 			{
 				for (int k = z + 1; k < maxZ; k ++)
 				{
@@ -289,12 +289,12 @@ public class PathPlannerUtils {
 			//top out case
 			else
 			{
-				return canStep(agent, world, pos, up);
+				return canStep(agent, world, pos, Up);
 			}
 		}
 		
 		//descending
-		else if (dir == down)
+		else if (dir == Down)
 		{
 			Position checkPos = new Position(pos);
 			checkPos.z --;
@@ -327,24 +327,24 @@ public class PathPlannerUtils {
 			climbingSurfacePos.z --;
 			
 			//first check connection context of climbing surface at starting position for uncrossable edges
-			if (world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == standalone
-					|| (dir == left && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == start)
-					|| (dir == right && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == end))
+			if (world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == Standalone
+					|| (dir == Left && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == Start)
+					|| (dir == Right && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == End))
 			{
 				return false;
 			}
 			
 			//next check that there is a climbing surface at the target position
-			if (dir == left)
+			if (dir == Left)
 				climbingSurfacePos.x --;
 			else
 				climbingSurfacePos.x ++;
-			if (hasClimbingSurfaceWithDir(world, climbingSurfacePos, up))
+			if (hasClimbingSurfaceWithDir(world, climbingSurfacePos, Up))
 			{
 				//check if the connection context for the target climbing surface has an uncrossable edge
-				if (world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == standalone
-						|| (dir == left && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == end)
-						|| (dir == right && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == start))
+				if (world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == Standalone
+						|| (dir == Left && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == End)
+						|| (dir == Right && world.getThingsAt(climbingSurfacePos).getClimbingSurfaceConnectionContext() == Start))
 				{
 					return false;
 				}
@@ -364,12 +364,12 @@ public class PathPlannerUtils {
 		}
 	}
 
-	private static boolean hasRampWithDir(World world, Position pos, direction dir)
+	private static boolean hasRampWithDir(World world, Position pos, Direction dir)
 	{
 		return world.hasThing(pos) && world.getThingsAt(pos).hasRamp() && world.getThingsAt(pos).getRampDir() == dir;
 	}
 	
-	private static boolean hasClimbingSurfaceWithDir(World world, Position pos, direction dir)
+	private static boolean hasClimbingSurfaceWithDir(World world, Position pos, Direction dir)
 	{
 		return world.hasThing(pos) && world.getThingsAt(pos).hasClimbingSurface() && world.getThingsAt(pos).getClimbingSurfaceDir() == dir;
 	}
@@ -383,7 +383,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return {true if the agent should use a horizontal ramp step, true if the ramp step is ascending}
 	 */
-	public static boolean[] checkForHorizontalRampStep(World world, Position pos, direction dir)
+	public static boolean[] checkForHorizontalRampStep(World world, Position pos, Direction dir)
 	{
 		//on ramp case will always require a horizontal ramp step
 		if (isOnRampHorizontal(world, pos))
@@ -401,16 +401,16 @@ public class PathPlannerUtils {
 		int xt = x; //target pos x
 		switch (dir)
 		{
-		case left:	xt = x - 1;	break;
-		case right:	xt = x + 1;	break;
+		case Left:	xt = x - 1;	break;
+		case Right:	xt = x + 1;	break;
 		default: boolean[] result = {false, false}; return result; //stepping on to a horizontal ramp can only happen with left/right steps
 		}
 		
 		boolean isRampStep = false;
 		boolean ascending = false;
-		direction oppositeDir = right;
-		if (dir == right)
-			oppositeDir = left;
+		Direction oppositeDir = Right;
+		if (dir == Right)
+			oppositeDir = Left;
 		
 		//check for ramp in front (starting ascent)
 		if (world.hasThing(xt, y, z) && world.getThingsAt(xt, y, z).hasRamp()
@@ -437,7 +437,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return true if the agent should use a vertical ramp step
 	 */
-	public static boolean checkForVerticalRampStep(World world, Position pos, direction dir)
+	public static boolean checkForVerticalRampStep(World world, Position pos, Direction dir)
 	{
 		//on ramp case will always require a vertical ramp step
 		if (isOnRampVertical(world, pos))
@@ -445,18 +445,18 @@ public class PathPlannerUtils {
 	    
 		switch (dir)
 	    {
-		case up:
+		case Up:
 			//check for a vertical ramp in front
 			Position frontPos = new Position(pos);
 			frontPos.y ++;
 			return world.isInBounds(frontPos) && world.hasThing(frontPos)
-					&& world.getThingsAt(frontPos).hasRamp() && world.getThingsAt(frontPos).getRampDir() == up;
-		case down:
+					&& world.getThingsAt(frontPos).hasRamp() && world.getThingsAt(frontPos).getRampDir() == Up;
+		case Down:
 			//check for a vertical ramp below and a completely open space in front
 			Position belowPos = new Position(pos);
 			belowPos.z --;
 			return world.isInBounds(belowPos) && world.hasThing(belowPos)
-					&& world.getThingsAt(belowPos).hasRamp() && world.getThingsAt(belowPos).getRampDir() == up
+					&& world.getThingsAt(belowPos).hasRamp() && world.getThingsAt(belowPos).getRampDir() == Up
 					&& world.isInBounds(pos.x, pos.y - 1, pos.z - 1) && world.getTerrainAt(pos.x, pos.y - 1, pos.z - 1).getTerrainType() == terrainType.air
 					&& (!world.hasThing(pos.x, pos.y - 1, pos.z) || !world.getThingsAt(pos.x, pos.y - 1, pos.z).isCrossable());
 		default:
@@ -471,7 +471,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return true if the agent should climb
 	 */
-	public static boolean checkForClimb(World world, Position pos, direction dir)
+	public static boolean checkForClimb(World world, Position pos, Direction dir)
 	{
 		//on ramp case will always require a vertical ramp step
 		if (isOnClimbingSurface(world, pos))
@@ -479,18 +479,18 @@ public class PathPlannerUtils {
 	    
 		switch (dir)
 	    {
-		case up:
+		case Up:
 			//check for a climbing surface in front
 			Position frontPos = new Position(pos);
 			frontPos.y ++;
 			return world.isInBounds(frontPos) && world.hasThing(frontPos)
-					&& world.getThingsAt(frontPos).hasClimbingSurface() && world.getThingsAt(frontPos).getClimbingSurfaceDir() == up;
-		case down:
+					&& world.getThingsAt(frontPos).hasClimbingSurface() && world.getThingsAt(frontPos).getClimbingSurfaceDir() == Up;
+		case Down:
 			//check for a climbing surface below and a completely open space in front
 			Position belowPos = new Position(pos);
 			belowPos.z --;
 			return world.isInBounds(belowPos) && world.hasThing(belowPos)
-					&& world.getThingsAt(belowPos).hasClimbingSurface() && world.getThingsAt(belowPos).getClimbingSurfaceDir() == up
+					&& world.getThingsAt(belowPos).hasClimbingSurface() && world.getThingsAt(belowPos).getClimbingSurfaceDir() == Up
 					&& world.isInBounds(pos.x, pos.y - 1, pos.z - 1) && world.getTerrainAt(pos.x, pos.y - 1, pos.z - 1).getTerrainType() == terrainType.air
 					&& (!world.hasThing(pos.x, pos.y - 1, pos.z) || !world.getThingsAt(pos.x, pos.y - 1, pos.z).isCrossable());
 		default:
@@ -501,7 +501,7 @@ public class PathPlannerUtils {
 	public static boolean isOnRampHorizontal(World world, Position pos)
 	{
 		return (world.hasThing(pos.x, pos.y, pos.z - 1) && world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp()
-		&& (world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == left || world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == right));
+		&& (world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == Left || world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == Right));
 	}
 	
 	public static boolean isOnRampVertical(World world, Position pos)
@@ -509,7 +509,7 @@ public class PathPlannerUtils {
 		return world.isInBounds(pos.x, pos.y, pos.z - 1) && world.getTerrainAt(pos.x, pos.y, pos.z - 1).getTerrainType() == terrainType.air
 				&& (!world.hasThing(pos.x, pos.y, pos.z) || !world.getThingsAt(pos.x, pos.y, pos.z).isCrossable())
 				&& world.isInBounds(pos.x, pos.y + 1, pos.z - 1) && world.hasThing(pos.x, pos.y + 1, pos.z - 1)
-				&& world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).hasRamp() && world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).getRampDir() == up;
+				&& world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).hasRamp() && world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).getRampDir() == Up;
 	}
 	
 	public static boolean isOnClimbingSurface(World world, Position pos)
@@ -517,7 +517,7 @@ public class PathPlannerUtils {
 		return world.isInBounds(pos.x, pos.y, pos.z - 1) && world.getTerrainAt(pos.x, pos.y, pos.z - 1).getTerrainType() == terrainType.air
 				&& (!world.hasThing(pos.x, pos.y, pos.z) || !world.getThingsAt(pos.x, pos.y, pos.z).isCrossable())
 				&& world.isInBounds(pos.x, pos.y + 1, pos.z - 1) && world.hasThing(pos.x, pos.y + 1, pos.z - 1)
-				&& world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).hasClimbingSurface() && world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).getClimbingSurfaceDir() == up;
+				&& world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).hasClimbingSurface() && world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).getClimbingSurfaceDir() == Up;
 	}
 
 	/**
@@ -529,15 +529,15 @@ public class PathPlannerUtils {
 	 * @param dir the direction to step
 	 * @return the resulting Position at the step's conclusion
 	 */
-	public static Position simulateSimpleStep(World world, Position pos, direction dir)
+	public static Position simulateSimpleStep(World world, Position pos, Direction dir)
 	{
 		Position resultingPos = new Position(pos);
 		switch (dir)
 		{
-		case up:	resultingPos.y ++;	break;
-		case down:	resultingPos.y --;	break;
-		case left:	resultingPos.x --;	break;
-		case right:	resultingPos.x ++;	break;
+		case Up:	resultingPos.y ++;	break;
+		case Down:	resultingPos.y --;	break;
+		case Left:	resultingPos.x --;	break;
+		case Right:	resultingPos.x ++;	break;
 		}
 		
 		return resultingPos;
@@ -555,13 +555,13 @@ public class PathPlannerUtils {
 	 * @return the resulting Position at the step's conclusion
 	 */
 	@SuppressWarnings("incomplete-switch")
-	public static Position simulateHorizontalRampStep(World world, Position pos, direction dir, boolean ascending)
+	public static Position simulateHorizontalRampStep(World world, Position pos, Direction dir, boolean ascending)
 	{
 		Position resultingPos = new Position(pos);
 		switch (dir)
 		{
-		case left:	resultingPos.x --;	break;
-		case right:	resultingPos.x ++;	break;
+		case Left:	resultingPos.x --;	break;
+		case Right:	resultingPos.x ++;	break;
 		}
 		
 		if (ascending)
@@ -589,15 +589,15 @@ public class PathPlannerUtils {
 	 * @param dir the direction to step
 	 * @return the resulting Position at the step's conclusion
 	 */
-	public static Position simulateVerticalRampStep(World world, Position pos, direction dir)
+	public static Position simulateVerticalRampStep(World world, Position pos, Direction dir)
 	{
 		Position resultingPosition = new Position(pos);
 		switch (dir)
 		{
-		case up:
+		case Up:
 			//first case: climbing
 			Position checkPosUp = new Position(pos.x, pos.y + 1, pos.z);
-			if (hasRampWithDir(world, checkPosUp, up))
+			if (hasRampWithDir(world, checkPosUp, Up))
 			{
 				resultingPosition.z ++;
 			}
@@ -607,10 +607,10 @@ public class PathPlannerUtils {
 				resultingPosition.y ++;
 			}
 		break;
-		case down:
+		case Down:
 			//first case: stepping on to ramp
 			Position checkPosDown = new Position(pos.x, pos.y, pos.z - 1);
-			if (hasRampWithDir(world, checkPosDown, up))
+			if (hasRampWithDir(world, checkPosDown, Up))
 			{
 				resultingPosition.y --;
 			}
@@ -620,10 +620,10 @@ public class PathPlannerUtils {
 				resultingPosition.z --;
 			}
 		break;
-		case left:
+		case Left:
 			resultingPosition.x --;
 		break;
-		case right:
+		case Right:
 			resultingPosition.x ++;
 		break;
 		}
@@ -640,15 +640,15 @@ public class PathPlannerUtils {
 	 * @param dir the direction to climb
 	 * @return the resulting Position at the climb's conclusion
 	 */
-	public static Position simulateClimb(World world, Position pos, direction dir)
+	public static Position simulateClimb(World world, Position pos, Direction dir)
 	{
 		Position resultingPosition = new Position(pos);
 		switch (dir)
 		{
-		case up:
+		case Up:
 			Position checkPosUp = new Position(pos.x, pos.y + 1, pos.z);
 			//first case: standard climbing
-			if (hasClimbingSurfaceWithDir(world, checkPosUp, up))
+			if (hasClimbingSurfaceWithDir(world, checkPosUp, Up))
 			{
 				resultingPosition.z ++;
 			}
@@ -658,10 +658,10 @@ public class PathPlannerUtils {
 				resultingPosition.y ++;
 			}
 		break;
-		case down:
+		case Down:
 			//first case: lowering onto the climb
 			Position checkPosDown = new Position(pos.x, pos.y, pos.z - 1);
-			if (hasClimbingSurfaceWithDir(world, checkPosDown, up))
+			if (hasClimbingSurfaceWithDir(world, checkPosDown, Up))
 			{
 				resultingPosition.y --;
 			}
@@ -671,10 +671,10 @@ public class PathPlannerUtils {
 				resultingPosition.z --;
 			}
 		break;
-		case left:
+		case Left:
 			resultingPosition.x --;
 		break;
-		case right:
+		case Right:
 			resultingPosition.x ++;
 		break;
 		}
