@@ -8,6 +8,7 @@ import java.util.Random;
 //import loop.GameLoop;
 //import loop.Timing;
 
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -40,6 +41,7 @@ import things.Stairs;
 import things.Table;
 import things.WallCandle;
 import utils.display.DisplayText;
+import world.Grid;
 import world.Position;
 import world.Terrain;
 import world.World;
@@ -405,189 +407,21 @@ public class GameMain {
 	
 	/*#################################################################################
 	 * Test Worlds
-	 *#################################################################################*/
-	private void genTestWorld0()
-	{
-		int xs = 10, ys = 10, zs = 10;
-		Terrain[][][] t = new Terrain[xs][ys][zs];
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				for (int k = 0; k < zs; k ++)
-				{
-					t[i][j][k] = new Terrain(air);
-				}
-			}
-		}
-		
-		t[xs/2][ys/2][zs/2] = new Terrain(grass);
-		
-		world = new World(xs, ys, zs);
-		world.setTerrain(t);
-	}
-	
-	private void genTestWorld1()
-	{
-		int xs = 10, ys = 10, zs = 10;
-		Terrain[][][] t = new Terrain[xs][ys][zs];
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				t[i][j][0] = new Terrain(rock);
-				t[i][j][1] = new Terrain(grass);
-			}
-		}
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				for (int k = 2; k < zs; k ++)
-				{
-					t[i][j][k] = new Terrain(air);
-				}
-			}
-		}
-		
-		t[2][2][1] = new Terrain(rock);
-		t[3][2][1] = new Terrain(rock);
-		t[4][2][1] = new Terrain(rock);
-		t[2][3][1] = new Terrain(rock);
-		t[3][3][1] = new Terrain(rock);
-		t[4][3][1] = new Terrain(rock);
-		t[3][4][1] = new Terrain(rock);
-		t[4][4][1] = new Terrain(rock);
-		t[3][4][2] = new Terrain(rock);
-		t[4][4][2] = new Terrain(rock);
-		
-		t[2][2][2] = new Terrain(grass);
-		t[3][2][2] = new Terrain(grass);
-		t[4][2][2] = new Terrain(grass);
-		t[2][3][2] = new Terrain(grass);
-		t[3][3][2] = new Terrain(grass);
-		t[4][3][2] = new Terrain(grass);
-		
-		t[3][4][3] = new Terrain(dirt);
-		t[4][4][3] = new Terrain(dirt);
-		
-		t[7][3][1] = new Terrain(rock);
-		t[7][3][2] = new Terrain(rock);
-		
-		t[7][3][3] = new Terrain(dirt, grass);
-		
-		t[6][8][1] = new Terrain(rock);
-		t[6][8][2] = new Terrain(rock);
-		t[7][8][1] = new Terrain(rock);
-		t[7][8][2] = new Terrain(rock);
-		t[8][8][1] = new Terrain(rock);
-		t[8][8][2] = new Terrain(rock);
-		t[7][8][3] = new Terrain(grass);
-		t[8][8][3] = new Terrain(grass);
-		t[6][8][3] = new Terrain(rock);
-		t[6][8][4] = new Terrain(rock);
-		t[6][8][5] = new Terrain(grass);
-		
-		t[0][9][1] = new Terrain(dirt);
-		t[0][8][1] = new Terrain(dirt);
-		t[0][7][1] = new Terrain(dirt);
-		t[0][6][1] = new Terrain(dirt);
-		t[1][9][1] = new Terrain(dirt);
-		t[1][8][1] = new Terrain(air);
-		t[1][7][1] = new Terrain(air);
-		
-		world = new World(xs, ys, zs);
-		world.setTerrain(t);
-	}
-	
-	private void genTestWorldHeroTest()
-	{
-		genTestWorld1();
-		
-		ArrayList<Agent> agents = new ArrayList<Agent>();
-		
-		Hero hero = new Hero();
-		hero.setPos(new Position(1, 1, 2));
-		agents.add(hero);
-		
-		Wanderer wanderer = new Wanderer(new Position(8, 6, 2), 32, 2);
-		wanderer.setPos(new Position(8, 6, 2));
-		agents.add(wanderer);
-		
-		world.addAgents(agents);
-		world.setPlayer(hero);
-	}
-	
-	private void genTestWorldJump()
-	{
-		int xs = 6, ys = 6, zs = 8;
-		Terrain[][][] t = new Terrain[xs][ys][zs];
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				for (int k = 0; k < zs; k ++)
-				{
-					t[i][j][k] = new Terrain(air);
-				}
-			}
-		}
-		
-		for (int i = 0; i < xs; i ++)
-		{
-			for (int j = 0; j < ys; j ++)
-			{
-				t[i][j][0] = new Terrain(grass);
-			}
-		}
-		
-		t[2][2][1] = new Terrain(grass);
-		t[2][3][1] = new Terrain(grass);
-		t[3][2][1] = new Terrain(grass);
-		t[3][3][1] = new Terrain(grass);
-		t[2][2][2] = new Terrain(grass);
-		t[2][3][2] = new Terrain(grass);
-		t[1][2][1] = new Terrain(grass);
-		t[0][2][1] = new Terrain(grass);
-		t[0][3][1] = new Terrain(grass);
-		t[0][3][2] = new Terrain(grass);
-		t[1][3][1] = new Terrain(grass);
-		t[1][3][2] = new Terrain(grass);
-		t[0][4][1] = new Terrain(grass);
-		t[0][4][2] = new Terrain(grass);
-		t[1][4][1] = new Terrain(grass);
-		t[1][4][2] = new Terrain(grass);
-		t[5][5][1] = new Terrain(grass);
-		
-		world = new World(xs, ys, zs);
-		world.setTerrain(t);
-		
-		world.setTod(Sunrise);
-		
-		ArrayList<Agent> agents = new ArrayList<Agent>();
-		
-		Hero hero = new Hero();
-		hero.setPos(new Position(4, 1, 1));
-		agents.add(hero);
-		
-		world.addAgents(agents);
-		world.setPlayer(hero);
-	}
-	
+	 *#################################################################################*/	
 	private void genLargeWorld()
 	{
 		int xs = 50, ys = 50, zs = 10;
 		
 		world = new World(xs, ys, zs);
 		
-		Terrain[][][] t = new Terrain[xs][ys][zs];
+		Grid<Terrain> t = new Grid<Terrain>(xs, ys, zs);
 		for (int i = 0; i < xs; i ++)
 		{
 			for (int j = 0; j < ys; j ++)
 			{
 				for (int k = 0; k < zs; k ++)
 				{
-					t[i][j][k] = new Terrain(air);
+					t.set(i, j, k, new Terrain(air));
 				}
 			}
 		}
@@ -598,9 +432,9 @@ public class GameMain {
 			for (int j = 0; j < ys; j ++)
 			{
 				if (rand.nextInt(2) == 0)
-					t[i][j][0] = new Terrain(grass);
+					t.set(i, j, 0, new Terrain(grass));
 				else
-					t[i][j][0] = new Terrain(dirt);
+					t.set(i, j, 0, new Terrain(dirt));
 			}
 		}
 		
@@ -609,9 +443,9 @@ public class GameMain {
 		{
 			for (int j = 25; j < 31; j ++)
 			{
-				t[i][j][1] = new Terrain(dirt, grass);
+				t.set(i, j, 1, new Terrain(dirt, grass));
 			}
-			t[i][27][2] = new Terrain(dirt, grass);
+			t.set(i, 27, 2, new Terrain(dirt, grass));
 		}
 		Candle jumpCandle = new Candle();
 		world.addThing(jumpCandle, 14, 27, 3);
@@ -628,7 +462,7 @@ public class GameMain {
 		{
 			for (int j = 30; j < 38; j ++)
 			{
-				t[i][j][0] = new Terrain(dirt, woodPlank);
+				t.set(i, j, 0, new Terrain(dirt, woodPlank));
 			}
 		}
 		//walls
@@ -636,76 +470,76 @@ public class GameMain {
 		{
 			for (int k = 1; k < 4; k ++)
 			{
-				t[i][37][k] = new Terrain(rock);
+				t.set(i, 37, k, new Terrain(rock));
 				if (i < 34 || i > 35)
-					t[i][30][k] = new Terrain(rock);
+					t.set(i, 30, k, new Terrain(rock));
 			}
 			for (int k = 4; k < 7; k ++)
 			{
-				t[i][37][k] = new Terrain(woodPlank, thatch);
-				t[i][30][k] = new Terrain(plaster, thatch);
+				t.set(i, 37, k, new Terrain(woodPlank, thatch));
+				t.set(i, 30, k, new Terrain(plaster, thatch));
 			}
 		}
 		for (int j = 30; j < 38; j ++)
 		{
 			for (int k = 1; k < 4; k ++)
 			{
-				t[25][j][k] = new Terrain(rock);
-				t[44][j][k] = new Terrain(rock);
+				t.set(25, j, k, new Terrain(rock));
+				t.set(44, j, k, new Terrain(rock));
 			}
 			for (int k = 4; k < 6; k ++)
 			{
-				t[24][j][k] = new Terrain(plaster, thatch);
-				t[45][j][k] = new Terrain(plaster, thatch);
-				t[25][j][k] = new Terrain(plaster, thatch);
-				t[44][j][k] = new Terrain(plaster, thatch);
+				t.set(24, j, k, new Terrain(plaster, thatch));
+				t.set(45, j, k, new Terrain(plaster, thatch));
+				t.set(25, j, k, new Terrain(plaster, thatch));
+				t.set(44, j, k, new Terrain(plaster, thatch));
 			}
 		}
 		for (int i = 25; i < 45; i ++)
 		{
 			for (int j = 31; j < 37; j ++)
 			{
-				t[i][j][3] = new Terrain(woodSupport, woodPlank);
+				t.set(i, j, 3, new Terrain(woodSupport, woodPlank));
 			}
 		}
 		for (int i = 25; i < 45; i ++)
 		{
 			for (int j = 31; j < 37; j ++)
 			{
-				t[i][j][6] = new Terrain(woodSupport, thatch);
+				t.set(i, j, 6, new Terrain(woodSupport, thatch));
 			}
 		}
 		
 		//doorway top
-		t[34][30][3] = new Terrain(rock);
-		t[35][30][3] = new Terrain(rock);
+		t.set(34, 30, 3, new Terrain(rock));
+		t.set(35, 30, 3, new Terrain(rock));
 		
 		//openings for stairs and chimney
-		t[37][36][3] = new Terrain(air);
-		t[41][36][3] = new Terrain(air);
-		t[42][36][3] = new Terrain(air);
+		t.set(37, 36, 3, new Terrain(air));
+		t.set(41, 36, 3, new Terrain(air));
+		t.set(42, 36, 3, new Terrain(air));
 		
 		//windows
-		t[28][30][2] = new Terrain(windowProtruding, air);
-		t[29][30][2] = new Terrain(windowProtruding, air);
-		t[30][30][2] = new Terrain(windowProtruding, air);
+		t.set(28, 30, 2, new Terrain(windowProtruding, air));
+		t.set(29, 30, 2, new Terrain(windowProtruding, air));
+		t.set(30, 30, 2, new Terrain(windowProtruding, air));
 		
-		t[39][30][2] = new Terrain(windowProtruding, air);
-		t[40][30][2] = new Terrain(windowProtruding, air);
-		t[41][30][2] = new Terrain(windowProtruding, air);
+		t.set(39, 30, 2, new Terrain(windowProtruding, air));
+		t.set(40, 30, 2, new Terrain(windowProtruding, air));
+		t.set(41, 30, 2, new Terrain(windowProtruding, air));
 		
 		
-		t[27][30][5] = new Terrain(window, air);
-		t[27][37][5] = new Terrain(window, air);
+		t.set(27, 30, 5, new Terrain(window, air));
+		t.set(27, 37, 5, new Terrain(window, air));
 		
-		t[32][30][5] = new Terrain(window, air);
-		t[32][37][5] = new Terrain(window, air);
+		t.set(32, 30, 5, new Terrain(window, air));
+		t.set(32, 37, 5, new Terrain(window, air));
 		
-		t[37][30][5] = new Terrain(window, air);
-		//t[37][37][5] = new Terrain(window, air);
+		t.set(37, 30, 5, new Terrain(window, air));
+		//t.set(37, 37, 5, new Terrain(window, air));
 		
-		t[42][30][5] = new Terrain(window, air);
-		t[42][37][5] = new Terrain(window, air);
+		t.set(42, 30, 5, new Terrain(window, air));
+		t.set(42, 37, 5, new Terrain(window, air));
 		
 		//exterior wood beams
 		Beam dbeam1 = new Beam.BeamBuilder().orientation(Diagonal).connection(Start).dir(Right).build();
@@ -877,7 +711,7 @@ public class GameMain {
 		world.addThing(chimney3, 37, 36, 5);
 		world.addThing(chimney4, 37, 36, 6);
 		world.addThing(chimneytop, 37, 36, 7);
-		t[37][36][6] = new Terrain(air);
+		t.set(37, 36, 6, new Terrain(air));
 		
 		Firewood fw1 = new Firewood();
 		Firewood fw2 = new Firewood();
@@ -889,22 +723,22 @@ public class GameMain {
 		//shadow tests
 		for (int i = 1; i < 8; i ++)
 		{
-			t[22][28][i] = new Terrain(dirt, grass);
-			t[18][25][i] = new Terrain(dirt, grass);
+			t.set(22, 28, i, new Terrain(dirt, grass));
+			t.set(18, 25, i, new Terrain(dirt, grass));
 		}
-		t[19][25][7] = new Terrain(dirt, grass);
-		t[19][24][7] = new Terrain(dirt, grass);
-		t[17][26][7] = new Terrain(dirt, grass);
-		t[17][25][7] = new Terrain(dirt, grass);
+		t.set(19, 25, 7, new Terrain(dirt, grass));
+		t.set(19, 24, 7, new Terrain(dirt, grass));
+		t.set(17, 26, 7, new Terrain(dirt, grass));
+		t.set(17, 25, 7, new Terrain(dirt, grass));
 		
 		//vertical transparency test
 		for (int i = 1; i < 4; i ++)
 		{
 			for (int j = 13; j <= 18; j ++)
 			{
-				t[j][13][i] = new Terrain(dirt, grass);
-				t[j][14][i] = new Terrain(dirt, grass);
-				t[j][15][i] = new Terrain(dirt, grass);
+				t.set(j, 13, i, new Terrain(dirt, grass));
+				t.set(j, 14, i, new Terrain(dirt, grass));
+				t.set(j, 15, i, new Terrain(dirt, grass));
 			}
 		}
 		
@@ -915,7 +749,7 @@ public class GameMain {
 			{
 				for (int k = 1; k < 4; k ++)
 				{
-					t[i][j][k] = new Terrain(dirt, grass);
+					t.set(i, j, k, new Terrain(dirt, grass));
 				}
 			}
 		}

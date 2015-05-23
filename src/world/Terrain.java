@@ -303,4 +303,62 @@ public class Terrain {
 		
 		textures.add(h0);
 	}
+
+	public String save()
+	{
+		String data = new String("");
+		data += typeToString(type) + typeToString(top);
+		return data;
+	}
+
+	public static Terrain load(String data)
+	{
+		if (data.length() < 6)
+		{
+			System.out.println("Invalid terrain data");
+			return new Terrain(air);
+		}
+		
+		return new Terrain(stringToType(data.substring(0, 3)), stringToType(data.substring(3,6)));
+	}
+	
+	private static String typeToString(terrainType type)
+	{
+		switch (type)
+		{
+		case air:					return "000";
+		case dirt:					return "001";
+		case glass:					return "002";
+		case grass:					return "003";
+		case plaster:				return "004";
+		case rock:					return "005";
+		case thatch:				return "006";
+		case window:				return "007";
+		case windowProtruding:		return "008";
+		case woodPlank:				return "009";
+		case woodPlankWeathered:	return "010";
+		case woodSupport:			return "011";
+		default: 					return "000";
+		}
+	}
+	
+	private static terrainType stringToType(String str)
+	{
+		switch (str)
+		{
+		case "000":	return air;
+		case "001":	return dirt;
+		case "002":	return glass;
+		case "003":	return grass;
+		case "004":	return plaster;
+		case "005":	return rock;
+		case "006":	return thatch;
+		case "007":	return window;
+		case "008":	return windowProtruding;
+		case "009":	return woodPlank;
+		case "010":	return woodPlankWeathered;
+		case "011":	return woodSupport;
+		default:	return air;
+		}
+	}
 }

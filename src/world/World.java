@@ -18,18 +18,19 @@ import static world.Terrain.terrainType.*;
 import static world.World.TimeOfDay.*;
 import static world.World.ControlState.*;
 
-public class World {
-	Terrain[][][] terrainGrid;
-	ThingGridCell[][][] thingGrid;
-	Agent[][][] agentGrid;
-	float[][][] lightModGrid;
+public class World
+{
+	Grid<Terrain> terrainGrid;
+	Grid<ThingGridCell> thingGrid;
+	Grid<Agent> agentGrid;
+	Grid<Float> lightModGrid;
 	ArrayList<Agent> agents;
 	ArrayList<Thing> things;
 	ArrayList<Thing> lightSources;
 	ArrayList<Thing> antiLightSources;
-	private float width;
-	private float depth;
-	private float height;
+	private int width;
+	private int depth;
+	private int height;
 	
 	//TODO: refactor this stuff to a new Game State class
 	Hero player;
@@ -39,6 +40,7 @@ public class World {
 	}
 	private TimeOfDay tod;
 	
+	//rendering constants
 	private final int pixelSize = 2;
 	private final int textureSize = 16;
 	private final int textureSheetSize = 256;
@@ -87,7 +89,7 @@ public class World {
 	 * @param xSize world length
 	 * @param ySize world width
 	 * @param zSize world height
-	 * @param center (x,y,z) center of the screen
+	 * @param center (x,y,z) center of the screen in grid coordinates
 	 */
 	public World(int xSize, int ySize, int zSize, int[] center)
 	{
@@ -97,14 +99,30 @@ public class World {
 		displayCenter[1] = center[1] + center[2];
 	}
 	
+	/**
+	 * Constructor, sets initial display center
+	 * 
+	 * @param xSize world length
+	 * @param ySize world width
+	 * @param zSize world height
+	 * @param displayCenter (x,y) center of the screen in display coordinates
+	 */
+	public World(int xSize, int ySize, int zSize, float[] displayCenter)
+	{
+		this.init(xSize, ySize, zSize);
+		
+		this.displayCenter[0] = displayCenter[0];
+		this.displayCenter[1] = displayCenter[1] + displayCenter[2];
+	}
+	
 	private void init(int xSize, int ySize, int zSize)
 	{
-		terrainGrid = new Terrain[xSize][ySize][zSize];
-		thingGrid = new ThingGridCell[xSize][ySize][zSize];
-		agentGrid = new Agent[xSize][ySize][zSize];
-		lightModGrid = new float[xSize][ySize][zSize];
+		terrainGrid = new Grid<Terrain>(xSize, ySize, zSize);
+		thingGrid = new Grid<ThingGridCell>(xSize, ySize, zSize);
+		agentGrid = new Grid<Agent>(xSize, ySize, zSize);
+		lightModGrid = new Grid<Float>(xSize, ySize, zSize);
 		
-		setWidth(xSize);
+		width = xSize;
 		depth = ySize;
 		height = zSize;
 		
@@ -160,7 +178,7 @@ public class World {
 	{
 		if (player == null)
 		{
-			return terrainGrid[0][0].length;
+			return height;
 		}
 		
 		int x = player.getPos().x;
@@ -168,9 +186,9 @@ public class World {
 		int z = player.getPos().z;
 		
 		//roof check
-		for (int k = z; k < terrainGrid[0][0].length; k ++)
+		for (int k = z; k < height; k ++)
 		{
-			if (terrainGrid[x][y][k].getTerrainType() != air)
+			if (terrainGrid.get(x, y, z).getTerrainType() != air)
 			{
 				//adjustment for standing on stairs
 				if (z - 1 >= 0 && this.hasThing(x, y, z - 1) && this.getThingsAt(x, y, z - 1).hasRamp())
@@ -183,13 +201,13 @@ public class World {
 		for (int j = y - 1; j >= 0; j --)
 		{
 			int k = z + (y - j);
-			if (k >= terrainGrid[0][0].length)
+			if (k >= height)
 				break;
 			for (int i = 0; i < 10; i ++)
 			{
-				if (k + i >= terrainGrid[0][0].length)
+				if (k + i >= height)
 					break;
-				if (terrainGrid[x][j][k + i].getTerrainType() != air)
+				if (terrainGrid.get(x, j, k + i).getTerrainType() != air)
 				{
 					//adjustment for standing on stairs
 					if (z - 1 >= 0 && this.hasThing(x, y, z - 1) && this.getThingsAt(x, y, z - 1).hasRamp())
@@ -199,7 +217,7 @@ public class World {
 			}
 		}
 		
-		return terrainGrid[0][0].length;
+		return height;
 	}
 	
 	public void updateCameraScrollLock()
@@ -315,18 +333,18 @@ public class World {
 			break;
 		}
 		
-		for (int k = 0; k + z < terrainGrid[0][0].length; k ++)
+		for (int k = 0; k + z < height; k ++)
 		{
 			if (k % shadowLength == 0)
 				x += shadowDirection;
 
-			if (x < 0 || x >= terrainGrid[0].length || y < 0 || y >= terrainGrid[0].length)
+			if (x < 0 || x >= width || y < 0 || y >= depth)
 				break;
 			
-			if (!terrainGrid[x][y][k + z].isTransparent())
+			if (!terrainGrid.get(x, y, k + z).isTransparent())
 				return true;
 			
-			if (longShadows && y + 1 < terrainGrid[0].length && !terrainGrid[x][y + 1][k + z].isTransparent())
+			if (longShadows && y + 1 < depth && !terrainGrid.get(x, y + 1, k + z).isTransparent())
 				return true;
 		}
 		
@@ -346,8 +364,16 @@ public class World {
 	 */
 	public void updateLightModGrid(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax)
 	{
-		float[][][] clearFloatGrid = new float[terrainGrid.length][terrainGrid[0].length][terrainGrid[0][0].length];
-		lightModGrid = clearFloatGrid;
+		for (int i = 0; i < width; i ++)
+		{
+			for (int j = 0; j < depth; j ++)
+			{
+				for (int k = 0; k < height; k ++)
+				{
+					lightModGrid.set(i, j, k, 0f);
+				}
+			}
+		}
 		
 		for (int n = 0; n < lightSources.size(); n ++)
 		{
@@ -371,9 +397,9 @@ public class World {
 				int iMin = Math.max(i - lightDst, 0);
 				int jMin = Math.max(j - lightDst, 0);
 				int kMin = Math.max(k - lightDst, 0);
-				int iMax = Math.min(i + lightDst, terrainGrid.length - 1);
-				int jMax = Math.min(j + lightDst, terrainGrid[0].length - 1);
-				int kMax = Math.min(k + lightDst, terrainGrid[0][0].length - 1);
+				int iMax = Math.min(i + lightDst, width - 1);
+				int jMax = Math.min(j + lightDst, depth - 1);
+				int kMax = Math.min(k + lightDst, height - 1);
 				for (int i2 = iMin; i2 <= iMax; i2 ++)
 				{
 					for (int j2 = jMin; j2 <= jMax; j2 ++)
@@ -385,8 +411,8 @@ public class World {
 								//increase light modification based on distance to light source
 								float dst = (float)Math.sqrt(Math.pow(i - i2, 2) + Math.pow(j - j2, 2) + Math.pow(k - k2, 2));
 								float updateVal = Math.max(lightPower - dst/10.0f, 0);
-								if (updateVal > lightModGrid[i2][j2][k2])
-									lightModGrid[i2][j2][k2] = updateVal;
+								if (updateVal > lightModGrid.get(i2, j2, k2))
+									lightModGrid.set(i2, j2, k2, updateVal);
 							}
 						}
 					}
@@ -409,9 +435,9 @@ public class World {
 				int iMin = Math.max(i - lightDst, 0);
 				int jMin = Math.max(j - lightDst, 0);
 				int kMin = Math.max(k - lightDst, 0);
-				int iMax = Math.min(i + lightDst, terrainGrid.length - 1);
-				int jMax = Math.min(j + lightDst, terrainGrid[0].length - 1);
-				int kMax = Math.min(k + lightDst, terrainGrid[0][0].length - 1);
+				int iMax = Math.min(i + lightDst, width - 1);
+				int jMax = Math.min(j + lightDst, depth - 1);
+				int kMax = Math.min(k + lightDst, height - 1);
 				for (int i2 = iMin; i2 <= iMax; i2 ++)
 				{
 					for (int j2 = jMin; j2 <= jMax; j2 ++)
@@ -423,8 +449,8 @@ public class World {
 								//increase light modification based on distance to light source
 								float dst = (float)Math.sqrt(Math.pow(i - i2, 2) + Math.pow(j - j2, 2) + Math.pow(k - k2, 2));
 								float updateVal = Math.min(lightPower + dst/10.0f, 0);
-								if (updateVal < lightModGrid[i2][j2][k2])
-									lightModGrid[i2][j2][k2] = updateVal;
+								if (updateVal < lightModGrid.get(i2, j2, k2))
+									lightModGrid.set(i2, j2, k2, updateVal);
 							}
 						}
 					}
@@ -440,20 +466,20 @@ public class World {
 	{		
 		int iMin, iMax, jMin, jMax, kMin, kMax;
 		kMin = 0;
-		kMax = Math.min(terrainGrid[0][0].length - 1, updateHeightMax());
+		kMax = Math.min(height - 1, updateHeightMax());
 		iMin = Math.max(0, (int)(displayCenter[0] - 13));
-		iMax = Math.min(terrainGrid.length - 1, (int)(displayCenter[0] + 15));
+		iMax = Math.min(width - 1, (int)(displayCenter[0] + 15));
 		jMin = Math.max(0, (int)(displayCenter[1] - 10 - kMax));
-		jMax = Math.min(terrainGrid[0].length - 1, (int)(displayCenter[1] + 11 + kMax));
+		jMax = Math.min(depth - 1, (int)(displayCenter[1] + 11 + kMax));
 		
 		//adjustment for off-screen lights, this may need experimentation depending on max light distances
 		int buffer = 4;
 		int lightXMin = Math.max(0, iMin - buffer);
-		int lightXMax = Math.min(terrainGrid.length, iMax + buffer);
+		int lightXMax = Math.min(width, iMax + buffer);
 		int lightYMin = Math.max(0, jMin - buffer);
-		int lightYMax = Math.min(terrainGrid[0].length, jMax + buffer);
+		int lightYMax = Math.min(depth, jMax + buffer);
 		int lightZMin = Math.max(0, kMin - buffer);
-		int lightZMax = Math.min(terrainGrid[0][0].length, kMax + buffer);
+		int lightZMax = Math.min(height, kMax + buffer);
 		
 		updateLightModGrid(lightXMin, lightXMax, lightYMin, lightYMax, lightZMin, lightZMax);
 		//updateLightModGrid(iMin, iMax, jMin, jMax, lightZMin, lightZMax);
@@ -467,7 +493,7 @@ public class World {
 			{
 				for (int i = iMin; i <= iMax; i ++)
 				{
-					Terrain t = terrainGrid[i][j][k];					
+					Terrain t = terrainGrid.get(i, j, k);					
 					
 					//Display vertical textures
 					if (t.getTerrainType() != air)
@@ -495,26 +521,26 @@ public class World {
 						    	
 						    	if (t.isUnblendedVertical())
 						    	{
-							    	topEmpty = k + 1 >= terrainGrid[0][0].length || terrainGrid[i][j][k+1].getTerrainType() != t.getTerrainType();
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() != t.getTerrainType();
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() != t.getTerrainType();
+							    	topEmpty = k + 1 >= height || terrainGrid.get(i, j, k+1).getTerrainType() != t.getTerrainType();
+					    			rightEmpty = i + 1 >= width || terrainGrid.get(i+1, j, k).getTerrainType() != t.getTerrainType();
+					    			leftEmpty = i - 1 < 0 || terrainGrid.get(i-1, j, k).getTerrainType() != t.getTerrainType();
 	
 					    			bottomOnGround = false;
 					    			if (k - 1 < 0 || j - 1 < 0)
 					    				bottomOnGround = true;
-					    			else if (terrainGrid[i][j][k-1].getTerrainType() != t.getTerrainType())
+					    			else if (terrainGrid.get(i, j, k-1).getTerrainType() != t.getTerrainType())
 					    				bottomOnGround = true;
 						    	}
 						    	else
 						    	{
-							    	topEmpty = k + 1 >= terrainGrid[0][0].length || terrainGrid[i][j][k+1].getTerrainType() == air || terrainGrid[i][j][k+1].isUnblendedVertical();
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air || terrainGrid[i+1][j][k].isUnblendedVertical();
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air || terrainGrid[i-1][j][k].isUnblendedVertical();
+							    	topEmpty = k + 1 >= height || terrainGrid.get(i, j, k+1).getTerrainType() == air || terrainGrid.get(i, j, k+1).isUnblendedVertical();
+					    			rightEmpty = i + 1 >= width || terrainGrid.get(i+1, j, k).getTerrainType() == air || terrainGrid.get(i+1, j, k).isUnblendedVertical();
+					    			leftEmpty = i - 1 < 0 || terrainGrid.get(i-1, j, k).getTerrainType() == air || terrainGrid.get(i-1, j, k).isUnblendedVertical();
 	
 					    			bottomOnGround = false;
 					    			if (k - 1 < 0 || j - 1 < 0)
 					    				bottomOnGround = false;
-					    			else if (terrainGrid[i][j-1][k].getTerrainType() == air && terrainGrid[i][j-1][k-1].getTerrainType() != air)
+					    			else if (terrainGrid.get(i, j-1, k).getTerrainType() == air && terrainGrid.get(i, j-1, k-1).getTerrainType() != air)
 					    				bottomOnGround = true;
 						    	}
 				    			
@@ -553,16 +579,16 @@ public class World {
 					    		}
 						    	
 					    		if (k == kMax && t.isTransparent())
-					    			renderCell(texX, texY, false, lightModGrid[i][j][k], .75f);
+					    			renderCell(texX, texY, false, lightModGrid.get(i, j, k), .75f);
 					    		else
-					    			renderCell(texX, texY, false, lightModGrid[i][j][k]);
+					    			renderCell(texX, texY, false, lightModGrid.get(i, j, k));
 							}
 							else
 							{
 								//Commented out conditional also accounts for having a fullBlock thing below the piece of vertical terrain.
 								//Uncomment this if there is ever a thing that is made to replace a wall.
 								//if (terrainGrid[i][j][k-1].type != air || (this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()))
-								if (terrainGrid[i][j][k-1].type != air)
+								if (terrainGrid.get(i, j, k-1).type != air)
 								{
 									renderCrossSection(i, j, k, t);
 								}
@@ -570,10 +596,10 @@ public class World {
 							
 						GL11.glPopMatrix();
 						//Edge overhang textures
-						if ((j == 0 || (j - 1 >= 0 && terrainGrid[i][j-1][k].getTerrainType() == air)) 
-								&& k != kMax && terrainGrid[i][j][k+1].getTerrainType() == air)
+						if ((j == 0 || (j - 1 >= 0 && terrainGrid.get(i, j-1, k).getTerrainType() == air)) 
+								&& k != kMax && terrainGrid.get(i, j, k+1).getTerrainType() == air)
 						{
-							t = terrainGrid[i][j][k];
+							t = terrainGrid.get(i, j, k);
 							//Determine position on screen
 							x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
 							y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
@@ -590,8 +616,8 @@ public class World {
 					    	int texX = t.getTexColTop();
 					    	int texY = t.getTexRowTop();
 						
-							boolean rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k].getTerrainType() == air,
-			    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k].getTerrainType() == air;
+							boolean rightEmpty = i + 1 >= width || terrainGrid.get(i+1, j, k).getTerrainType() == air,
+			    			leftEmpty = i - 1 < 0 || terrainGrid.get(i-1, j, k).getTerrainType() == air;
 			    		
 				    		texY += 4;
 				    		
@@ -612,17 +638,17 @@ public class World {
 				    			texX += 1;
 				    		}
 				    		
-				    		renderCell(texX, texY, isShadowed(i, j, k+1), lightModGrid[i][j][k+1]);
+				    		renderCell(texX, texY, isShadowed(i, j, k+1), lightModGrid.get(i, j, k+1));
 						
 						GL11.glPopMatrix();
 						}
 					}
 					//Display horizontal textures
-					else if (k - 1 >= 0 && terrainGrid[i][j][k-1].getTerrainType() != air)
+					else if (k - 1 >= 0 && terrainGrid.get(i, j, k-1).getTerrainType() != air)
 					{
 						if (k - 1 >= 0)
 						{							
-							t = terrainGrid[i][j][k-1];
+							t = terrainGrid.get(i, j, k-1);
 							//Determine position on screen
 							int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
 							int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
@@ -643,17 +669,17 @@ public class World {
 						    	boolean topEmpty, bottomEmpty, rightEmpty, leftEmpty;
 						    	if (t.isUnblendedHorizontal())
 						    	{
-									topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainTop() != t.getTerrainTop();
-					    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainTop() != t.getTerrainTop();
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainTop() != t.getTerrainTop();
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainTop() != t.getTerrainTop();
+									topEmpty = j + 1 >= depth || terrainGrid.get(i, j+1, k-1).getTerrainTop() != t.getTerrainTop();
+					    			bottomEmpty = j - 1 < 0 || terrainGrid.get(i, j-1, k-1).getTerrainTop() != t.getTerrainTop();
+					    			rightEmpty = i + 1 >= width || terrainGrid.get(i+1, j, k-1).getTerrainTop() != t.getTerrainTop();
+					    			leftEmpty = i - 1 < 0 || terrainGrid.get(i-1, j, k-1).getTerrainTop() != t.getTerrainTop();
 						    	}
 						    	else
 						    	{
-									topEmpty = j + 1 >= terrainGrid[0].length || terrainGrid[i][j+1][k-1].getTerrainType() == air;
-					    			bottomEmpty = j - 1 < 0 || terrainGrid[i][j-1][k-1].getTerrainType() == air;
-					    			rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k-1].getTerrainType() == air;
-					    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k-1].getTerrainType() == air;
+									topEmpty = j + 1 >= depth || terrainGrid.get(i, j+1, k-1).getTerrainType() == air;
+					    			bottomEmpty = j - 1 < 0 || terrainGrid.get(i, j-1, k-1).getTerrainType() == air;
+					    			rightEmpty = i + 1 >= width || terrainGrid.get(i+1, j, k-1).getTerrainType() == air;
+					    			leftEmpty = i - 1 < 0 || terrainGrid.get(i-1, j, k-1).getTerrainType() == air;
 						    	}
 				    		
 					    		if (topEmpty && bottomEmpty)
@@ -690,17 +716,17 @@ public class World {
 					    			texX += 1;
 					    		}
 					    		
-					    		renderCell(texX, texY, isShadowed(i, j, k), lightModGrid[i][j][k]);
+					    		renderCell(texX, texY, isShadowed(i, j, k), lightModGrid.get(i, j, k));
 							
 							GL11.glPopMatrix();
 						}
 					}
 					//Display hanging bottom vertical textures
-					if (k + 1 < kMax && terrainGrid[i][j][k+1].getTerrainType() != air && k - 1 >= 0
-							&& ((!terrainGrid[i][j][k+1].isUnblendedVertical() && (terrainGrid[i][j][k].getTerrainType() == air || terrainGrid[i][j][k].isUnblendedVertical()))
-									|| (terrainGrid[i][j][k+1].isUnblendedVertical() && (terrainGrid[i][j][k].getTerrainType() == air || terrainGrid[i][j][k].getTerrainType() != terrainGrid[i][j][k+1].getTerrainType()))))
+					if (k + 1 < kMax && terrainGrid.get(i, j, k+1).getTerrainType() != air && k - 1 >= 0
+							&& ((!terrainGrid.get(i, j, k+1).isUnblendedVertical() && (terrainGrid.get(i, j, k).getTerrainType() == air || terrainGrid.get(i, j, k).isUnblendedVertical()))
+									|| (terrainGrid.get(i, j, k+1).isUnblendedVertical() && (terrainGrid.get(i, j, k).getTerrainType() == air || terrainGrid.get(i, j, k).getTerrainType() != terrainGrid.get(i, j, k+1).getTerrainType()))))
 					{
-						t = terrainGrid[i][j][k+1];
+						t = terrainGrid.get(i, j, k+1);
 						//Determine position on screen
 						int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
 						int y = (pixelSize*(textureSize*j - (int)(displayCenter[1]*textureSize)) + 300) + quadVertexMax*k - (quadVertexMax)/2;
@@ -719,13 +745,13 @@ public class World {
 					    	
 					    	if (t.isUnblendedVertical())
 					    	{
-					    		rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k+1].getTerrainType() != t.getTerrainType();
-				    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k+1].getTerrainType() != t.getTerrainType();
+					    		rightEmpty = i + 1 >= width || terrainGrid.get(i+1, j, k+1).getTerrainType() != t.getTerrainType();
+				    			leftEmpty = i - 1 < 0 || terrainGrid.get(i-1, j, k+1).getTerrainType() != t.getTerrainType();
 					    	}
 					    	else
 					    	{
-						    	rightEmpty = i + 1 >= terrainGrid.length || terrainGrid[i+1][j][k+1].getTerrainType() == air;
-				    			leftEmpty = i - 1 < 0 || terrainGrid[i-1][j][k+1].getTerrainType() == air;
+						    	rightEmpty = i + 1 >= width || terrainGrid.get(i+1, j, k+1).getTerrainType() == air;
+				    			leftEmpty = i - 1 < 0 || terrainGrid.get(i-1, j, k+1).getTerrainType() == air;
 					    	}
 							
 				    		texY += 4;
@@ -747,7 +773,7 @@ public class World {
 				    			texX += 1;
 				    		}
 					    	
-				    		renderCell(texX, texY, false, lightModGrid[i][j][k+1]);
+				    		renderCell(texX, texY, false, lightModGrid.get(i, j, k+1));
 							
 						GL11.glPopMatrix();
 					}
@@ -767,12 +793,12 @@ public class World {
 							
 							GL11.glPushMatrix();
 								//don't shadow if the thing is in (i.e. on) a vertical wall
-								if (terrainGrid[i][j][k].getTerrainType() != air)
-									setLighting(false, lightModGrid[i][j][k]);
+								if (terrainGrid.get(i, j, k).getTerrainType() != air)
+									setLighting(false, lightModGrid.get(i, j, k));
 								else
-									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+									setLighting(isShadowed(i, j, k), lightModGrid.get(i, j, k));
 								GL11.glTranslatef(x, y, 0);
-								thingGrid[i][j][k].renderThings(pixelSize, textureSize);
+								thingGrid.get(i, j, k).renderThings(pixelSize, textureSize);
 							GL11.glPopMatrix();
 						}
 						else
@@ -807,7 +833,7 @@ public class World {
 					//Render Agents
 					for (int i = iMin; i <= iMax; i ++)
 					{
-						Agent agent = agentGrid[i][j][k];
+						Agent agent = agentGrid.get(i, j, k);
 						if (agent != null)
 						{
 							int x = pixelSize*(textureSize*i - (int)(displayCenter[0]*textureSize)) + 400 - (quadVertexMax)/2;
@@ -817,10 +843,10 @@ public class World {
 								if (agent.getClass() == Placeholder.class)
 								{
 									Position effectivePos = ((Placeholder)agent).getEffectivePos();
-									setLighting(isShadowed(effectivePos.x, effectivePos.y, effectivePos.z), lightModGrid[effectivePos.x][effectivePos.y][effectivePos.z]);
+									setLighting(isShadowed(effectivePos.x, effectivePos.y, effectivePos.z), lightModGrid.get(effectivePos.x, effectivePos.y, effectivePos.z));
 								}
 								else
-									setLighting(isShadowed(i, j, k), lightModGrid[i][j][k]);
+									setLighting(isShadowed(i, j, k), lightModGrid.get(i, j, k));
 								GL11.glTranslatef(x, y, 0);
 								agent.renderAgent(pixelSize, textureSize);
 							GL11.glPopMatrix();
@@ -836,13 +862,13 @@ public class World {
 		//Determine which part of the texture to use based on how many neighbors are air
 		Terrain toppedTerrain;
 		int adjustment = 0;	//height adjustment needed for comparing unblended terrains
-		if (terrainGrid[x][y][z-1].isTransparent())
+		if (terrainGrid.get(x, y, z-1).isTransparent())
 		{
 			toppedTerrain = t;
 		}
 		else
 		{
-			toppedTerrain = terrainGrid[x][y][z-1];
+			toppedTerrain = terrainGrid.get(x, y, z-1);
 			adjustment = -1;
 		}
 		int texX = toppedTerrain.getTexCol();
@@ -852,33 +878,33 @@ public class World {
     	boolean topEmpty, bottomEmpty, rightEmpty, leftEmpty;
     	if (toppedTerrain.isUnblendedVertical())
     	{
-			topEmpty = y + 1 >= terrainGrid[0].length
-					|| terrainGrid[x][y+1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x][y+1][z].isTransparent()
-					|| terrainGrid[x][y+1][z-1].getTerrainType() == air;
+			topEmpty = y + 1 >= depth
+					|| terrainGrid.get(x, y+1, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x, y+1, z).isTransparent()
+					|| terrainGrid.get(x, y+1, z-1).getTerrainType() == air;
 			bottomEmpty = y - 1 < 0
-					|| terrainGrid[x][y-1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x][y-1][z].isTransparent()
-					|| terrainGrid[x][y-1][z-1].getTerrainType() == air;
-			rightEmpty = x + 1 >= terrainGrid.length
-					|| terrainGrid[x+1][y][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x+1][y][z].isTransparent()
-					|| terrainGrid[x+1][y][z-1].getTerrainType() == air;
+					|| terrainGrid.get(x, y-1, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x, y-1, z).isTransparent()
+					|| terrainGrid.get(x, y-1, z-1).getTerrainType() == air;
+			rightEmpty = x + 1 >= width
+					|| terrainGrid.get(x+1, y, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x+1, y, z).isTransparent()
+					|| terrainGrid.get(x+1, y, z-1).getTerrainType() == air;
 			leftEmpty = x - 1 < 0
-					|| terrainGrid[x-1][y][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x-1][y][z].isTransparent()
-					|| terrainGrid[x-1][y][z-1].getTerrainType() == air;
+					|| terrainGrid.get(x-1, y, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x-1, y, z).isTransparent()
+					|| terrainGrid.get(x-1, y, z-1).getTerrainType() == air;
     	}
     	else
     	{
-			topEmpty = y + 1 >= terrainGrid[0].length
-					|| terrainGrid[x][y+1][z].getTerrainType() == air || terrainGrid[x][y+1][z].isTransparent()
-					|| terrainGrid[x][y+1][z-1].getTerrainType() == air;
+			topEmpty = y + 1 >= depth
+					|| terrainGrid.get(x, y+1, z).getTerrainType() == air || terrainGrid.get(x, y+1, z).isTransparent()
+					|| terrainGrid.get(x, y+1, z-1).getTerrainType() == air;
 			bottomEmpty = y - 1 < 0
-					|| terrainGrid[x][y-1][z].getTerrainType() == air || terrainGrid[x][y-1][z].isTransparent()
-					|| terrainGrid[x][y-1][z-1].getTerrainType() == air;
-			rightEmpty = x + 1 >= terrainGrid.length
-					|| terrainGrid[x+1][y][z].getTerrainType() == air || terrainGrid[x+1][y][z].isTransparent()
-					|| terrainGrid[x+1][y][z-1].getTerrainType() == air;
+					|| terrainGrid.get(x, y-1, z).getTerrainType() == air || terrainGrid.get(x, y-1, z).isTransparent()
+					|| terrainGrid.get(x, y-1, z-1).getTerrainType() == air;
+			rightEmpty = x + 1 >= width
+					|| terrainGrid.get(x+1, y, z).getTerrainType() == air || terrainGrid.get(x+1, y, z).isTransparent()
+					|| terrainGrid.get(x+1, y, z-1).getTerrainType() == air;
 			leftEmpty = x - 1 < 0
-					|| terrainGrid[x-1][y][z].getTerrainType() == air || terrainGrid[x-1][y][z].isTransparent()
-					|| terrainGrid[x-1][y][z-1].getTerrainType() == air;
+					|| terrainGrid.get(x-1, y, z).getTerrainType() == air || terrainGrid.get(x-1, y, z).isTransparent()
+					|| terrainGrid.get(x-1, y, z-1).getTerrainType() == air;
     	}
 	
 		if (topEmpty && bottomEmpty)
@@ -918,7 +944,7 @@ public class World {
 		//shift in x direction to cross section textures
 		texX += 4;
 		
-		renderCell(texX, texY, false, lightModGrid[x][y][z]);
+		renderCell(texX, texY, false, lightModGrid.get(x, y, z));
 		
 		//corner rendering checks (four non-exclusive cases)
 		if (!topEmpty && !rightEmpty)
@@ -927,15 +953,15 @@ public class World {
 			boolean cornerEmpty;
 			if (toppedTerrain.isUnblendedVertical())
 	    	{
-				cornerEmpty = x + 1 >= terrainGrid.length || y + 1 >= terrainGrid[0].length
-						|| terrainGrid[x+1][y+1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x+1][y+1][z].isTransparent()
-						|| terrainGrid[x+1][y+1][z-1].getTerrainType() == air;
+				cornerEmpty = x + 1 >= width || y + 1 >= depth
+						|| terrainGrid.get(x+1, y+1, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x+1, y+1, z).isTransparent()
+						|| terrainGrid.get(x+1, y+1, z-1).getTerrainType() == air;
 	    	}
 	    	else
 	    	{
-	    		cornerEmpty = x + 1 >= terrainGrid.length || y + 1 >= terrainGrid[0].length
-						|| terrainGrid[x+1][y+1][z].getTerrainType() == air || terrainGrid[x+1][y+1][z].isTransparent()
-						|| terrainGrid[x+1][y+1][z-1].getTerrainType() == air;
+	    		cornerEmpty = x + 1 >= width || y + 1 >= depth
+						|| terrainGrid.get(x+1, y+1, z).getTerrainType() == air || terrainGrid.get(x+1, y+1, z).isTransparent()
+						|| terrainGrid.get(x+1, y+1, z-1).getTerrainType() == air;
 	    	}
 			
 			if (cornerEmpty)
@@ -947,7 +973,7 @@ public class World {
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid[x][y][z]);
+				setLighting(false, lightModGrid.get(x, y, z));
 					GL11.glTexCoord2f(texX * tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
 					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax/2.0f);
 					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvQuarterAdjustment);
@@ -965,15 +991,15 @@ public class World {
 			boolean cornerEmpty;
 			if (toppedTerrain.isUnblendedVertical())
 	    	{
-				cornerEmpty = x + 1 >= terrainGrid.length || y - 1 < 0
-						|| terrainGrid[x+1][y-1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x+1][y-1][z].isTransparent()
-						|| terrainGrid[x+1][y-1][z-1].getTerrainType() == air;
+				cornerEmpty = x + 1 >= width || y - 1 < 0
+						|| terrainGrid.get(x+1, y-1, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x+1, y-1, z).isTransparent()
+						|| terrainGrid.get(x+1, y-1, z-1).getTerrainType() == air;
 	    	}
 	    	else
 	    	{
-	    		cornerEmpty = x + 1 >= terrainGrid.length || y - 1 < 0
-						|| terrainGrid[x+1][y-1][z].getTerrainType() == air || terrainGrid[x+1][y-1][z].isTransparent()
-						|| terrainGrid[x+1][y-1][z-1].getTerrainType() == air;
+	    		cornerEmpty = x + 1 >= width || y - 1 < 0
+						|| terrainGrid.get(x+1, y-1, z).getTerrainType() == air || terrainGrid.get(x+1, y-1, z).isTransparent()
+						|| terrainGrid.get(x+1, y-1, z-1).getTerrainType() == air;
 	    	}
 			
 			if (cornerEmpty)
@@ -985,7 +1011,7 @@ public class World {
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid[x][y][z]);
+				setLighting(false, lightModGrid.get(x, y, z));
 					GL11.glTexCoord2f(texX * tConv + tConvQuarterAdjustment, texY*tConv + tConv);
 					GL11.glVertex2f(quadVertexMax/2.0f, 0);
 					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
@@ -1004,14 +1030,14 @@ public class World {
 			if (toppedTerrain.isUnblendedVertical())
 	    	{
 				cornerEmpty = x - 1 < 0 || y - 1 < 0
-						|| terrainGrid[x-1][y-1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x-1][y-1][z].isTransparent()
-						|| terrainGrid[x-1][y-1][z-1].getTerrainType() == air;
+						|| terrainGrid.get(x-1, y-1, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x-1, y-1, z).isTransparent()
+						|| terrainGrid.get(x-1, y-1, z-1).getTerrainType() == air;
 	    	}
 	    	else
 	    	{
 	    		cornerEmpty = x - 1 < 0 || y - 1 < 0
-						|| terrainGrid[x-1][y-1][z].getTerrainType() == air || terrainGrid[x-1][y-1][z].isTransparent()
-						|| terrainGrid[x-1][y-1][z-1].getTerrainType() == air;
+						|| terrainGrid.get(x-1, y-1, z).getTerrainType() == air || terrainGrid.get(x-1, y-1, z).isTransparent()
+						|| terrainGrid.get(x-1, y-1, z-1).getTerrainType() == air;
 	    	}
 			
 			if (cornerEmpty)
@@ -1023,7 +1049,7 @@ public class World {
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid[x][y][z]);
+				setLighting(false, lightModGrid.get(x, y, z));
 					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 					GL11.glVertex2f(0, 0);
 					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConv);
@@ -1041,15 +1067,15 @@ public class World {
 			boolean cornerEmpty;
 			if (toppedTerrain.isUnblendedVertical())
 	    	{
-				cornerEmpty = x - 1 < 0 || y + 1 >= terrainGrid[0].length
-						|| terrainGrid[x-1][y+1][z+adjustment].getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid[x-1][y+1][z].isTransparent()
-						|| terrainGrid[x-1][y+1][z-1].getTerrainType() == air;
+				cornerEmpty = x - 1 < 0 || y + 1 >= depth
+						|| terrainGrid.get(x-1, y+1, z+adjustment).getTerrainType() != toppedTerrain.getTerrainType() || terrainGrid.get(x-1, y+1, z).isTransparent()
+						|| terrainGrid.get(x-1, y+1, z-1).getTerrainType() == air;
 	    	}
 	    	else
 	    	{
-	    		cornerEmpty = x - 1 < 0 || y + 1 >= terrainGrid[0].length
-						|| terrainGrid[x-1][y+1][z].getTerrainType() == air || terrainGrid[x-1][y+1][z].isTransparent()
-						|| terrainGrid[x-1][y+1][z-1].getTerrainType() == air;
+	    		cornerEmpty = x - 1 < 0 || y + 1 >= depth
+						|| terrainGrid.get(x-1, y+1, z).getTerrainType() == air || terrainGrid.get(x-1, y+1, z).isTransparent()
+						|| terrainGrid.get(x-1, y+1, z-1).getTerrainType() == air;
 	    	}
 			
 			if (cornerEmpty)
@@ -1061,7 +1087,7 @@ public class World {
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid[x][y][z]);
+				setLighting(false, lightModGrid.get(x, y, z));
 					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConvQuarterAdjustment);
 					GL11.glVertex2f(0, quadVertexMax/2.0f);
 					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
@@ -1254,7 +1280,7 @@ public class World {
 		agents.add(newAgent);
 		
 		Position pos = newAgent.getPos();
-		agentGrid[pos.x][pos.y][pos.z] = newAgent;
+		agentGrid.set(pos.x, pos.y, pos.z, newAgent);
 	}
 	
 	/**
@@ -1267,26 +1293,26 @@ public class World {
 		for (int i = 0; i < newAgents.size(); i ++)
 		{
 			Position pos = newAgents.get(i).getPos();
-			agentGrid[pos.x][pos.y][pos.z] = newAgents.get(i);
+			agentGrid.set(pos.x, pos.y, pos.z, newAgents.get(i));
 		}
 	}
 	
 	public Agent getAgentAt(int x, int y, int z)
 	{
-		return agentGrid[x][y][z];
+		return agentGrid.get(x, y, z);
 	}
 	
 	public void removeAgentAt(int x, int y, int z)
 	{
-		agents.remove(agentGrid[x][y][z]);
-		agentGrid[x][y][z] = null;
+		agents.remove(agentGrid.get(x, y, z));
+		agentGrid.set(x, y, z, null);
 	}
 	
 	public void addThing(Thing t, int x, int y, int z)
 	{
-		if (thingGrid[x][y][z] == null)
-			thingGrid[x][y][z] = new ThingGridCell();
-		thingGrid[x][y][z].addThing(t);
+		if (thingGrid.get(x, y, z) == null)
+			thingGrid.set(x, y, z, new ThingGridCell());
+		thingGrid.get(x, y, z).addThing(t);
 		t.setPos(new Position(x, y, z));
 		things.add(t);
 		if (t.isLightSource())
@@ -1295,9 +1321,9 @@ public class World {
 	
 	public void removeThingsAt(int x, int y, int z)
 	{
-		if (thingGrid[x][y][z] != null)
+		if (thingGrid.get(x, y, z) != null)
 		{
-			ArrayList<Thing> thingList = thingGrid[x][y][z].getThings();
+			ArrayList<Thing> thingList = thingGrid.get(x, y, z).getThings();
 			for (int i = 0; i < thingList.size(); i ++)
 			{
 				if (thingList.get(i).isLightSource())
@@ -1316,38 +1342,38 @@ public class World {
 		int newX = oldX + xChange;
 		int newY = oldY + yChange;
 		int newZ = oldZ + zChange;
-		if (newX < 0 || newX >= thingGrid.length || newY < 0 || newY >= thingGrid[0].length || newZ < 0 || newZ >= thingGrid[0][0].length)
+		if (newX < 0 || newX >= width || newY < 0 || newY >= depth || newZ < 0 || newZ >= height)
 		{
 			System.out.println("Could not move agent, position out of bounds");
 		}
 		else
 		{
 			thing.setPos(new Position(newX, newY, newZ));
-			thingGrid[oldX][oldY][oldZ].removeThing(thing);
-			if (thingGrid[newX][newY][newZ] == null)
-				thingGrid[newX][newY][newZ] = new ThingGridCell();
-			thingGrid[newX][newY][newZ].addThing(thing);
+			thingGrid.get(oldX, oldY, oldZ).removeThing(thing);
+			if (thingGrid.get(newX, newY, newZ) == null)
+				thingGrid.set(newX, newY, newZ, new ThingGridCell());
+			thingGrid.get(newX, newY, newZ).addThing(thing);
 		}
 	}
 	
 	public ThingGridCell getThingsAt(int x, int y, int z)
 	{
-		return thingGrid[x][y][z];
+		return thingGrid.get(x, y, z);
 	}
 	
 	public ThingGridCell getThingsAt(Position pos)
 	{
-		return thingGrid[pos.x][pos.y][pos.z];
+		return thingGrid.get(pos.x, pos.y, pos.z);
 	}
 	
 	public Terrain getTerrainAt(Position pos)
 	{
-		return terrainGrid[pos.x][pos.y][pos.z];
+		return terrainGrid.get(pos.x, pos.y, pos.z);
 	}
 	
 	public Terrain getTerrainAt(int x, int y, int z)
 	{
-		return terrainGrid[x][y][z];
+		return terrainGrid.get(x, y, z);
 	}
 	
 	public void moveAgent(Agent agent, int xChange, int yChange, int zChange)
@@ -1359,15 +1385,15 @@ public class World {
 		int newX = oldX + xChange;
 		int newY = oldY + yChange;
 		int newZ = oldZ + zChange;
-		if (newX < 0 || newX >= agentGrid.length || newY < 0 || newY >= agentGrid[0].length || newZ < 0 || newZ >= agentGrid[0][0].length)
+		if (newX < 0 || newX >= width || newY < 0 || newY >= depth || newZ < 0 || newZ >= height)
 		{
 			System.out.println("Could not move agent, position out of bounds");
 		}
 		else
 		{
 			agent.setPos(new Position(newX, newY, newZ));
-			agentGrid[oldX][oldY][oldZ] = null;
-			agentGrid[newX][newY][newZ] = agent;
+			agentGrid.set(oldX, oldY, oldZ, null);
+			agentGrid.set(newX, newY, newZ, agent);
 		}
 	}
 	
@@ -1437,7 +1463,7 @@ public class World {
 	public boolean isOccupied(int x, int y, int z)
 	{
 		if (this.isInBounds(x, y, z))
-			return agentGrid[x][y][z] != null;
+			return agentGrid.get(x, y, z) != null;
 		else
 			return false;
 	}
@@ -1453,7 +1479,7 @@ public class World {
 	public boolean hasThing(int x, int y, int z)
 	{
 		if (this.isInBounds(x, y, z))
-			return thingGrid[x][y][z] != null && !thingGrid[x][y][z].isEmpty();
+			return thingGrid.get(x, y, z) != null && !thingGrid.get(x, y, z).isEmpty();
 		else
 			return false;
 	}
@@ -1461,7 +1487,7 @@ public class World {
 	public boolean hasThing(Position pos)
 	{
 		if (this.isInBounds(pos.x, pos.y, pos.z))
-			return thingGrid[pos.x][pos.y][pos.z] != null && !thingGrid[pos.x][pos.y][pos.z].isEmpty();
+			return thingGrid.get(pos.x, pos.y, pos.z) != null && !thingGrid.get(pos.x, pos.y, pos.z).isEmpty();
 		else
 			return false;
 	}
@@ -1481,11 +1507,11 @@ public class World {
 		{
 			return true;
 		}
-		else if (terrainGrid[x][y][z].isBlocking())
+		else if (terrainGrid.get(x, y, z).isBlocking())
 		{
 			return true;
 		}
-		else if (this.hasThing(x, y, z) && thingGrid[x][y][z].isBlocking()) //things
+		else if (this.hasThing(x, y, z) && thingGrid.get(x, y, z).isBlocking()) //things
 		{
 			return true;
 		}
@@ -1499,12 +1525,12 @@ public class World {
 	
 	public boolean isLightBlocking(int x, int y, int z)
 	{
-		if (isOccupied(x, y, z) && !agentGrid[x][y][z].isTransparent())
+		if (isOccupied(x, y, z) && !agentGrid.get(x, y, z).isTransparent())
 			return true;
-		else if (hasThing(x, y, z) && !thingGrid[x][y][z].isTransparent())
+		else if (hasThing(x, y, z) && !thingGrid.get(x, y, z).isTransparent())
 			return true;
 		else
-			return !terrainGrid[x][y][z].isTransparent();
+			return !terrainGrid.get(x, y, z).isTransparent();
 	}
 	
 	/**
@@ -1527,7 +1553,7 @@ public class World {
 		//handle special cases of light-blocking test cells
 		if (isLightBlocking(x2, y2, z2))
 		{
-			if (terrainGrid[x2][y2][z2].isBlocking())
+			if (terrainGrid.get(x2, y2, z2).isBlocking())
 			{
 				if (dy < 0)
 					return true;
@@ -1565,18 +1591,18 @@ public class World {
 		if (!this.isInBounds(x, y, z - 1))
 		{
 			if (this.hasThing(x, y, z))
-				return this.thingGrid[x][y][z].isCrossable();
+				return this.thingGrid.get(x, y, z).isCrossable();
 			return false;
 		}
 		
 		
-		if (this.terrainGrid[x][y][z-1].isBlocking())
+		if (this.terrainGrid.get(x, y, z-1).isBlocking())
 			return true;
 		else
 		{
 			if (this.hasThing(x, y, z))
 			{
-				return this.thingGrid[x][y][z].isCrossable();
+				return this.thingGrid.get(x, y, z).isCrossable();
 			}
 			return false;
 		}
@@ -1585,7 +1611,7 @@ public class World {
 	public boolean isLandable(int x, int y, int z)
 	{
 		//Add things that can't be landed on here
-		if (this.hasThing(x, y, z) && this.thingGrid[x][y][z].hasRamp())
+		if (this.hasThing(x, y, z) && this.thingGrid.get(x, y, z).hasRamp())
 			return false;
 		else
 			return isCrossable(x, y, z);
@@ -1601,7 +1627,7 @@ public class World {
 	 */
 	public boolean isInBounds(int x, int y, int z)
 	{
-		if (x >= 0 && x < terrainGrid.length && y >= 0 && y < terrainGrid[0].length && z >= 0 && z < terrainGrid[0][0].length)
+		if (x >= 0 && x < width && y >= 0 && y < depth && z >= 0 && z < height)
 		{
 			return true;
 		}
@@ -1616,25 +1642,25 @@ public class World {
 	 */
 	public boolean isInBounds(Position pos)
 	{
-		if (pos.x >= 0 && pos.x < terrainGrid.length && pos.y >= 0 && pos.y < terrainGrid[0].length && pos.z >= 0 && pos.z < terrainGrid[0][0].length)
+		if (pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < depth && pos.z >= 0 && pos.z < height)
 		{
 			return true;
 		}
 		return false;
 	}
 	
-	public void setTerrain(Terrain[][][] t)
+	public void setTerrain(Grid<Terrain> t)
 	{
-		for (int i = 0; i < t.length; i ++)
+		for (int i = 0; i < t.getWidth(); i ++)
 		{
-			for (int j = 0; j < t[0].length; j ++)
+			for (int j = 0; j < t.getDepth(); j ++)
 			{
-				for (int k = 0; k < t[0][0].length; k ++)
+				for (int k = 0; k < t.getHeight(); k ++)
 				{
 					//bounds checking
-					if (i < terrainGrid.length && j < terrainGrid[0].length && k < terrainGrid[0][0].length)
+					if (i < width && j < depth && k < height)
 					{
-						terrainGrid[i][j][k] = t[i][j][k];
+						terrainGrid.set(i, j, k, t.get(i, j, k));
 					}
 				}
 			}
@@ -1683,7 +1709,7 @@ public class World {
 		return cameraLockH;
 	}
 
-	public void setWidth(float width) {
+	public void setWidth(int width) {
 		this.width = width;
 	}
 
@@ -1713,5 +1739,19 @@ public class World {
 
 	public void setCs(ControlState cs) {
 		this.cs = cs;
+	}
+
+	public String save() 
+	{
+		String data = new String();
+		data = width + "," + depth + "," + height + "\n";
+		data += displayCenter[0] + "," + displayCenter[1] + "\n";
+		
+		return null;
+	}
+
+	public static World load(String data) {
+		
+		return null;
 	}
 }
