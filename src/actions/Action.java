@@ -2,7 +2,7 @@ package actions;
 
 import entities.Agent;
 
-import world.World;
+import world.Map;
 
 public interface Action {	
 	/**
@@ -12,7 +12,7 @@ public interface Action {
 	 * @param world the world which contains all information necessary for
 	 * an action to be executed
 	 */
-	public void execute(Agent agent, World world);
+	public void execute(Agent agent, Map world);
 	
 	public boolean isFinished();
 	

@@ -4,7 +4,7 @@ import java.util.Random;
 
 import utils.planners.Distance;
 import world.Position;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
@@ -33,7 +33,7 @@ public class Wander implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, World world)
+	public void execute(Agent agent, Map world)
 	{
 		Random rand = new Random();
 		if (step == null || step.isFinished())

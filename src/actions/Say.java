@@ -2,7 +2,7 @@ package actions;
 
 import utils.display.DisplayText;
 import world.Position;
-import world.World;
+import world.Map;
 import entities.Agent;
 
 import static entities.Agent.Direction.*;
@@ -44,7 +44,7 @@ public class Say implements Action
 	}
 	
 	@Override
-	public void execute(Agent agent, World world)
+	public void execute(Agent agent, Map world)
 	{
 		if (!initialized)
 		{

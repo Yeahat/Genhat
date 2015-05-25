@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import world.World;
+import world.Map;
 import entities.Agent;
 
 public class Fireplace extends Thing {
@@ -174,7 +174,7 @@ public class Fireplace extends Thing {
 	}
 
 	@Override
-	public void interact(Agent agent, World world)
+	public void interact(Agent agent, Map world)
 	{
 		if (!lit)
 			lit = true;

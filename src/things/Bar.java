@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
@@ -36,7 +36,7 @@ public class Bar extends Thing {
 	}
 
 	@Override
-	public void interact(Agent agent, World world){
+	public void interact(Agent agent, Map world){
 		//get direction of interaction
 		int x = 2*pos.x - agent.getPos().x;
 		int y = 2*pos.y - agent.getPos().y;

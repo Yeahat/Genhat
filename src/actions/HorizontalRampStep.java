@@ -2,7 +2,7 @@ package actions;
 
 import utils.planners.PathPlannerUtils;
 import world.Position;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 import entities.Hero;
@@ -32,7 +32,7 @@ public class HorizontalRampStep implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, World world)
+	public void execute(Agent agent, Map world)
 	{		
 		if (finished)
 			return;

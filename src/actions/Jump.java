@@ -1,7 +1,7 @@
 package actions;
 
 import world.Position;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
@@ -21,7 +21,7 @@ public class Jump implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, World world)
+	public void execute(Agent agent, Map world)
 	{
 		if (finished)
 			return;
@@ -337,7 +337,7 @@ public class Jump implements Action {
 		return finished;
 	}
 
-	private boolean canJump(Agent agent, World world)
+	private boolean canJump(Agent agent, Map world)
 	{
 		Position pos = agent.getPos();
 		int xFinish = pos.x;

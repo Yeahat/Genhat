@@ -19,7 +19,7 @@ public class Grid<E>
 		this.setWidth(width);
 		this.setDepth(depth);
 		this.setHeight(height);
-		grid = new Object[this.getWidth()*this.getDepth()*this.getHeight()];
+		setGrid(new Object[this.getWidth()*this.getDepth()*this.getHeight()]);
 	}
 	
 	/**
@@ -32,7 +32,7 @@ public class Grid<E>
 	@SuppressWarnings("unchecked")
 	public E get(int x, int y, int z)
 	{
-		return (E)(grid[x*getDepth()*getHeight() + y*getHeight() + z]);
+		return (E)(getGrid()[x*getDepth()*getHeight() + y*getHeight() + z]);
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class Grid<E>
 	 */
 	public void set(int x, int y, int z, E element)
 	{
-		grid[x*getDepth()*getHeight() + y*getHeight() + z] = element;
+		getGrid()[x*getDepth()*getHeight() + y*getHeight() + z] = element;
 	}
 	
 	public int getWidth() {
@@ -69,5 +69,13 @@ public class Grid<E>
 
 	public void setHeight(int height) {
 		this.height = height;
+	}
+
+	public Object[] getGrid() {
+		return grid;
+	}
+
+	public void setGrid(Object[] grid) {
+		this.grid = grid;
 	}
 }

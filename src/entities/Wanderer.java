@@ -12,7 +12,7 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import actions.Wander;
 import world.Position;
-import world.World;
+import world.Map;
 
 public class Wanderer extends Agent {
 	int frequency;
@@ -55,7 +55,7 @@ public class Wanderer extends Agent {
 	}
 	
 	@Override
-	public void decideNextAction(World world) 
+	public void decideNextAction(Map world) 
 	{
 		if (currentAction != wander)
 			currentAction = wander;

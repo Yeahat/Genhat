@@ -7,7 +7,7 @@ import org.newdawn.slick.opengl.Texture;
 
 import static entities.Agent.Direction.*;
 import world.Position;
-import world.World;
+import world.Map;
 import actions.Action;
 import actions.Idle;
 
@@ -126,13 +126,13 @@ public abstract class Agent {
 	 * Update the currentAction based on world information
 	 * @param world the world
 	 */
-	public abstract void decideNextAction(World world);
+	public abstract void decideNextAction(Map world);
 	
 	/**
 	 * Execute the current action
 	 * @param world the world information to be passed through to the action's execute call
 	 */
-	public void executeAction(World world)
+	public void executeAction(Map world)
 	{
 		currentAction.execute(this, world);
 	}
@@ -142,7 +142,7 @@ public abstract class Agent {
 	 * @param agent the agent doing the interacting
 	 * @param world the world in which the interacting agents exist
 	 */
-	public void interact(Agent agent, World world){}
+	public void interact(Agent agent, Map world){}
 	
 	/**
 	 * Incrementer for the x offset value

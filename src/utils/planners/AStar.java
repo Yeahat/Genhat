@@ -6,7 +6,7 @@ import java.util.PriorityQueue;
 
 import utils.planners.PathPlannerUtils.MovementClass;
 import world.Position;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 import static utils.planners.PathPlannerUtils.MovementClass.*;
@@ -21,7 +21,7 @@ public class AStar {
 	private Position goal;
 	private int loopCounter;
 	private Agent agent;
-	private World world;
+	private Map world;
 	
 	private MovementClass movementType;
 	private int loopsPerPlanningIteration;
@@ -49,7 +49,7 @@ public class AStar {
 		path = "";
 	}
 	
-	public void startPlanningQuery(Agent agent, World world, Position start, Position goal)
+	public void startPlanningQuery(Agent agent, Map world, Position start, Position goal)
 	{
 		this.agent = agent;
 		this.world = world;

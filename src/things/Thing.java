@@ -3,7 +3,7 @@ package things;
 import org.newdawn.slick.opengl.Texture;
 
 import world.Position;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 
@@ -68,7 +68,7 @@ public abstract class Thing {
 	 * @param agent the agent interacting with the thing
 	 * @param world the world in which the thing exists
 	 */
-	public void interact(Agent agent, World world){}
+	public void interact(Agent agent, Map world){}
 	
 	/**
 	 * Method to call when removing a thing from the world, allows a thing's removal to first make any necessary changes
@@ -87,7 +87,7 @@ public abstract class Thing {
 	 * @param world the world in which the thing exists
 	 * @return true if the object should not be at rest with regards to gravity
 	 */
-	private boolean gravityCheck(World world)
+	private boolean gravityCheck(Map world)
 	{
 		//check if there's room to fall
 		if (!blockedBelow(world))
@@ -107,7 +107,7 @@ public abstract class Thing {
 	 * 
 	 * @param world the world in which the thing exists
 	 */
-	public void applyGravity(World world)
+	public void applyGravity(Map world)
 	{
 		//check to see if gravity should be acting on an object
 		if (gravityCheck(world))
@@ -121,7 +121,7 @@ public abstract class Thing {
 	 * @param world the world in which the thing exists
 	 * @return true if blocked
 	 */
-	private boolean blockedBelow(World world)
+	private boolean blockedBelow(Map world)
 	{
 		if (pos.z - 1 < 0)
 			return true;
@@ -137,7 +137,7 @@ public abstract class Thing {
 	 * @param world the world in which the thing exists
 	 * @return true if blocked
 	 */
-	private boolean blockedAbove(World world)
+	private boolean blockedAbove(Map world)
 	{
 		if (!world.isInBounds(pos.x, pos.y, pos.z + 1)
 				|| (world.getTerrainAt(pos.x, pos.y, pos.z + 1) != null && world.getTerrainAt(pos.x, pos.y, pos.z + 1).isBlocking())
@@ -154,7 +154,7 @@ public abstract class Thing {
 	 * @return true if blocked
 	 */
 	@SuppressWarnings("unused")
-	private boolean blockedInDirection(World world, Direction d)
+	private boolean blockedInDirection(Map world, Direction d)
 	{
 		int x = pos.x, y = pos.y, z = pos.z;
 		
@@ -177,7 +177,7 @@ public abstract class Thing {
 	 * 
 	 * @param world the world in which the thing exists
 	 */
-	public void propagateOffset(World world)
+	public void propagateOffset(Map world)
 	{
 		realOffset[0] += velocity[0];
 		realOffset[1] += velocity[1];

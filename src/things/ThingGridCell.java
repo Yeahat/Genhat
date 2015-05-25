@@ -3,7 +3,7 @@ package things;
 import java.util.ArrayList;
 
 import things.Thing.ConnectionContext;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 
@@ -175,7 +175,7 @@ public class ThingGridCell {
 	/**
 	 * Interact with the things in this cell, currently interacts only with the thing on top.
 	 */
-	public void interact(Agent agent, World world)
+	public void interact(Agent agent, Map world)
 	{
 		thingList.get(thingList.size() - 1).interact(agent, world);
 	}

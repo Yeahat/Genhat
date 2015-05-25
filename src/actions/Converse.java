@@ -2,7 +2,7 @@ package actions;
 
 import java.util.ArrayList;
 
-import world.World;
+import world.Map;
 import entities.Agent;
 
 public class Converse implements Action
@@ -28,7 +28,7 @@ public class Converse implements Action
 	}
 	
 	@Override
-	public void execute(Agent agent, World world)
+	public void execute(Agent agent, Map world)
 	{
 		if (texts.isEmpty() && say.isFinished())
 			return;

@@ -1,6 +1,6 @@
 package actions;
 
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 import utils.planners.PathPlannerUtils.MovementClass;
@@ -27,7 +27,7 @@ public class FollowPath implements Action
 	}
 	
 	@Override
-	public void execute(Agent agent, World world) 
+	public void execute(Agent agent, Map world) 
 	{		
 		if (currentStep == '-' && path.length() == 0)
 			return;

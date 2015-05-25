@@ -2,7 +2,7 @@ package actions;
 
 
 import utils.planners.PathPlannerUtils;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
@@ -22,7 +22,7 @@ public class StepOrClimb implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, World world)
+	public void execute(Agent agent, Map world)
 	{
 		//begin a new step if one is not already in progress, otherwise continue executing the step in progress
 		if (!continueStepping(agent, world))
@@ -71,7 +71,7 @@ public class StepOrClimb implements Action {
 		return finished;
 	}
 	
-	private boolean continueStepping(Agent agent, World world)
+	private boolean continueStepping(Agent agent, Map world)
 	{
 		if (agent.isRampAscending() || agent.isRampDescending())
 		{

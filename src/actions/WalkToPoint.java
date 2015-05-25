@@ -3,7 +3,7 @@ package actions;
 import utils.planners.AStar;
 import utils.planners.PathPlannerUtils.MovementClass;
 import world.Position;
-import world.World;
+import world.Map;
 import entities.Agent;
 import static utils.planners.PathPlannerUtils.MovementClass.*;
 
@@ -39,7 +39,7 @@ public class WalkToPoint implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, World world)
+	public void execute(Agent agent, Map world)
 	{
 		if (finished)
 			return;

@@ -9,6 +9,7 @@ import java.util.Random;
 //import loop.Timing;
 
 
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -40,14 +41,15 @@ import things.Rope;
 import things.Stairs;
 import things.Table;
 import things.WallCandle;
+import utils.data.MapSaver;
 import utils.display.DisplayText;
 import world.Grid;
 import world.Position;
 import world.Terrain;
-import world.World;
+import world.Map;
 import static world.Terrain.terrainType.*;
 import static entities.Agent.Direction.*;
-import static world.World.TimeOfDay.*;
+import static world.Map.TimeOfDay.*;
 import static things.Chair.chairType.*;
 import static things.Thing.ConnectionContext.*;
 import static things.Thing.Orientation.*;
@@ -56,7 +58,7 @@ import static things.Stairs.stairsType.*;
 
 public class GameMain {
 	
-	World world;
+	Map world;
 	
 	int arrowKeyInputCount = 0;
 	
@@ -125,6 +127,13 @@ public class GameMain {
 				if (Keyboard.getEventKey() == Keyboard.KEY_T)
 				{
 					world.cycleTimeOfDay();
+				}
+				
+				if (Keyboard.getEventKey() == Keyboard.KEY_S)
+				{
+					System.out.println("Saving map...");
+					MapSaver.saveMap(world);
+					System.out.println("Map saved.");
 				}
 				
 				//Tilde key (without shift) loads up the debug overlay 
@@ -355,10 +364,8 @@ public class GameMain {
 	 */
 	public void initWorld()
 	{
-		//genTestWorldHeroTest();
-		//genTestWorldStairs();
-		//genTestWorldJump();
-		genLargeWorld();
+		genInnTest();
+		//loadInnTest();
 	}
 	
 	/**
@@ -408,11 +415,11 @@ public class GameMain {
 	/*#################################################################################
 	 * Test Worlds
 	 *#################################################################################*/	
-	private void genLargeWorld()
+	private void genInnTest()
 	{
 		int xs = 50, ys = 50, zs = 10;
 		
-		world = new World(xs, ys, zs);
+		world = new Map("innTest", xs, ys, zs);
 		
 		Grid<Terrain> t = new Grid<Terrain>(xs, ys, zs);
 		for (int i = 0; i < xs; i ++)
@@ -836,6 +843,20 @@ public class GameMain {
 		agents.add(innkeeper);
 		
 		world.setTod(Sunrise);
+		
+		world.addAgents(agents);
+		world.setPlayer(hero);
+	}
+	
+	private void loadInnTest()
+	{
+		world = MapSaver.loadMap("innTest");
+		
+		ArrayList<Agent> agents = new ArrayList<Agent>();
+		
+		Hero hero = new Hero();
+		hero.setPos(new Position(25, 25, 1));
+		agents.add(hero);
 		
 		world.addAgents(agents);
 		world.setPlayer(hero);

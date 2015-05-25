@@ -15,11 +15,13 @@ import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
 import static world.Terrain.terrainType.*;
-import static world.World.TimeOfDay.*;
-import static world.World.ControlState.*;
+import static world.Map.TimeOfDay.*;
+import static world.Map.ControlState.*;
 
-public class World
+public class Map
 {
+	private String mapName;
+	
 	Grid<Terrain> terrainGrid;
 	Grid<ThingGridCell> thingGrid;
 	Grid<Agent> agentGrid;
@@ -75,10 +77,12 @@ public class World
 	 * @param ySize world width
 	 * @param zSize world height
 	 */
-	public World(int xSize, int ySize, int zSize)
-	{		
-		this.init(xSize, ySize, zSize);
+	public Map(String mapName, int xSize, int ySize, int zSize)
+	{
+		this.mapName = mapName;
 		
+		this.init(xSize, ySize, zSize);
+
 		displayCenter[0] = (float)xSize/2;
 		displayCenter[1] = (float)ySize/2 + (float)zSize/2;
 	}
@@ -91,8 +95,10 @@ public class World
 	 * @param zSize world height
 	 * @param center (x,y,z) center of the screen in grid coordinates
 	 */
-	public World(int xSize, int ySize, int zSize, int[] center)
+	public Map(String mapName, int xSize, int ySize, int zSize, int[] center)
 	{
+		this.mapName = mapName;
+		
 		this.init(xSize, ySize, zSize);
 		
 		displayCenter[0] = center[0];
@@ -107,8 +113,10 @@ public class World
 	 * @param zSize world height
 	 * @param displayCenter (x,y) center of the screen in display coordinates
 	 */
-	public World(int xSize, int ySize, int zSize, float[] displayCenter)
+	public Map(String mapName, int xSize, int ySize, int zSize, float[] displayCenter)
 	{
+		this.mapName = mapName;
+		
 		this.init(xSize, ySize, zSize);
 		
 		this.displayCenter[0] = displayCenter[0];
@@ -188,7 +196,7 @@ public class World
 		//roof check
 		for (int k = z; k < height; k ++)
 		{
-			if (terrainGrid.get(x, y, z).getTerrainType() != air)
+			if (terrainGrid.get(x, y, k).getTerrainType() != air)
 			{
 				//adjustment for standing on stairs
 				if (z - 1 >= 0 && this.hasThing(x, y, z - 1) && this.getThingsAt(x, y, z - 1).hasRamp())
@@ -1741,17 +1749,80 @@ public class World
 		this.cs = cs;
 	}
 
-	public String save() 
+	public ArrayList<String> save() 
 	{
-		String data = new String();
-		data = width + "," + depth + "," + height + "\n";
-		data += displayCenter[0] + "," + displayCenter[1] + "\n";
+		ArrayList<String> data = new ArrayList<String>();
+
+		//save map name
+		data.add(getMapName() + "\n");
 		
-		return null;
+		//save dimensions and current center
+		data.add(width + "," + depth + "," + height + "\n");
+		data.add(displayCenter[0] + "," + displayCenter[1] + "\n");
+		
+		//save terrain
+		for (int i = 0; i < terrainGrid.getGrid().length; i ++)
+		{
+			data.add(((Terrain)(terrainGrid.getGrid()[i])).save());
+		}
+		
+		data.add("\n");
+		
+		//save things
+		
+		//save agents
+		
+		//save other state stuff
+		
+		
+		return data;
 	}
 
-	public static World load(String data) {
+	public static Map load(String data)
+	{
+		//read in map name
+		String mapName = data.substring(0, data.indexOf('\n'));
+		data = data.substring(data.indexOf('\n') + 1);
 		
-		return null;
+		//read in dimensions
+		int width, depth, height;
+		width = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		depth = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		height = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		Map world = new Map(mapName, width, depth, height);
+		
+		//read in display center center
+		float[] displayCenter = new float[2];
+		displayCenter[0] = Float.parseFloat(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		displayCenter[1] = Float.parseFloat(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		world.setDisplayCenter(displayCenter);
+		
+		// read in terrain
+		ArrayList<Terrain> terrain = new ArrayList<Terrain>();
+		while (data.charAt(0) != '\n')
+		{
+			terrain.add(Terrain.load(data.substring(0, 6)));
+			data = data.substring(6);
+		}
+		Grid<Terrain> terrainGrid = new Grid<Terrain>(width, depth, height);
+		terrainGrid.setGrid(terrain.toArray());
+		world.setTerrain(terrainGrid);
+		
+		return world;
+	}
+
+	public String getMapName() {
+		return mapName;
+	}
+
+	public void setMapName(String mapName) {
+		this.mapName = mapName;
 	}
 }

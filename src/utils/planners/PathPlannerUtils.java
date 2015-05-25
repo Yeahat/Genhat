@@ -2,7 +2,7 @@ package utils.planners;
 
 import world.Position;
 import world.Terrain.terrainType;
-import world.World;
+import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
@@ -33,7 +33,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return true if the agent can step in the given direction, false otherwise
 	 */
-	public static boolean canStep(Agent agent, World world, Position pos, Direction dir)
+	public static boolean canStep(Agent agent, Map world, Position pos, Direction dir)
 	{
 		int x = pos.x;
 		int y = pos.y;
@@ -76,7 +76,7 @@ public class PathPlannerUtils {
 		return true;
 	}
 
-	public static boolean isContinuingDescent(Agent agent, World world, Position pos, Direction dir)
+	public static boolean isContinuingDescent(Agent agent, Map world, Position pos, Direction dir)
 	{
 		Position posBelow = new Position(pos);
 		posBelow.z --;
@@ -109,7 +109,7 @@ public class PathPlannerUtils {
 	 * @param continuingDescent true for the special case of descending from a ramp onto another ramp, the z needs extra adjustment
 	 * @return true if the agent can step in the given direction, false otherwise
 	 */
-	public static boolean canStepHorizontalRamp(Agent agent, World world, Position pos, Direction dir, boolean ascending, boolean continuingDescent)
+	public static boolean canStepHorizontalRamp(Agent agent, Map world, Position pos, Direction dir, boolean ascending, boolean continuingDescent)
 	{
 		int x = pos.x;
 		int y = pos.y;
@@ -166,7 +166,7 @@ public class PathPlannerUtils {
 		return true;
 	}
 	
-	public static boolean canStepVerticalRamp(Agent agent, World world, Position pos, Direction dir)
+	public static boolean canStepVerticalRamp(Agent agent, Map world, Position pos, Direction dir)
 	{
 		//ascending
 		if (dir == Up)
@@ -265,7 +265,7 @@ public class PathPlannerUtils {
 		}
 	}
 	
-	public static boolean canClimb(Agent agent, World world, Position pos, Direction dir)
+	public static boolean canClimb(Agent agent, Map world, Position pos, Direction dir)
 	{
 		//ascending
 		if (dir == Up)
@@ -364,12 +364,12 @@ public class PathPlannerUtils {
 		}
 	}
 
-	private static boolean hasRampWithDir(World world, Position pos, Direction dir)
+	private static boolean hasRampWithDir(Map world, Position pos, Direction dir)
 	{
 		return world.hasThing(pos) && world.getThingsAt(pos).hasRamp() && world.getThingsAt(pos).getRampDir() == dir;
 	}
 	
-	private static boolean hasClimbingSurfaceWithDir(World world, Position pos, Direction dir)
+	private static boolean hasClimbingSurfaceWithDir(Map world, Position pos, Direction dir)
 	{
 		return world.hasThing(pos) && world.getThingsAt(pos).hasClimbingSurface() && world.getThingsAt(pos).getClimbingSurfaceDir() == dir;
 	}
@@ -383,7 +383,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return {true if the agent should use a horizontal ramp step, true if the ramp step is ascending}
 	 */
-	public static boolean[] checkForHorizontalRampStep(World world, Position pos, Direction dir)
+	public static boolean[] checkForHorizontalRampStep(Map world, Position pos, Direction dir)
 	{
 		//on ramp case will always require a horizontal ramp step
 		if (isOnRampHorizontal(world, pos))
@@ -437,7 +437,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return true if the agent should use a vertical ramp step
 	 */
-	public static boolean checkForVerticalRampStep(World world, Position pos, Direction dir)
+	public static boolean checkForVerticalRampStep(Map world, Position pos, Direction dir)
 	{
 		//on ramp case will always require a vertical ramp step
 		if (isOnRampVertical(world, pos))
@@ -471,7 +471,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction of the step
 	 * @return true if the agent should climb
 	 */
-	public static boolean checkForClimb(World world, Position pos, Direction dir)
+	public static boolean checkForClimb(Map world, Position pos, Direction dir)
 	{
 		//on ramp case will always require a vertical ramp step
 		if (isOnClimbingSurface(world, pos))
@@ -498,13 +498,13 @@ public class PathPlannerUtils {
 	    }
 	}
 	
-	public static boolean isOnRampHorizontal(World world, Position pos)
+	public static boolean isOnRampHorizontal(Map world, Position pos)
 	{
 		return (world.hasThing(pos.x, pos.y, pos.z - 1) && world.getThingsAt(pos.x, pos.y, pos.z - 1).hasRamp()
 		&& (world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == Left || world.getThingsAt(pos.x, pos.y, pos.z - 1).getRampDir() == Right));
 	}
 	
-	public static boolean isOnRampVertical(World world, Position pos)
+	public static boolean isOnRampVertical(Map world, Position pos)
 	{
 		return world.isInBounds(pos.x, pos.y, pos.z - 1) && world.getTerrainAt(pos.x, pos.y, pos.z - 1).getTerrainType() == terrainType.air
 				&& (!world.hasThing(pos.x, pos.y, pos.z) || !world.getThingsAt(pos.x, pos.y, pos.z).isCrossable())
@@ -512,7 +512,7 @@ public class PathPlannerUtils {
 				&& world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).hasRamp() && world.getThingsAt(pos.x, pos.y + 1, pos.z - 1).getRampDir() == Up;
 	}
 	
-	public static boolean isOnClimbingSurface(World world, Position pos)
+	public static boolean isOnClimbingSurface(Map world, Position pos)
 	{
 		return world.isInBounds(pos.x, pos.y, pos.z - 1) && world.getTerrainAt(pos.x, pos.y, pos.z - 1).getTerrainType() == terrainType.air
 				&& (!world.hasThing(pos.x, pos.y, pos.z) || !world.getThingsAt(pos.x, pos.y, pos.z).isCrossable())
@@ -529,7 +529,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction to step
 	 * @return the resulting Position at the step's conclusion
 	 */
-	public static Position simulateSimpleStep(World world, Position pos, Direction dir)
+	public static Position simulateSimpleStep(Map world, Position pos, Direction dir)
 	{
 		Position resultingPos = new Position(pos);
 		switch (dir)
@@ -555,7 +555,7 @@ public class PathPlannerUtils {
 	 * @return the resulting Position at the step's conclusion
 	 */
 	@SuppressWarnings("incomplete-switch")
-	public static Position simulateHorizontalRampStep(World world, Position pos, Direction dir, boolean ascending)
+	public static Position simulateHorizontalRampStep(Map world, Position pos, Direction dir, boolean ascending)
 	{
 		Position resultingPos = new Position(pos);
 		switch (dir)
@@ -589,7 +589,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction to step
 	 * @return the resulting Position at the step's conclusion
 	 */
-	public static Position simulateVerticalRampStep(World world, Position pos, Direction dir)
+	public static Position simulateVerticalRampStep(Map world, Position pos, Direction dir)
 	{
 		Position resultingPosition = new Position(pos);
 		switch (dir)
@@ -640,7 +640,7 @@ public class PathPlannerUtils {
 	 * @param dir the direction to climb
 	 * @return the resulting Position at the climb's conclusion
 	 */
-	public static Position simulateClimb(World world, Position pos, Direction dir)
+	public static Position simulateClimb(Map world, Position pos, Direction dir)
 	{
 		Position resultingPosition = new Position(pos);
 		switch (dir)

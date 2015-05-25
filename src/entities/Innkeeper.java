@@ -12,10 +12,10 @@ import actions.Say;
 import actions.Turn;
 import actions.WalkToPoint;
 import world.Position;
-import world.World;
+import world.Map;
 
 import static entities.Agent.Direction.*;
-import static world.World.ControlState.*;
+import static world.Map.ControlState.*;
 import static utils.planners.PathPlannerUtils.MovementClass.*;
 
 public class Innkeeper extends Agent
@@ -71,7 +71,7 @@ public class Innkeeper extends Agent
 	}
 	
 	@Override
-	public void interact(Agent agent, World world)
+	public void interact(Agent agent, Map world)
 	{
 		if (currentAction.isInterruptable())
 		{
@@ -100,7 +100,7 @@ public class Innkeeper extends Agent
 		}
 	}
 	
-	private void beginInteraction(Agent agent, World world)
+	private void beginInteraction(Agent agent, Map world)
 	{
 		if (agent == world.getPlayer())
 		{
@@ -202,7 +202,7 @@ public class Innkeeper extends Agent
 	}
 	
 	@Override
-	public void decideNextAction(World world)
+	public void decideNextAction(Map world)
 	{
 		if (isInteractingWithHero())
 		{
