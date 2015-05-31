@@ -1,25 +1,28 @@
 package things;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import things.Thing.ConnectionContext;
+import world.Position;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
 import static things.Thing.ConnectionContext.*;
-import static things.Stairs.stairsType.*;
+import static things.Stairs.StairsType.*;
 
 public class Stairs extends Ramp {
-	public enum stairsType
+	public enum StairsType
 	{
 		outdoorWooden, indoorWooden;
 	}
-	private final stairsType type;
+	private final StairsType type;
 	private final ConnectionContext horizontalConnection;
 	private final ConnectionContext verticalConnection;
-	private final StairsBottom associatedBottom;	//an extra thing rendered for graphical consistency
+	private StairsBottom associatedBottom;	//an extra thing rendered for graphical consistency
 	
 	private Stairs(StairsBuilder builder)
 	{
@@ -46,7 +49,12 @@ public class Stairs extends Ramp {
 
 		if ((this.dir == Left && (this.getHorizontalConnection() == Middle || this.getHorizontalConnection() == ConnectionContext.Start))
 				|| (this.dir == Right && (this.getHorizontalConnection() == Middle || this.getHorizontalConnection() == ConnectionContext.End)))
-			associatedBottom = new StairsBottom(this.dir);
+		{
+			if (builder.addAssociatedBottom)
+				associatedBottom = new StairsBottom(this.dir);
+			else
+				associatedBottom = null;
+		}
 		else
 			associatedBottom = null;
 		
@@ -153,6 +161,16 @@ public class Stairs extends Ramp {
 		return null;
 	}
 	
+	@Override
+	public void setPos(Position pos)
+	{
+		this.pos = new Position(pos);
+		if (associatedBottom != null && pos.z - 1 >= 0)
+		{
+			associatedBottom.setPos(new Position(pos.x, pos.y, pos.z - 1));
+		}
+	}
+	
 	public StairsBottom getAssociatedBottom() {
 		return associatedBottom;
 	}
@@ -161,15 +179,74 @@ public class Stairs extends Ramp {
 		return horizontalConnection;
 	}
 
+	@Override
+	public boolean hasAssociatedThings()
+	{
+		return associatedBottom != null;
+	}
+	
+	@Override
+	public ArrayList<Thing> getAssociatedThings()
+	{
+		ArrayList<Thing> associations = new ArrayList<Thing>();
+		if (associatedBottom != null)
+			associations.add(associatedBottom);
+		return associations;
+	}
+	
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Stairs:\n";
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += dir.toString() + "\n";
+		data += type.toString() + "," + horizontalConnection.toString() + "," + verticalConnection.toString()
+				+ "," + (associatedBottom != null) + "\n";
+		
+		return data;
+	}
+	
+	public static Stairs load(String data)
+	{
+		//read in position
+		Position pos = new Position();
+		pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read direction and connection
+		Direction dir = Direction.valueOf(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		StairsType stairsType = StairsType.valueOf(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		ConnectionContext horizontalConnection = ConnectionContext.valueOf(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		ConnectionContext verticalConnection = ConnectionContext.valueOf(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		Boolean addAssociatedBottom = Boolean.parseBoolean(data.substring(0, data.indexOf('\n')));
+		
+		//create thing and set any relevant data
+		Stairs stairs = new Stairs.StairsBuilder(stairsType).dir(dir).horizontalConnection(horizontalConnection)
+				.verticalConnection(verticalConnection).addAssociatedBottom(addAssociatedBottom).build();
+		stairs.setPos(pos);
+		
+		return stairs;
+	}
+	
 	public static class StairsBuilder
 	{
-		private final stairsType type;
+		private final StairsType type;
+		private boolean addAssociatedBottom = false;
 		private ConnectionContext horizontalConnection = Standalone;
 		private ConnectionContext verticalConnection = Standalone;
 		private Direction dir = Right;
 		
 		
-		public StairsBuilder(stairsType type)
+		public StairsBuilder(StairsType type)
 		{
 			this.type = type;
 		}
@@ -189,6 +266,12 @@ public class Stairs extends Ramp {
 		public StairsBuilder dir(Direction dir)
 		{
 			this.dir = dir;
+			return this;
+		}
+		
+		public StairsBuilder addAssociatedBottom(boolean addAssociatedBottom)
+		{
+			this.addAssociatedBottom = addAssociatedBottom;
 			return this;
 		}
 		

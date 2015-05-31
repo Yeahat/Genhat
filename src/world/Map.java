@@ -10,6 +10,7 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import things.Thing;
 import things.ThingGridCell;
+import things.ThingLoader;
 import utils.display.DisplayText;
 import entities.Agent;
 import entities.Hero;
@@ -1316,6 +1317,11 @@ public class Map
 		agentGrid.set(x, y, z, null);
 	}
 	
+	public void addThing(Thing t, Position pos)
+	{
+		addThing(t, pos.x, pos.y, pos.z);
+	}
+	
 	public void addThing(Thing t, int x, int y, int z)
 	{
 		if (thingGrid.get(x, y, z) == null)
@@ -1766,14 +1772,33 @@ public class Map
 			data.add(((Terrain)(terrainGrid.getGrid()[i])).save());
 		}
 		
-		data.add("\n");
+		data.add("\n=\n");	//end terrain saving
 		
 		//save things
+		for (int i = 0; i < thingGrid.getGrid().length; i ++)
+		{
+			ThingGridCell thingGridCell = (ThingGridCell)thingGrid.getGrid()[i];
+			if (thingGridCell != null && !thingGridCell.isEmpty())
+			{
+				for (int j = 0; j < thingGridCell.getThings().size(); j ++)
+				{
+					if (!thingGridCell.getThings().get(j).isAssociated())
+					{
+						data.add(thingGridCell.getThings().get(j).save());
+						data.add("-\n");
+					}
+				}
+			}
+		}
+		
+		data.add("=\n");	//end thing saving
 		
 		//save agents
+		data.add("AGENT LIST PLACEHOLDER\n");
+		data.add("=\n");	//end agent saving
 		
 		//save other state stuff
-		
+		data.add("OTHER STATE INFO PLACEHOLDER");
 		
 		return data;
 	}
@@ -1804,7 +1829,7 @@ public class Map
 		
 		world.setDisplayCenter(displayCenter);
 		
-		// read in terrain
+		//read in terrain
 		ArrayList<Terrain> terrain = new ArrayList<Terrain>();
 		while (data.charAt(0) != '\n')
 		{
@@ -1814,6 +1839,19 @@ public class Map
 		Grid<Terrain> terrainGrid = new Grid<Terrain>(width, depth, height);
 		terrainGrid.setGrid(terrain.toArray());
 		world.setTerrain(terrainGrid);
+		
+		//read in things
+		data = data.substring(3);	//remove list delimiter (3 characters: \n=\n)
+		while (data.charAt(0) != '=')
+		{
+			Thing thing = ThingLoader.loadThing(data.substring(0, data.indexOf('-')));
+			world.addThing(thing, thing.getPos());
+			for (int i = 0; i < thing.getAssociatedThings().size(); i ++)
+			{
+				world.addThing(thing.getAssociatedThings().get(i), thing.getAssociatedThings().get(i).getPos());
+			}
+			data = data.substring(data.indexOf('-') + 2);	//move on past the "-\n" that ends a thing entry
+		}
 		
 		return world;
 	}

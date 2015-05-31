@@ -6,6 +6,10 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import things.Thing.ConnectionContext;
+import things.Thing.Orientation;
+import world.Position;
+import entities.Agent.Direction;
 import static things.Thing.ConnectionContext.*;
 import static entities.Agent.Direction.*;
 
@@ -93,5 +97,36 @@ public class Ladder extends ClimbingSurface {
 			GL11.glEnd();
 			
 		GL11.glPopMatrix();
+	}
+	
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Ladder:\n";
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += verticalConnection.toString() + "\n";
+		return data;
+	}
+	
+	public static Ladder load(String data)
+	{
+		//read in position
+		Position pos = new Position();
+		pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read verticalConnection
+		ConnectionContext verticalConnection = ConnectionContext.valueOf(data.substring(0, data.indexOf('\n')));
+		
+		//create thing and set any relevant data
+		Ladder ladder = new Ladder(verticalConnection);
+		ladder.setPos(pos);
+		
+		return ladder;
 	}
 }

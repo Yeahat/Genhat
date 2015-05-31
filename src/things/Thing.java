@@ -1,5 +1,7 @@
 package things;
 
+import java.util.ArrayList;
+
 import org.newdawn.slick.opengl.Texture;
 
 import world.Position;
@@ -30,6 +32,7 @@ public abstract class Thing {
 	protected boolean lightSource = false;
 	protected boolean antiLightSource = false;
 	protected float lightPower = 0.6f; //strength of light emission if the Thing is a light source, light absorption if the thing is an anti light source
+	private boolean associated = false; //true if a type of Thing is to be treated as an associated Thing, meaning that it exists to support a Thing/Agent that it is linked to
 	protected Position pos = new Position(); //Position (x, y, z)
 	protected float[] realOffset = new float[3]; //sub-grid offset from the current position (x, y, z) measured in pixels (default is 16 pixels per grid space)
 	protected float[] pixelOffset = new float[2]; //Pixel offset from current position (x, y, z), truncated to the nearest pixel when rendering
@@ -64,11 +67,18 @@ public abstract class Thing {
 	public void update(){}
 	
 	/**
-	 * Action taken when the thing is interacted with; empty by default but can be overridden.
+	 * Action taken when the thing is interacted with; empty by default but can be overridden.  Can return false
+	 * if an interaction should be skipped and the next Thing in the ThingGridCell stack should be interacted with
+	 * instead.
+	 * 
 	 * @param agent the agent interacting with the thing
 	 * @param world the world in which the thing exists
+	 * @return true when interaction is complete, false if interaction was skipped.
 	 */
-	public void interact(Agent agent, Map world){}
+	public boolean interact(Agent agent, Map world)
+	{
+		return true;
+	}
 	
 	/**
 	 * Method to call when removing a thing from the world, allows a thing's removal to first make any necessary changes
@@ -216,6 +226,31 @@ public abstract class Thing {
 		}
 	}
 	
+	/**
+	 * Convert Thing to a String for saving data.
+	 * @return the Thing converted to a String.
+	 */
+	public abstract String save();
+	
+	/**
+	 * Check if a Thing currently has any associated things.  Override this if the Thing can have associations.
+	 * @return true if the Thing currently has one or more associated things.
+	 */
+	public boolean hasAssociatedThings()
+	{
+		return false;
+	}
+	
+	/**
+	 * Get the list of current associated things.  Override this if the Thing can have associations.
+	 * @return an array list containing any currently associated Things.
+	 */
+	public ArrayList<Thing> getAssociatedThings()
+	{
+		//return an empty list
+		return new ArrayList<Thing>();
+	}
+	
 	//***********************************************************
 	//**************** Getters and Setters **********************
 	//***********************************************************
@@ -292,5 +327,13 @@ public abstract class Thing {
 
 	public float getLightPower() {
 		return lightPower;
+	}
+
+	public boolean isAssociated() {
+		return associated;
+	}
+
+	public void setAssociated(boolean associated) {
+		this.associated = associated;
 	}
 }

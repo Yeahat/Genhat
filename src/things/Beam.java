@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import world.Position;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
 import static things.Thing.ConnectionContext.*;
@@ -139,6 +140,42 @@ public class Beam extends Thing {
 		GL11.glPopMatrix();
 	}
 
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Beam:\n";
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += dir.toString() + "\n";
+		data += connection.toString() + "," + orientation.toString() + "\n";
+		return data;
+	}
+	
+	public static Beam load(String data)
+	{
+		//read in position
+		Position pos = new Position();
+		pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read direction, connection, and orientation
+		Direction dir = Direction.valueOf(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		ConnectionContext connection = ConnectionContext.valueOf(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		Orientation orientation = Orientation.valueOf(data.substring(0, data.indexOf('\n')));
+		
+		//create thing and set any relevant data
+		Beam beam = new Beam.BeamBuilder().dir(dir).connection(connection).orientation(orientation).build();
+		beam.setPos(pos);
+		
+		return beam;
+	}
+	
 	public static class BeamBuilder
 	{
 		private ConnectionContext connection = Standalone;

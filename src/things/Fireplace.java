@@ -8,6 +8,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import world.Map;
+import world.Position;
 import entities.Agent;
 
 public class Fireplace extends Thing {
@@ -174,11 +175,13 @@ public class Fireplace extends Thing {
 	}
 
 	@Override
-	public void interact(Agent agent, Map world)
+	public boolean interact(Agent agent, Map world)
 	{
 		if (!lit)
 			lit = true;
 		setWoodLevel(3);
+		
+		return true;
 	}
 	
 	//TODO: Have the piece check to make sure it has a left and right piece and adjust rendering accordingly, make the same changes for the left and right side
@@ -241,5 +244,47 @@ public class Fireplace extends Thing {
 			woodLevel = 3;
 			baseLightPower = .7f;
 		}
+	}
+	
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Fireplace:\n";
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += lit + "," + woodLevel + "," + updateCounter + "," + animationFrame + "," + burnoutCounter + "\n";
+		return data;
+	}
+	
+	public static Fireplace load(String data)
+	{
+		//read in position
+		Position pos = new Position();
+		pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read lit and flicker state data
+		boolean lit = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		int woodLevel = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		int updateCounter = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		int animationFrame = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		int burnoutCounter = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		
+		//create thing and set any relevant data
+		Fireplace fireplace = new Fireplace(lit, woodLevel);
+		fireplace.setPos(pos);
+		fireplace.updateCounter = updateCounter;
+		fireplace.animationFrame = animationFrame;
+		fireplace.burnoutCounter = burnoutCounter;
+		
+		return fireplace;
 	}
 }

@@ -6,7 +6,10 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import things.Thing.ConnectionContext;
+import things.Thing.Orientation;
 import world.Map;
+import world.Position;
 import entities.Agent;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
@@ -41,7 +44,7 @@ public class Table extends Thing {
 	}
 
 	@Override
-	public void interact(Agent agent, Map world){
+	public boolean interact(Agent agent, Map world){
 		//get direction of interaction
 		int x = 2*pos.x - agent.getPos().x;
 		int y = 2*pos.y - agent.getPos().y;
@@ -52,6 +55,8 @@ public class Table extends Thing {
 		{
 			world.getAgentAt(x, y, z).interact(agent, world);
 		}
+		
+		return true;
 	}
 	
 	@Override
@@ -101,4 +106,35 @@ public class Table extends Thing {
 		GL11.glPopMatrix();
 	}
 
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Table:\n";
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += dir.toString() + "\n";
+		return data;
+	}
+	
+	public static Table load(String data)
+	{
+		//read in position
+		Position pos = new Position();
+		pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read direction
+		Direction dir = Direction.valueOf(data.substring(0, data.indexOf('\n')));
+		
+		//create thing and set any relevant data
+		Table table = new Table(dir);
+		table.setPos(pos);
+		
+		return table;
+	}
+	
 }

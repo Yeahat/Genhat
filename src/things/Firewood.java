@@ -7,8 +7,9 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import world.Map;
-
+import world.Position;
 import entities.Agent;
+import entities.Agent.Direction;
 
 public class Firewood extends Thing {
 
@@ -77,10 +78,11 @@ public class Firewood extends Thing {
 	}
 
 	@Override
-	public void interact(Agent agent, Map world)
+	public boolean interact(Agent agent, Map world)
 	{
 		if (quantity > 0)
 			setQuantity(quantity - 1);
+		return true;
 	}
 	
 	public void setQuantity(int q)
@@ -95,5 +97,36 @@ public class Firewood extends Thing {
 			blocking = false;
 		else
 			blocking = true;
+	}
+	
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Firewood:\n";
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += quantity + "\n";
+		return data;
+	}
+	
+	public static Firewood load(String data)
+	{
+		//read in position
+		Position pos = new Position();
+		pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read quantity
+		int quantity = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		
+		//create thing and set any relevant data
+		Firewood firewood = new Firewood(quantity);
+		firewood.setPos(pos);
+		
+		return firewood;
 	}
 }

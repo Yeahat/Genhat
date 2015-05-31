@@ -7,34 +7,34 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import world.Map;
-
+import world.Position;
 import entities.Agent;
 import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
-import static things.Chair.chairType.*;
+import static things.Chair.ChairType.*;
 
 public class Chair extends Thing {
-	public enum chairType
+	public enum ChairType
 	{
 		chairWooden, stoolWooden
 	}
 	private boolean pushedIn;
-	private final chairType type;
+	private final ChairType chairType;
 	
 	private Chair(ChairBuilder builder)
 	{
-		this.type = builder.type;
+		this.chairType = builder.chairType;
 		this.dir = builder.dir;
 		this.pushedIn = builder.pushedIn;
 		
 		this.transparent = true;
 		
-		if (this.type == chairWooden)
+		if (this.chairType == chairWooden)
 		{
 			this.texRow = 1;
 			this.texCol = 0;
 		}
-		else if (this.type == stoolWooden)
+		else if (this.chairType == stoolWooden)
 		{
 			this.texRow = 3;
 			this.texCol = 0;
@@ -49,7 +49,7 @@ public class Chair extends Thing {
 	}
 	
 	@Override
-	public void interact(Agent agent, Map world)
+	public boolean interact(Agent agent, Map world)
 	{
 		if (!world.isOccupied(this.getPos().x, this.getPos().y, this.getPos().z))
 		{
@@ -64,6 +64,8 @@ public class Chair extends Thing {
 				blocking = true;
 			}
 		}
+		
+		return true;
 	}
 	
 	@Override
@@ -134,15 +136,51 @@ public class Chair extends Thing {
 		GL11.glPopMatrix();
 	}
 
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Chair:\n";
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += dir.toString() + "\n";
+		data += chairType.toString() + "," + pushedIn + "\n";
+		return data;
+	}
+	
+	public static Chair load(String data)
+	{
+		//read in position
+		Position pos = new Position();
+		pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read pushedIn and chairType
+		Direction dir = Direction.valueOf(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		ChairType chairType = ChairType.valueOf(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		boolean pushedIn = Boolean.parseBoolean(data.substring(0, data.indexOf('\n')));
+		
+		//create thing and set any relevant data
+		Chair chair = new Chair.ChairBuilder(chairType).dir(dir).pushedIn(pushedIn).build();
+		chair.setPos(pos);
+		
+		return chair;
+	}
+	
 	public static class ChairBuilder
 	{
-		private final chairType type;
+		private final ChairType chairType;
 		private Direction dir = Up;
 		private boolean pushedIn = true;
 		
-		public ChairBuilder(chairType type)
+		public ChairBuilder(ChairType chairType)
 		{
-			this.type = type;
+			this.chairType = chairType;
 		}
 		
 		public ChairBuilder dir(Direction dir)

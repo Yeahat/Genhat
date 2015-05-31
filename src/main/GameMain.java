@@ -50,10 +50,10 @@ import world.Map;
 import static world.Terrain.terrainType.*;
 import static entities.Agent.Direction.*;
 import static world.Map.TimeOfDay.*;
-import static things.Chair.chairType.*;
+import static things.Chair.ChairType.*;
 import static things.Thing.ConnectionContext.*;
 import static things.Thing.Orientation.*;
-import static things.Stairs.stairsType.*;
+import static things.Stairs.StairsType.*;
 
 
 public class GameMain {
@@ -677,14 +677,22 @@ public class GameMain {
 		world.addThing(c5, 42, 32, 1);
 		world.addThing(c6, 42, 34, 1);
 		
-		Stairs s1 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(Start).build();
-		Stairs s2 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(Middle).build();
-		Stairs s3 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(End).build();
+		Firewood fw1 = new Firewood();
+		Firewood fw2 = new Firewood();
+		Firewood fw3 = new Firewood();
+		world.addThing(fw1, 41, 36, 1);
+		world.addThing(fw2, 42, 36, 1);
+		world.addThing(fw3, 43, 36, 1);
+		
+		Stairs s1 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(Start).addAssociatedBottom(false).build();
+		Stairs s2 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(Middle).addAssociatedBottom(true).build();
+		Stairs s3 = new Stairs.StairsBuilder(indoorWooden).dir(Right).horizontalConnection(End).addAssociatedBottom(true).build();
 		world.addThing(s1, 40, 36, 1);
 		world.addThing(s2, 41, 36, 2);
 		world.addThing(s3, 42, 36, 3);
-		world.addThing(s2.getAssociatedBottom(), 41, 36, 1);
-		world.addThing(s3.getAssociatedBottom(), 42, 36, 2);
+		
+		world.addThing(s2.getAssociatedBottom(), s2.getAssociatedBottom().getPos());
+		world.addThing(s3.getAssociatedBottom(), s3.getAssociatedBottom().getPos());
 		
 		WallCandle candle1 = new WallCandle();
 		WallCandle candle2 = new WallCandle();
@@ -719,13 +727,6 @@ public class GameMain {
 		world.addThing(chimney4, 37, 36, 6);
 		world.addThing(chimneytop, 37, 36, 7);
 		t.set(37, 36, 6, new Terrain(air));
-		
-		Firewood fw1 = new Firewood();
-		Firewood fw2 = new Firewood();
-		Firewood fw3 = new Firewood();
-		world.addThing(fw1, 41, 36, 1);
-		world.addThing(fw2, 42, 36, 1);
-		world.addThing(fw3, 43, 36, 1);
 		
 		//shadow tests
 		for (int i = 1; i < 8; i ++)
@@ -815,7 +816,7 @@ public class GameMain {
 				tempVStairs2 = new Rope.RopeBuilder().dir(Up).horizontalConnection(End).verticalConnection(Middle).build();
 				tempVStairs3 = new Rope.RopeBuilder().dir(Up).horizontalConnection(Standalone).verticalConnection(Middle).build();
 			}
-				
+			
 			world.addThing(tempVStairs1, 15, 13, k);
 			world.addThing(tempVStairs2, 16, 13, k);
 			world.addThing(tempVStairs3, 17, 13, k);

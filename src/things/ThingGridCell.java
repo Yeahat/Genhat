@@ -177,7 +177,11 @@ public class ThingGridCell {
 	 */
 	public void interact(Agent agent, Map world)
 	{
-		thingList.get(thingList.size() - 1).interact(agent, world);
+		for (int i = thingList.size() - 1; i >= 0; i --)
+		{
+			if (thingList.get(i).interact(agent, world))
+				break;
+		}
 	}
 	
 	/**
