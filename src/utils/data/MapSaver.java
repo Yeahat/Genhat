@@ -33,7 +33,10 @@ public class MapSaver
 	{
 		String filePath = "maps/" + mapName + ".txt";
 		try {
+			long start = System.nanoTime();
 			String data = new Scanner(new File(filePath)).useDelimiter("\\A").next();
+			long end = System.nanoTime();
+			System.out.println("Reading finished in time: " + (end - start));
 			return Map.load(data);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

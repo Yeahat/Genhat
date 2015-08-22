@@ -13,6 +13,7 @@ import things.ThingGridCell;
 import things.ThingLoader;
 import utils.display.DisplayText;
 import entities.Agent;
+import entities.AgentLoader;
 import entities.Hero;
 import entities.Placeholder;
 import static world.Terrain.terrainType.*;
@@ -493,13 +494,14 @@ public class Map
 		updateLightModGrid(lightXMin, lightXMax, lightYMin, lightYMax, lightZMin, lightZMax);
 		//updateLightModGrid(iMin, iMax, jMin, jMax, lightZMin, lightZMax);
 		
+		for (int j = jMax; j >= jMin; j --)
+		{
 		for (int k = kMin; k <= kMax; k ++)
 		{
 			//***************************************************************************************************************
 			//********* TERRAIN AND THING AND AGENT RENDERING ***************************************************************
 			//***************************************************************************************************************
-			for (int j = jMax; j >= jMin; j --)
-			{
+			
 				for (int i = iMin; i <= iMax; i ++)
 				{
 					Terrain t = terrainGrid.get(i, j, k);					
@@ -1794,7 +1796,15 @@ public class Map
 		data.add("=\n");	//end thing saving
 		
 		//save agents
-		data.add("AGENT LIST PLACEHOLDER\n");
+		for (int i = 0; i < agentGrid.getGrid().length; i ++)
+		{
+			Agent agent = (Agent)agentGrid.getGrid()[i];
+			if (agent != null && !agent.isAssociated() && agent != getPlayer())
+			{
+				data.add(agent.save());
+				data.add("-\n");
+			}
+		}
 		data.add("=\n");	//end agent saving
 		
 		//save other state stuff
@@ -1805,6 +1815,7 @@ public class Map
 
 	public static Map load(String data)
 	{
+		long start = System.nanoTime();
 		//read in map name
 		String mapName = data.substring(0, data.indexOf('\n'));
 		data = data.substring(data.indexOf('\n') + 1);
@@ -1818,7 +1829,7 @@ public class Map
 		height = Integer.parseInt(data.substring(0, data.indexOf('\n')));
 		data = data.substring(data.indexOf('\n') + 1);
 		
-		Map world = new Map(mapName, width, depth, height);
+		Map map = new Map(mapName, width, depth, height);
 		
 		//read in display center center
 		float[] displayCenter = new float[2];
@@ -1827,7 +1838,7 @@ public class Map
 		displayCenter[1] = Float.parseFloat(data.substring(0, data.indexOf('\n')));
 		data = data.substring(data.indexOf('\n') + 1);
 		
-		world.setDisplayCenter(displayCenter);
+		map.setDisplayCenter(displayCenter);
 		
 		//read in terrain
 		ArrayList<Terrain> terrain = new ArrayList<Terrain>();
@@ -1838,22 +1849,41 @@ public class Map
 		}
 		Grid<Terrain> terrainGrid = new Grid<Terrain>(width, depth, height);
 		terrainGrid.setGrid(terrain.toArray());
-		world.setTerrain(terrainGrid);
+		map.setTerrain(terrainGrid);
 		
 		//read in things
 		data = data.substring(3);	//remove list delimiter (3 characters: \n=\n)
 		while (data.charAt(0) != '=')
 		{
 			Thing thing = ThingLoader.loadThing(data.substring(0, data.indexOf('-')));
-			world.addThing(thing, thing.getPos());
+			map.addThing(thing, thing.getPos());
 			for (int i = 0; i < thing.getAssociatedThings().size(); i ++)
 			{
-				world.addThing(thing.getAssociatedThings().get(i), thing.getAssociatedThings().get(i).getPos());
+				map.addThing(thing.getAssociatedThings().get(i), thing.getAssociatedThings().get(i).getPos());
 			}
 			data = data.substring(data.indexOf('-') + 2);	//move on past the "-\n" that ends a thing entry
 		}
 		
-		return world;
+		//read in agents
+		data = data.substring(2);	//remove list delimiter (2 characters: =\n)
+		while (data.charAt(0) != '=')
+		{
+			Agent agent = AgentLoader.loadAgent(data.substring(0, data.indexOf('-')));
+			if (agent.isOnRamp())	//make necessary corrections in case of ramp standing
+			{
+				agent.loadOffsetForRamp(map);
+			}
+			map.addAgent(agent);
+			for (int i = 0; i < agent.getAssociatedThings().size(); i ++)
+			{
+				map.addThing(agent.getAssociatedThings().get(i), agent.getAssociatedThings().get(i).getPos());
+			}
+			data = data.substring(data.indexOf('-') + 2);	//move on past the "-\n" that ends an agent entry
+		}
+		
+		long end = System.nanoTime();
+		System.out.println("Loading finished in time: " + (end - start));
+		return map;
 	}
 
 	public String getMapName() {

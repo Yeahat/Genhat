@@ -1,7 +1,6 @@
 package actions;
 
 import entities.Agent;
-
 import world.Map;
 
 public interface Action {	
@@ -19,4 +18,8 @@ public interface Action {
 	public boolean requestInterrupt();
 	
 	public boolean isInterruptable();
+	
+	/* Actions are not currently saved, keeping this here in case they ever are...
+	public String save();
+	*/
 }

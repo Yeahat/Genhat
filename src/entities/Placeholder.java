@@ -12,11 +12,17 @@ public class Placeholder extends Agent {
 
 	Agent agent; //the agent for which the placeholder is acting
 	
+	public Placeholder(Position pos)
+	{
+		this.pos = pos;
+		this.agent = null;
+	}
+	
 	public Placeholder(Agent agent, Position pos)
 	{
 		this.pos = pos;
-		
 		this.agent = agent;
+		this.setAssociated(true);
 		
 		if (agent.isRenderOnPlaceholder() && !agent.isTransparent())
 			this.setTransparent(false);
@@ -185,5 +191,25 @@ public class Placeholder extends Agent {
 	public Position getEffectivePos()
 	{
 		return agent.pos;
+	}
+	
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Placeholder:\n";
+		data += this.saveCommon();
+		return data;
+	}
+	
+	public static Placeholder load(String data)
+	{
+		//read in common data
+		CommonData commonData = Agent.loadCommon(data);
+		
+		//create agent and set any relevant data
+		Placeholder placeholder = new Placeholder(commonData.pos);
+		
+		return placeholder;
 	}
 }

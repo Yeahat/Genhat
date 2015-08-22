@@ -5,6 +5,7 @@ import world.Map;
 import entities.Agent;
 import entities.Hero;
 import entities.Placeholder;
+import entities.Agent.Direction;
 import static entities.Agent.Direction.*;
 
 public class Jump implements Action {
@@ -442,5 +443,34 @@ public class Jump implements Action {
 	@Override
 	public boolean isInterruptable() {
 		return false;
+	}
+	
+	/* Actions are not currently saved, keeping this here in case they ever are...
+	@Override
+	public String save()
+	{
+		String data = new String("Jump:\n");
+		data += finished + "," + jumpingUp + "," + switched + "," + dstJumped + "\n";
+		data += "~Climb\n";
+		return data;
+	}
+	*/
+	
+	public static Jump load(String data)
+	{
+		if (data.equals("null\n"))
+			return null;
+
+		Jump jump = new Jump();
+		
+		jump.finished = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		jump.jumpingUp = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		jump.switched = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		jump.dstJumped = Float.parseFloat(data.substring(0, data.indexOf('\n')));
+		
+		return jump;
 	}
 }

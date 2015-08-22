@@ -282,4 +282,31 @@ public class Climb implements Action {
 	public boolean isInterruptable() {
 		return true;
 	}
+	
+	/* Actions are not currently saved, keeping this here in case they ever are...
+	@Override
+	public String save()
+	{
+		String data = new String("Climb:\n");
+		data += dir.toString() + "," + initialized + "," + finished + "," + specialCase + "\n";
+		data += "~Climb\n";
+		return data;
+	}
+	*/
+	
+	public static Climb load(String data)
+	{
+		if (data.equals("null\n"))
+			return null;
+
+		Climb climb = new Climb(Direction.valueOf(data.substring(0, data.indexOf(','))));
+		data = data.substring(data.indexOf(',') + 1);
+		climb.initialized = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		climb.finished = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		climb.specialCase = Boolean.parseBoolean(data.substring(0, data.indexOf('\n')));
+		
+		return climb;
+	}
 }

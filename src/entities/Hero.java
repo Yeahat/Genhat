@@ -117,4 +117,28 @@ public class Hero extends Agent {
 		else
 			return false;
 	}
+
+	@Override
+	public String save()
+	{
+		//Generally, the player character should not be saved with the other Agents, but this is included for completeness.
+		String data = new String("");
+		data += "Hero:\n";
+		data += this.saveCommon();
+		return data;
+	}
+	
+	public static Hero load(String data)
+	{
+		//read in common data
+		CommonData commonData = Agent.loadCommon(data);
+		
+		//create agent and set any relevant data
+		Hero hero = new Hero();
+		hero.setPos(commonData.pos);
+		hero.setDir(commonData.dir);
+		hero.setOnRamp(commonData.onRamp);
+		
+		return hero;
+	}
 }

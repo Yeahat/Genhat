@@ -279,4 +279,31 @@ public class VerticalRampStep implements Action {
 	public boolean isInterruptable() {
 		return true;
 	}
+	
+	/* Actions are not currently saved, keeping this here in case they ever are...
+	@Override
+	public String save()
+	{
+		String data = new String("VerticalRampStep:\n");
+		data += dir.toString() + "," + initialized + "," + finished + "," + specialCase + "\n";
+		data += "~VerticalRampStep\n";
+		return data;
+	}
+	*/
+	
+	public static VerticalRampStep load(String data)
+	{
+		if (data.equals("null\n"))
+			return null;
+
+		VerticalRampStep verticalRampStep = new VerticalRampStep(Direction.valueOf(data.substring(0, data.indexOf(','))));
+		data = data.substring(data.indexOf(',') + 1);
+		verticalRampStep.initialized = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		verticalRampStep.finished = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		verticalRampStep.specialCase = Boolean.parseBoolean(data.substring(0, data.indexOf('\n')));
+		
+		return verticalRampStep;
+	}
 }

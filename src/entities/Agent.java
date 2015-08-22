@@ -1,11 +1,13 @@
 package entities;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
 import static entities.Agent.Direction.*;
+import things.Thing;
 import world.Position;
 import world.Map;
 import actions.Action;
@@ -46,6 +48,7 @@ public abstract class Agent {
 	private Direction footstep = Left; //whether the next step is the left or right foot
 	private Direction stance = Right;	//which foot to put first when jumping (left = regular footed, right = goofy footed)
 	private int height = 2;	//Agent height in tiles
+	private boolean associated = false; //true if a type of Agent is to be treated as an associated Agent, meaning that it exists to support a Thing/Agent that it is linked to
 	private Position homePos;
 	
 	//Actions: List all actions of this agent here
@@ -295,7 +298,62 @@ public abstract class Agent {
 		}
 	}
 
+	/**
+	 * Convert Agent to a String for saving data.
+	 */
+	public abstract String save();
 	
+	/**
+	 * Convert common data for Agents into a String for saving.
+	 */
+	protected String saveCommon()
+	{
+		String data = new String("");
+		data += pos.x + "," + pos.y + "," + pos.z + "\n";
+		data += dir.toString() + "," + onRamp + "\n";
+		return data;
+	}
+	
+	/**
+	 * Load common data for Agents and return it in a CommonData object.
+	 * @param agent Agent for which to load data
+	 * @return common data for the Agent
+	 */
+	public static CommonData loadCommon(String data)
+	{
+		CommonData commonData = new CommonData();
+		
+		commonData.pos.x = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		commonData.pos.y = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		commonData.pos.z = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		data = data.substring(data.indexOf('\n') + 1);
+		
+		//read direction and onRamp
+		commonData.dir = Direction.valueOf(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		commonData.onRamp = Boolean.parseBoolean(data.substring(0, data.indexOf('\n')));
+		commonData.remainingData = data.substring(data.indexOf('\n') + 1);
+		
+		return commonData;
+	}
+	
+	/**
+	 * Correctly set the offset if an Agent is standing on a horizontal ramp when loaded
+	 * @param map the map in which the Agent is loaded
+	 */
+	public void loadOffsetForRamp(Map map)
+	{
+		Position checkPos = new Position(this.pos);
+		checkPos.z --;
+		if (map.isInBounds(checkPos) && map.hasThing(checkPos) && map.getThingsAt(checkPos).hasRamp()
+				&& (map.getThingsAt(checkPos).getRampDir() == Left || map.getThingsAt(checkPos).getRampDir() == Right))
+		{
+			this.setOffsetY(-4.0f);
+		}
+	}
+		
 	//***********************************************************
 	//**************** Getters and Setters **********************
 	//***********************************************************
@@ -510,5 +568,23 @@ public abstract class Agent {
 
 	public void setClimbing(boolean climbing) {
 		this.climbing = climbing;
+	}
+
+	public boolean isAssociated() {
+		return associated;
+	}
+
+	public void setAssociated(boolean associated) {
+		this.associated = associated;
+	}
+	
+	/**
+	 * Get the list of current associated Things.  Override this if the Agent can have associations.
+	 * @return an array list containing any currently associated Things.
+	 */
+	public ArrayList<Thing> getAssociatedThings()
+	{
+		//return an empty list
+		return new ArrayList<Thing>();
 	}
 }

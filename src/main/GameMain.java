@@ -89,7 +89,6 @@ public class GameMain {
 			world.updateAgents();
 			world.updateCameraScrollLock();
 			world.updateCamera();
-			
 			//render everything
 			renderGL();
 			
@@ -364,8 +363,8 @@ public class GameMain {
 	 */
 	public void initWorld()
 	{
-		genInnTest();
-		//loadInnTest();
+		//genInnTest();
+		loadInnTest();
 	}
 	
 	/**
@@ -836,7 +835,7 @@ public class GameMain {
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
-		hero.setPos(new Position(25, 25, 1));
+		hero.setPos(new Position(34, 32, 1));
 		agents.add(hero);
 		
 		Innkeeper innkeeper = new Innkeeper("char1", 0, 1);
@@ -856,7 +855,7 @@ public class GameMain {
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
 		Hero hero = new Hero();
-		hero.setPos(new Position(25, 25, 1));
+		hero.setPos(new Position(34, 32, 1));
 		agents.add(hero);
 		
 		world.addAgents(agents);

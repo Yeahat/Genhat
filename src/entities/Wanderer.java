@@ -129,4 +129,32 @@ public class Wanderer extends Agent {
 		GL11.glPopMatrix();
 	}
 
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Wanderer:\n";
+		data += this.saveCommon();
+		data += frequency + "," + distance + "\n";
+		return data;
+	}
+	
+	public static Wanderer load(String data)
+	{
+		//read in common data
+		CommonData commonData = Agent.loadCommon(data);
+		data = commonData.remainingData;
+		
+		//read Wanderer-specific data
+		int frequency = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		int distance = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		
+		//create agent and set any relevant data
+		Wanderer wanderer = new Wanderer(commonData.pos, frequency, distance);
+		wanderer.setDir(commonData.dir);
+		wanderer.setOnRamp(commonData.onRamp);
+		
+		return wanderer;
+	}
 }

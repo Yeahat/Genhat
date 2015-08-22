@@ -104,7 +104,7 @@ public class HorizontalRampStep implements Action {
 							steppingState = Cont;
 							world.moveAgent(agent, -1, 0, 1);
 							agent.setOffsetX(16);
-							agent.setOffsetY(-24);
+							agent.setOffsetY(-20);
 							Position p1 = agent.getPos();
 							Placeholder h1 = new Placeholder(agent, new Position(p1.x + 1, p1.y, p1.z - 1));
 							world.addAgent(h1);
@@ -151,7 +151,7 @@ public class HorizontalRampStep implements Action {
 							steppingState = Off;
 							world.moveAgent(agent, -1, 0, -1);
 							agent.setOffsetX(16);
-							agent.setOffsetY(8);
+							agent.setOffsetY(12);
 							Position p1 = agent.getPos();
 							Placeholder h1 = new Placeholder(agent, new Position(p1.x + 1, p1.y, p1.z + 1));
 							world.addAgent(h1);
@@ -171,7 +171,7 @@ public class HorizontalRampStep implements Action {
 							steppingState = Cont;
 							world.moveAgent(agent, -1, 0, -1);
 							agent.setOffsetX(16);
-							agent.setOffsetY(8);
+							agent.setOffsetY(12);
 							Position p1 = agent.getPos();
 							Placeholder h1 = new Placeholder(agent, new Position(p1.x + 1, p1.y, p1.z + 1));
 							world.addAgent(h1);
@@ -240,7 +240,7 @@ public class HorizontalRampStep implements Action {
 							steppingState = Cont;
 							world.moveAgent(agent, 1, 0, 1);
 							agent.setOffsetX(-16);
-							agent.setOffsetY(-24);
+							agent.setOffsetY(-20);
 							Position p1 = agent.getPos();
 							Placeholder h1 = new Placeholder(agent, new Position(p1.x - 1, p1.y, p1.z - 1));
 							world.addAgent(h1);
@@ -287,7 +287,7 @@ public class HorizontalRampStep implements Action {
 							steppingState = Off;
 							world.moveAgent(agent, 1, 0, -1);
 							agent.setOffsetX(-16);
-							agent.setOffsetY(8);
+							agent.setOffsetY(12);
 							Position p1 = agent.getPos();
 							Placeholder h1 = new Placeholder(agent, new Position(p1.x - 1, p1.y, p1.z + 1));
 							world.addAgent(h1);
@@ -307,7 +307,7 @@ public class HorizontalRampStep implements Action {
 							steppingState = Cont;
 							world.moveAgent(agent, 1, 0, -1);
 							agent.setOffsetX(-16);
-							agent.setOffsetY(8);
+							agent.setOffsetY(12);
 							Position p1 = agent.getPos();
 							Placeholder h1 = new Placeholder(agent, new Position(p1.x - 1, p1.y, p1.z + 1));
 							world.addAgent(h1);
@@ -342,11 +342,11 @@ public class HorizontalRampStep implements Action {
 				break;
 				case Left:
 					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetX() <= 8)
+					if (agent.getOffsetX() <= 11)
 					{
 						agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-						if (agent.getOffsetY() >= -7)
-							agent.setOffsetY(-7);
+						if (agent.getOffsetY() >= -4)
+							agent.setOffsetY(-4);
 					}
 					if (agent.getOffsetX() <= 0)
 					{
@@ -354,18 +354,18 @@ public class HorizontalRampStep implements Action {
 						world.removeAgentAt(pos.x + 1, pos.y, pos.z - 1);
 						swapFootstep(agent);
 						agent.setOffsetX(0);
-						agent.setOffsetY(-7);
+						agent.setOffsetY(-4);
 						agent.setRampAscending(false);
 						finished = true;
 					}
 				break;
 				case Right:
 					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetX() >= -8)
+					if (agent.getOffsetX() >= -11)
 					{
 						agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-						if (agent.getOffsetY() >= -7)
-							agent.setOffsetY(-7);
+						if (agent.getOffsetY() >= -4)
+							agent.setOffsetY(-4);
 					}
 					if (agent.getOffsetX() >= 0)
 					{
@@ -373,7 +373,7 @@ public class HorizontalRampStep implements Action {
 						world.removeAgentAt(pos.x - 1, pos.y, pos.z - 1);
 						swapFootstep(agent);
 						agent.setOffsetX(0);
-						agent.setOffsetY(-7);
+						agent.setOffsetY(-4);
 						agent.setRampAscending(false);
 						finished = true;
 					}
@@ -435,8 +435,8 @@ public class HorizontalRampStep implements Action {
 				case Left:
 					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
 					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetY() >= -8)
-						agent.setOffsetY(-8);
+					if (agent.getOffsetY() >= -4)
+						agent.setOffsetY(-4);
 					if (agent.getOffsetX() <= 0)
 					{
 						Position pos = agent.getPos();
@@ -450,8 +450,8 @@ public class HorizontalRampStep implements Action {
 				case Right:
 					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
 					agent.incrementYOffset(agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetY() >= -8)
-						agent.setOffsetY(-8);
+					if (agent.getOffsetY() >= -4)
+						agent.setOffsetY(-4);
 					if (agent.getOffsetX() >= 0)
 					{
 						Position pos = agent.getPos();
@@ -481,11 +481,11 @@ public class HorizontalRampStep implements Action {
 				break;
 				case Left:
 					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetX() <= 8)
+					if (agent.getOffsetX() <= 3)
 					{
 						agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
-						if (agent.getOffsetY() <= -9)
-							agent.setOffsetY(-9);
+						if (agent.getOffsetY() <= -4)
+							agent.setOffsetY(-4);
 					}
 					if (agent.getOffsetX() <= 0)
 					{
@@ -493,18 +493,18 @@ public class HorizontalRampStep implements Action {
 						world.removeAgentAt(pos.x + 1, pos.y, pos.z);
 						swapFootstep(agent);
 						agent.setOffsetX(0);
-						agent.setOffsetY(-9);
+						agent.setOffsetY(-4);
 						agent.setRampDescending(false);
 						finished = true;
 					}
 				break;
 				case Right:
 					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetX() >= -8)
+					if (agent.getOffsetX() >= -3)
 					{
 						agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
-						if (agent.getOffsetY() <= -9)
-							agent.setOffsetY(-9);
+						if (agent.getOffsetY() <= -4)
+							agent.setOffsetY(-4);
 					}
 					if (agent.getOffsetX() >= 0)
 					{
@@ -512,7 +512,7 @@ public class HorizontalRampStep implements Action {
 						world.removeAgentAt(pos.x - 1, pos.y, pos.z);
 						swapFootstep(agent);
 						agent.setOffsetX(0);
-						agent.setOffsetY(-9);
+						agent.setOffsetY(-4);
 						agent.setRampDescending(false);
 						finished = true;
 					}
@@ -574,8 +574,8 @@ public class HorizontalRampStep implements Action {
 				case Left:
 					agent.incrementXOffset(-agent.getSpeed() * 16.0f / 32.0f);
 					agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetY() <= -8)
-						agent.setOffsetY(-8);
+					if (agent.getOffsetY() <= -4)
+						agent.setOffsetY(-4);
 					if (agent.getOffsetX() <= 0)
 					{
 						Position pos = agent.getPos();
@@ -589,8 +589,8 @@ public class HorizontalRampStep implements Action {
 				case Right:
 					agent.incrementXOffset(agent.getSpeed() * 16.0f / 32.0f);
 					agent.incrementYOffset(-agent.getSpeed() * 16.0f / 32.0f);
-					if (agent.getOffsetY() <= -8)
-						agent.setOffsetY(-8);
+					if (agent.getOffsetY() <= -4)
+						agent.setOffsetY(-4);
 					if (agent.getOffsetX() >= 0)
 					{
 						Position pos = agent.getPos();
@@ -641,5 +641,36 @@ public class HorizontalRampStep implements Action {
 	@Override
 	public boolean isInterruptable() {
 		return true;
+	}
+	
+	/* Actions are not currently saved, keeping this here in case they ever are...
+	@Override
+	public String save()
+	{
+		String data = new String("HorizontalRampStep:\n");
+		data += dir.toString() + "," + ascending + "," + initialized + "," + finished + "," + steppingState.toString() + "\n";
+		data += "~HorizontalRampStep\n";
+		return data;
+	}
+	*/
+	
+	public static HorizontalRampStep load(String data)
+	{
+		if (data.equals("null\n"))
+			return null;
+
+		Direction dir = Direction.valueOf(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		Boolean ascending = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		HorizontalRampStep horizontalRampStep = new HorizontalRampStep(dir, ascending);
+		
+		horizontalRampStep.initialized = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		horizontalRampStep.finished = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		horizontalRampStep.steppingState = SteppingState.valueOf(data.substring(0, data.indexOf('\n')));
+		
+		return horizontalRampStep;
 	}
 }

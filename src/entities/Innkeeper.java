@@ -13,7 +13,6 @@ import actions.Turn;
 import actions.WalkToPoint;
 import world.Position;
 import world.Map;
-
 import static entities.Agent.Direction.*;
 import static world.Map.ControlState.*;
 import static utils.planners.PathPlannerUtils.MovementClass.*;
@@ -60,12 +59,12 @@ public class Innkeeper extends Agent
 	 * @param row texture row
 	 * @param col texture column
 	 */
-	public Innkeeper(String charSheet, int row, int col)
+	public Innkeeper(String textureSheet, int texRow, int texCol)
 	{
 		super(true, true, false);
-		textureSheet = charSheet;
-		setTexRow(row);
-		setTexCol(col);
+		this.textureSheet = textureSheet;
+		setTexRow(texRow);
+		setTexCol(texCol);
 		
 		loadTextures();
 	}
@@ -284,4 +283,39 @@ public class Innkeeper extends Agent
 		} catch (IOException e) {e.printStackTrace();}
 	}
 
+	@Override
+	public String save()
+	{
+		String data = new String("");
+		data += "Innkeeper:\n";
+		data += this.saveCommon();
+		data += textureSheet.toString() + "," + this.getTexRow() + "," + this.getTexCol() + "," + conversationNumber + "\n";
+		return data;
+	}
+	
+	public static Innkeeper load(String data)
+	{
+		//read in common data
+		CommonData commonData = Agent.loadCommon(data);
+		data = commonData.remainingData;
+		
+		//read Innkeeper-specific data
+		String textureSheet = data.substring(0, data.indexOf(','));
+		data = data.substring(data.indexOf(',') + 1);
+		int texRow = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		int texCol = Integer.parseInt(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		int conversationNumber = Integer.parseInt(data.substring(0, data.indexOf('\n')));
+		
+		//create agent and set any relevant data
+		Innkeeper innkeeper = new Innkeeper(textureSheet, texRow, texCol);
+		innkeeper.setPos(commonData.pos);
+		innkeeper.setDir(commonData.dir);
+		innkeeper.setOnRamp(commonData.onRamp);
+		innkeeper.conversationNumber = conversationNumber;
+		
+		return innkeeper;
+	}
+	
 }

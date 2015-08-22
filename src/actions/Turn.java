@@ -48,4 +48,27 @@ public class Turn implements Action {
 	public boolean isInterruptable() {
 		return true;
 	}
+	
+	/* Actions are not currently saved, keeping this here in case they ever are...
+	@Override
+	public String save()
+	{
+		String data = new String("Turn:\n");
+		data += dir.toString() + "," + finished + "\n";
+		data += "~Turn\n";
+		return data;
+	}
+	*/
+	
+	public static Turn load(String data)
+	{
+		if (data.equals("null\n"))
+			return null;
+
+		Turn turn = new Turn(Direction.valueOf(data.substring(0, data.indexOf(','))));
+		data = data.substring(data.indexOf(',') + 1);
+		turn.finished = Boolean.parseBoolean(data.substring(0, data.indexOf('\n')));
+		
+		return turn;
+	}
 }

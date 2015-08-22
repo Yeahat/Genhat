@@ -197,8 +197,6 @@ public class SimpleStep implements Action {
 		return finished;
 	}
 	
-	
-		
 	private void swapFootstep(Agent agent)
 	{
 		if (agent.getFootstep() == Right)
@@ -219,5 +217,30 @@ public class SimpleStep implements Action {
 	@Override
 	public boolean isInterruptable() {
 		return true;
+	}
+	
+	/* Actions are not currently saved, keeping this here in case they ever are...
+	@Override
+	public String save()
+	{
+		String data = new String("SimpleStep:\n");
+		data += dir.toString() + "," + initialized + "," + finished + "\n";
+		data += "~SimpleStep\n";
+		return data;
+	}
+	*/
+	
+	public static SimpleStep load(String data)
+	{
+		if (data.equals("null\n"))
+			return null;
+
+		SimpleStep simpleStep = new SimpleStep(Direction.valueOf(data.substring(0, data.indexOf(','))));
+		data = data.substring(data.indexOf(',') + 1);
+		simpleStep.initialized = Boolean.parseBoolean(data.substring(0, data.indexOf(',')));
+		data = data.substring(data.indexOf(',') + 1);
+		simpleStep.finished = Boolean.parseBoolean(data.substring(0, data.indexOf('\n')));
+		
+		return simpleStep;
 	}
 }
