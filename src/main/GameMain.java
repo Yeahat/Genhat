@@ -42,7 +42,7 @@ import things.Rope;
 import things.Stairs;
 import things.Table;
 import things.WallCandle;
-import utils.data.MapSaver;
+import utils.data.GameSaver;
 import utils.display.DisplayText;
 import world.GameState;
 import world.Grid;
@@ -135,8 +135,11 @@ public class GameMain {
 				if (Keyboard.getEventKey() == Keyboard.KEY_S)
 				{
 					System.out.println("Saving map...");
-					MapSaver.saveMap(world, gameState);
+					GameSaver.saveMap(world, gameState, "save1");
 					System.out.println("Map saved.");
+					System.out.println("Saving game state...");
+					GameSaver.saveGameState(gameState, "save1");
+					System.out.println("Game state saved.");
 				}
 				
 				//Tilde key (without shift) loads up the debug overlay 
@@ -367,8 +370,8 @@ public class GameMain {
 	 */
 	public void initWorld()
 	{
-		genInnTest();
-		//loadInnTest();
+		//genInnTest();
+		loadInnTest();
 	}
 	
 	/**
@@ -851,20 +854,15 @@ public class GameMain {
 		gameState = new GameState();
 		gameState.setPlayer(hero);
 		gameState.setTimeOfDay(Morning);
+		gameState.setCurrentMap("innTest");
 	}
 	
 	private void loadInnTest()
 	{
-		world = MapSaver.loadMap("innTest");
-		
-		ArrayList<Agent> agents = new ArrayList<Agent>();
-		
-		Hero hero = new Hero();
-		hero.setPos(new Position(34, 32, 1));
-		agents.add(hero);
-		
-		world.addAgents(agents);
-		gameState.setPlayer(hero);
-		gameState.setTimeOfDay(Morning);
+		world = GameSaver.loadMap("innTest", "save1");
+		gameState = GameSaver.loadGameState("save1");
+		//with more maps, search through all map names until a match is found with the game state,
+		//make that map the active one, and add the player there.
+		world.addAgent(gameState.getPlayer());
 	}
 }

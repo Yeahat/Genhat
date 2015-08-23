@@ -290,7 +290,7 @@ public class Innkeeper extends Agent
 		String data = new String("");
 		data += "Innkeeper:\n";
 		data += this.saveCommon();
-		data += textureSheet.toString() + "," + this.getTexRow() + "," + this.getTexCol() + "," + conversationNumber + "\n";
+		data += textureSheet + "," + this.getTexRow() + "," + this.getTexCol() + "," + conversationNumber + "\n";
 		return data;
 	}
 	

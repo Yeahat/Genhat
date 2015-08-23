@@ -122,7 +122,6 @@ public class Hero extends Agent {
 	@Override
 	public String save()
 	{
-		//Generally, the player character should not be saved with the other Agents, but this is included for completeness.
 		String data = new String("");
 		data += "Hero:\n";
 		data += this.saveCommon();

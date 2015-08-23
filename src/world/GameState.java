@@ -1,13 +1,19 @@
 package world;
 
+import java.util.ArrayList;
+
+import things.Table;
 import world.Map.TimeOfDay;
+import entities.AgentLoader;
 import entities.Hero;
+import entities.Agent.Direction;
 import static world.Map.TimeOfDay.*;
 
 public class GameState
 {
 	private Hero player;
 	private TimeOfDay timeOfDay;
+	private String currentMap;
 	private int timeCounter;
 	private final int DAY_INTERVAL = 9600;	//the number of frames before the time of day changes
 	private final int NIGHT_INTERVAL = DAY_INTERVAL*2;
@@ -66,6 +72,32 @@ public class GameState
 		timeCounter = 0;
 	}
 	
+	public ArrayList<String> save()
+	{
+		ArrayList<String> data = new ArrayList<String>();
+		
+		data.add(currentMap + "," + timeOfDay.toString() + "," + timeCounter + "\n");
+		data.add(player.save());
+		
+		return data;
+	}
+	
+	public static GameState load(String data)
+	{
+		GameState gameState = new GameState();
+		
+		//read in map and time info
+		gameState.currentMap = data.substring(0, data.indexOf(','));
+		data = data.substring(data.indexOf(',') + 1);
+		gameState.setTimeOfDay(TimeOfDay.valueOf(data.substring(0, data.indexOf(','))));
+		data = data.substring(data.indexOf(',') + 1);
+		gameState.setTimeCounter(Integer.parseInt(data.substring(0, data.indexOf('\n'))));
+		data = data.substring(data.indexOf('\n') + 1);
+		gameState.setPlayer((Hero)AgentLoader.loadAgent(data));
+		
+		return gameState;
+	}
+	
 	public Hero getPlayer() {
 		return player;
 	}
@@ -107,5 +139,13 @@ public class GameState
 
 	public void setTimeCounter(int timeCounter) {
 		this.timeCounter = timeCounter;
+	}
+
+	public String getCurrentMap() {
+		return currentMap;
+	}
+
+	public void setCurrentMap(String currentMap) {
+		this.currentMap = currentMap;
 	}
 }
