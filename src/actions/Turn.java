@@ -2,8 +2,8 @@ package actions;
 
 import static entities.Agent.Direction.Down;
 import static entities.Agent.Direction.Up;
-
 import utils.planners.PathPlannerUtils;
+import world.GameState;
 import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
@@ -19,7 +19,7 @@ public class Turn implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world) {
+	public void execute(Agent agent, Map world, GameState gameState) {
 		
 		if (agent.getDir() != dir && !PathPlannerUtils.isOnClimbingSurface(world, agent.getPos()))
 		{

@@ -8,6 +8,7 @@ import org.newdawn.slick.opengl.Texture;
 
 import static entities.Agent.Direction.*;
 import things.Thing;
+import world.GameState;
 import world.Position;
 import world.Map;
 import actions.Action;
@@ -128,24 +129,26 @@ public abstract class Agent {
 	/**
 	 * Update the currentAction based on world information
 	 * @param world the world
+	 * @param gameState the game state
 	 */
-	public abstract void decideNextAction(Map world);
+	public abstract void decideNextAction(Map world, GameState gameState);
 	
 	/**
 	 * Execute the current action
 	 * @param world the world information to be passed through to the action's execute call
 	 */
-	public void executeAction(Map world)
+	public void executeAction(Map world, GameState gameState)
 	{
-		currentAction.execute(this, world);
+		currentAction.execute(this, world, gameState);
 	}
 	
 	/**
 	 * What to do when the agent is interacted with by another agent; empty by default but can be overriden.
 	 * @param agent the agent doing the interacting
 	 * @param world the world in which the interacting agents exist
+	 * @param gameState the current game state
 	 */
-	public void interact(Agent agent, Map world){}
+	public void interact(Agent agent, Map world, GameState gameState){}
 	
 	/**
 	 * Incrementer for the x offset value

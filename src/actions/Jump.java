@@ -1,5 +1,6 @@
 package actions;
 
+import world.GameState;
 import world.Position;
 import world.Map;
 import entities.Agent;
@@ -22,7 +23,7 @@ public class Jump implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{
 		if (finished)
 			return;
@@ -126,8 +127,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			
@@ -165,8 +166,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			case Left:
@@ -188,8 +189,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockH() || world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			case Right:
@@ -210,8 +211,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockH() || world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			}
@@ -253,8 +254,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			case Down:
@@ -276,8 +277,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			case Left:
@@ -300,8 +301,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockH() || world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			case Right:
@@ -324,8 +325,8 @@ public class Jump implements Action {
 				if (agent.getClass().equals(Hero.class))
 				{
 					if (world.isCameraLockH() || world.isCameraLockV())
-						world.updateCameraScrollLock();
-					world.updateCamera();
+						world.updateCameraScrollLock(gameState);
+					world.updateCamera(gameState);
 				}
 			break;
 			}

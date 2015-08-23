@@ -1,5 +1,6 @@
 package actions;
 
+import world.GameState;
 import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
@@ -27,7 +28,7 @@ public class FollowPath implements Action
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world) 
+	public void execute(Agent agent, Map world, GameState gameState) 
 	{		
 		if (currentStep == '-' && path.length() == 0)
 			return;
@@ -54,11 +55,11 @@ public class FollowPath implements Action
 		
 		if (!wait.isFinished())
 		{
-			wait.execute(agent, world);
+			wait.execute(agent, world, gameState);
 		}
 		else
 		{
-			step.execute(agent, world);
+			step.execute(agent, world, gameState);
 			if (step.isFinished() && !executingStep)
 			{
 				//step is blocked by something, try again on the next cycle

@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import world.GameState;
 import world.Map;
 import world.Position;
 import entities.Agent;
@@ -37,7 +38,7 @@ public class Bar extends Thing {
 	}
 
 	@Override
-	public boolean interact(Agent agent, Map world){
+	public boolean interact(Agent agent, Map world, GameState gameState){
 		//get direction of interaction
 		int x = 2*pos.x - agent.getPos().x;
 		int y = 2*pos.y - agent.getPos().y;
@@ -46,7 +47,7 @@ public class Bar extends Thing {
 		//pass on interaction if there is an agent one space along the interaction direction
 		if (world.isOccupied(x, y, z))
 		{
-			world.getAgentAt(x, y, z).interact(agent, world);
+			world.getAgentAt(x, y, z).interact(agent, world, gameState);
 		}
 		
 		return true;

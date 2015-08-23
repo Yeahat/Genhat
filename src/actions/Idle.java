@@ -1,7 +1,7 @@
 package actions;
 
 import entities.Agent;
-
+import world.GameState;
 import world.Map;
 
 public class Idle implements Action {
@@ -10,7 +10,7 @@ public class Idle implements Action {
 	 * Do nothing, this is the default idle action
 	 */
 	@Override
-	public void execute(Agent agent, Map world) 
+	public void execute(Agent agent, Map world, GameState gameState) 
 	{
 		return;
 	}

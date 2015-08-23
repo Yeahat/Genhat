@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import world.GameState;
 import world.Map;
 import world.Position;
 import entities.Agent;
@@ -78,7 +79,7 @@ public class Firewood extends Thing {
 	}
 
 	@Override
-	public boolean interact(Agent agent, Map world)
+	public boolean interact(Agent agent, Map world, GameState gameState)
 	{
 		if (quantity > 0)
 			setQuantity(quantity - 1);

@@ -5,6 +5,7 @@ import static entities.Agent.Direction.Right;
 
 import org.lwjgl.opengl.GL11;
 
+import world.GameState;
 import world.Position;
 import world.Map;
 
@@ -31,7 +32,7 @@ public class Placeholder extends Agent {
 	}
 	
 	@Override
-	public void decideNextAction(Map world) 
+	public void decideNextAction(Map world, GameState gameState) 
 	{
 		this.setCurrentAction(idle);
 	}

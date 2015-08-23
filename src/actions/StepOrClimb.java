@@ -2,6 +2,7 @@ package actions;
 
 
 import utils.planners.PathPlannerUtils;
+import world.GameState;
 import world.Map;
 import entities.Agent;
 import entities.Agent.Direction;
@@ -22,10 +23,10 @@ public class StepOrClimb implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{
 		//begin a new step if one is not already in progress, otherwise continue executing the step in progress
-		if (!continueStepping(agent, world))
+		if (!continueStepping(agent, world, gameState))
 		{
 			//set direction if necessary
 			if (agent.getDir() != dir && (dir == Left || dir == Right || !PathPlannerUtils.isOnRampHorizontal(world, agent.getPos())) 
@@ -38,25 +39,25 @@ public class StepOrClimb implements Action {
 			if (horizontalRampCheck[0])
 			{
 				rampStep = new HorizontalRampStep(dir, horizontalRampCheck[1]);
-				rampStep.execute(agent, world);
+				rampStep.execute(agent, world, gameState);
 			}
 			//check for vertical ramp steps
 			else if (PathPlannerUtils.checkForVerticalRampStep(world, agent.getPos(), dir))
 			{
 				rampStep = new VerticalRampStep(dir);
-				rampStep.execute(agent, world);
+				rampStep.execute(agent, world, gameState);
 			}
 			//check for climbing
 			else if (PathPlannerUtils.checkForClimb(world, agent.getPos(), dir))
 			{
 				climb = new Climb(dir);
-				climb.execute(agent, world);
+				climb.execute(agent, world, gameState);
 			}
 			//all special cases checked for, use a simple step instead
 			else
 			{
 				simpleStep = new SimpleStep(dir);
-				simpleStep.execute(agent, world);
+				simpleStep.execute(agent, world, gameState);
 			}
 		}
 		
@@ -71,23 +72,23 @@ public class StepOrClimb implements Action {
 		return finished;
 	}
 	
-	private boolean continueStepping(Agent agent, Map world)
+	private boolean continueStepping(Agent agent, Map world, GameState gameState)
 	{
 		if (agent.isRampAscending() || agent.isRampDescending())
 		{
-			rampStep.execute(agent, world);
+			rampStep.execute(agent, world, gameState);
 			return true;
 		}
 		
 		if (agent.isClimbing())
 		{
-			climb.execute(agent, world);
+			climb.execute(agent, world, gameState);
 			return true;
 		}
 		
 		if (agent.isStepping())
 		{
-			simpleStep.execute(agent, world);
+			simpleStep.execute(agent, world, gameState);
 			return true;
 		}
 		

@@ -1,6 +1,7 @@
 package actions;
 
 import utils.planners.PathPlannerUtils;
+import world.GameState;
 import world.Position;
 import world.Map;
 import entities.Agent;
@@ -32,7 +33,7 @@ public class HorizontalRampStep implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{		
 		if (finished)
 			return;
@@ -610,8 +611,8 @@ public class HorizontalRampStep implements Action {
 		if (agent.getClass().equals(Hero.class))
 		{
 			if (world.isCameraLockH() || world.isCameraLockV())
-				world.updateCameraScrollLock();
-			world.updateCamera();
+				world.updateCameraScrollLock(gameState);
+			world.updateCamera(gameState);
 		}
 	}
 

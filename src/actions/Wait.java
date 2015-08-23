@@ -1,5 +1,6 @@
 package actions;
 
+import world.GameState;
 import world.Map;
 import entities.Agent;
 
@@ -13,7 +14,7 @@ public class Wait implements Action
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{
 		if (frames > 0)
 			frames --;

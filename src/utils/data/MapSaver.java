@@ -8,16 +8,17 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import world.GameState;
 import world.Map;
 
 public class MapSaver
 {
-	public static void saveMap(Map world)
+	public static void saveMap(Map world, GameState gameState)
 	{
 		String filePath = "maps/" + world.getMapName() + ".txt";
 		try {
 			PrintWriter out = new PrintWriter(filePath);
-			ArrayList<String> data = world.save();
+			ArrayList<String> data = world.save(gameState);
 			for (int i = 0; i < data.size(); i ++)
 			{
 				out.print(data.get(i));

@@ -8,6 +8,7 @@ import org.newdawn.slick.util.ResourceLoader;
 import actions.Jump;
 import actions.StepOrClimb;
 import actions.Turn;
+import world.GameState;
 import world.Map;
 import static entities.Agent.Direction.*;
 
@@ -44,7 +45,7 @@ public class Hero extends Agent {
 	}
 	
 	@Override
-	public void decideNextAction(Map world) 
+	public void decideNextAction(Map world, GameState gameState) 
 	{
 		if (currentAction.isFinished())
 		{

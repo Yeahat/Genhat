@@ -17,7 +17,6 @@ import entities.AgentLoader;
 import entities.Hero;
 import entities.Placeholder;
 import static world.Terrain.terrainType.*;
-import static world.Map.TimeOfDay.*;
 import static world.Map.ControlState.*;
 
 public class Map
@@ -37,12 +36,12 @@ public class Map
 	private int height;
 	
 	//TODO: refactor this stuff to a new Game State class
-	Hero player;
+	//Hero player;
 	public enum TimeOfDay
 	{
 		Sunrise, Morning, Midday, Afternoon, Sunset, Night;
 	}
-	private TimeOfDay tod;
+	//private TimeOfDay tod;
 	
 	//rendering constants
 	private final int pixelSize = 2;
@@ -144,7 +143,6 @@ public class Map
 		textBoxActive = false;
 		textDisplay = new DisplayText();
 		
-		setTod(Midday);
 		setCs(walking);
 	}
 	
@@ -171,20 +169,21 @@ public class Map
 	
 	/**
 	 * Run an update on all agents active in the world
+	 * @param gameState the game state
 	 */
-	public void updateAgents()
+	public void updateAgents(GameState gameState)
 	{
 		for (int i = 0; i < agents.size(); i ++)
 		{
-			agents.get(i).executeAction(this);
-			agents.get(i).decideNextAction(this);
+			agents.get(i).executeAction(this, gameState);
+			agents.get(i).decideNextAction(this, gameState);
 		}
 	}
 	
 	/**
 	 * Update the maximum world height to be rendered depending on whether the Hero Agent has a roof overhead
 	 */
-	private int updateHeightMax()
+	private int updateHeightMax(Hero player)
 	{
 		if (player == null)
 		{
@@ -230,9 +229,9 @@ public class Map
 		return height;
 	}
 	
-	public void updateCameraScrollLock()
+	public void updateCameraScrollLock(GameState gameState)
 	{
-		Hero player = getPlayer();
+		Hero player = gameState.getPlayer();
 		Position pos = player.getPos();
 		float screenPosX = pos.x + player.getOffsetX()*(1.0f/16.0f);
 		float screenPosY = pos.y + pos.z + player.getOffsetY()*(1.0f/16.0f);
@@ -285,9 +284,9 @@ public class Map
 		}
 	}
 	
-	public void updateCamera()
+	public void updateCamera(GameState gameState)
 	{
-		Hero player = getPlayer();
+		Hero player = gameState.getPlayer();
 		Position pos = player.getPos();
 		float screenPosX = pos.x + player.getOffsetX()*(1.0f/16.0f);
 		float screenPosY = pos.y + pos.z + player.getOffsetY()*(1.0f/16.0f);
@@ -311,7 +310,7 @@ public class Map
 		setDisplayCenter(newDisplayCenter);
 	}
 	
-	public boolean isShadowed(int x, int y, int z)
+	public boolean isShadowed(int x, int y, int z, TimeOfDay tod)
 	{
 		int shadowLength = 1;
 		int shadowDirection = 1;
@@ -472,11 +471,11 @@ public class Map
 	/**
 	 * Render terrain, things, and agents by layers
 	 */
-	public void renderWorld()
+	public void renderWorld(GameState gameState)
 	{		
 		int iMin, iMax, jMin, jMax, kMin, kMax;
 		kMin = 0;
-		kMax = Math.min(height - 1, updateHeightMax());
+		kMax = Math.min(height - 1, updateHeightMax(gameState.getPlayer()));
 		iMin = Math.max(0, (int)(displayCenter[0] - 13));
 		iMax = Math.min(width - 1, (int)(displayCenter[0] + 15));
 		jMin = Math.max(0, (int)(displayCenter[1] - 10 - kMax));
@@ -590,9 +589,9 @@ public class Map
 					    		}
 						    	
 					    		if (k == kMax && t.isTransparent())
-					    			renderCell(texX, texY, false, lightModGrid.get(i, j, k), .75f);
+					    			renderCell(texX, texY, false, lightModGrid.get(i, j, k), gameState.getTimeOfDay(), .75f);
 					    		else
-					    			renderCell(texX, texY, false, lightModGrid.get(i, j, k));
+					    			renderCell(texX, texY, false, lightModGrid.get(i, j, k), gameState.getTimeOfDay());
 							}
 							else
 							{
@@ -601,7 +600,7 @@ public class Map
 								//if (terrainGrid[i][j][k-1].type != air || (this.hasThing(i, j, k-1) && this.getThingsAt(i, j, k-1).hasFullBlock()))
 								if (terrainGrid.get(i, j, k-1).type != air)
 								{
-									renderCrossSection(i, j, k, t);
+									renderCrossSection(i, j, k, t, gameState.getTimeOfDay());
 								}
 							}
 							
@@ -649,7 +648,7 @@ public class Map
 				    			texX += 1;
 				    		}
 				    		
-				    		renderCell(texX, texY, isShadowed(i, j, k+1), lightModGrid.get(i, j, k+1));
+				    		renderCell(texX, texY, isShadowed(i, j, k+1, gameState.getTimeOfDay()), lightModGrid.get(i, j, k+1), gameState.getTimeOfDay());
 						
 						GL11.glPopMatrix();
 						}
@@ -727,7 +726,7 @@ public class Map
 					    			texX += 1;
 					    		}
 					    		
-					    		renderCell(texX, texY, isShadowed(i, j, k), lightModGrid.get(i, j, k));
+					    		renderCell(texX, texY, isShadowed(i, j, k, gameState.getTimeOfDay()), lightModGrid.get(i, j, k), gameState.getTimeOfDay());
 							
 							GL11.glPopMatrix();
 						}
@@ -784,7 +783,7 @@ public class Map
 				    			texX += 1;
 				    		}
 					    	
-				    		renderCell(texX, texY, false, lightModGrid.get(i, j, k+1));
+				    		renderCell(texX, texY, false, lightModGrid.get(i, j, k+1), gameState.getTimeOfDay());
 							
 						GL11.glPopMatrix();
 					}
@@ -805,9 +804,9 @@ public class Map
 							GL11.glPushMatrix();
 								//don't shadow if the thing is in (i.e. on) a vertical wall
 								if (terrainGrid.get(i, j, k).getTerrainType() != air)
-									setLighting(false, lightModGrid.get(i, j, k));
+									setLighting(false, lightModGrid.get(i, j, k), gameState.getTimeOfDay());
 								else
-									setLighting(isShadowed(i, j, k), lightModGrid.get(i, j, k));
+									setLighting(isShadowed(i, j, k, gameState.getTimeOfDay()), lightModGrid.get(i, j, k), gameState.getTimeOfDay());
 								GL11.glTranslatef(x, y, 0);
 								thingGrid.get(i, j, k).renderThings(pixelSize, textureSize);
 							GL11.glPopMatrix();
@@ -854,10 +853,10 @@ public class Map
 								if (agent.getClass() == Placeholder.class)
 								{
 									Position effectivePos = ((Placeholder)agent).getEffectivePos();
-									setLighting(isShadowed(effectivePos.x, effectivePos.y, effectivePos.z), lightModGrid.get(effectivePos.x, effectivePos.y, effectivePos.z));
+									setLighting(isShadowed(effectivePos.x, effectivePos.y, effectivePos.z, gameState.getTimeOfDay()), lightModGrid.get(effectivePos.x, effectivePos.y, effectivePos.z), gameState.getTimeOfDay());
 								}
 								else
-									setLighting(isShadowed(i, j, k), lightModGrid.get(i, j, k));
+									setLighting(isShadowed(i, j, k, gameState.getTimeOfDay()), lightModGrid.get(i, j, k), gameState.getTimeOfDay());
 								GL11.glTranslatef(x, y, 0);
 								agent.renderAgent(pixelSize, textureSize);
 							GL11.glPopMatrix();
@@ -868,7 +867,7 @@ public class Map
 		}
 	}
 
-	private void renderCrossSection(int x, int y, int z, Terrain t)
+	private void renderCrossSection(int x, int y, int z, Terrain t, TimeOfDay tod)
 	{
 		//Determine which part of the texture to use based on how many neighbors are air
 		Terrain toppedTerrain;
@@ -955,7 +954,7 @@ public class Map
 		//shift in x direction to cross section textures
 		texX += 4;
 		
-		renderCell(texX, texY, false, lightModGrid.get(x, y, z));
+		renderCell(texX, texY, false, lightModGrid.get(x, y, z), tod);
 		
 		//corner rendering checks (four non-exclusive cases)
 		if (!topEmpty && !rightEmpty)
@@ -984,7 +983,7 @@ public class Map
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid.get(x, y, z));
+				setLighting(false, lightModGrid.get(x, y, z), tod);
 					GL11.glTexCoord2f(texX * tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
 					GL11.glVertex2f(quadVertexMax/2.0f, quadVertexMax/2.0f);
 					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConvQuarterAdjustment);
@@ -1022,7 +1021,7 @@ public class Map
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid.get(x, y, z));
+				setLighting(false, lightModGrid.get(x, y, z), tod);
 					GL11.glTexCoord2f(texX * tConv + tConvQuarterAdjustment, texY*tConv + tConv);
 					GL11.glVertex2f(quadVertexMax/2.0f, 0);
 					GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
@@ -1060,7 +1059,7 @@ public class Map
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid.get(x, y, z));
+				setLighting(false, lightModGrid.get(x, y, z), tod);
 					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 					GL11.glVertex2f(0, 0);
 					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConv);
@@ -1098,7 +1097,7 @@ public class Map
 				texY += 4; //shift to corner textures
 				
 				GL11.glBegin(GL11.GL_QUADS);
-				setLighting(false, lightModGrid.get(x, y, z));
+				setLighting(false, lightModGrid.get(x, y, z), tod);
 					GL11.glTexCoord2f(texX * tConv, texY*tConv + tConvQuarterAdjustment);
 					GL11.glVertex2f(0, quadVertexMax/2.0f);
 					GL11.glTexCoord2f(texX*tConv + tConvQuarterAdjustment, texY*tConv + tConvQuarterAdjustment);
@@ -1127,15 +1126,15 @@ public class Map
 		}
 	}
 	
-	private void renderCell(float texX, float texY, boolean isShadowed, float lightMod)
+	private void renderCell(float texX, float texY, boolean isShadowed, float lightMod, TimeOfDay tod)
 	{
-		renderCell(texX, texY, isShadowed, lightMod, 1.0f);
+		renderCell(texX, texY, isShadowed, lightMod, tod, 1.0f);
 	}
 	
-	private void renderCell(float texX, float texY, boolean isShadowed, float lightMod, float transparency)
+	private void renderCell(float texX, float texY, boolean isShadowed, float lightMod, TimeOfDay tod, float transparency)
 	{
 		GL11.glBegin(GL11.GL_QUADS);
-			setLighting(isShadowed, lightMod, transparency);
+			setLighting(isShadowed, lightMod, tod, transparency);
 			GL11.glTexCoord2f(texX * tConv, texY*tConv + tConv);
 			GL11.glVertex2f(0, 0);
 			GL11.glTexCoord2f(texX*tConv + tConv, texY*tConv + tConv);
@@ -1150,9 +1149,9 @@ public class Map
 	/**
 	 * Overload without transparency
 	 */
-	private void setLighting(boolean shadowed, float lightMod)
+	private void setLighting(boolean shadowed, float lightMod, TimeOfDay tod)
 	{
-		setLighting(shadowed, lightMod, 1.0f);
+		setLighting(shadowed, lightMod, tod, 1.0f);
 	}
 	
 	/**
@@ -1162,7 +1161,7 @@ public class Map
 	 * @param lightMod contributing amount from light sources
 	 * @param transparency how transparent the rendering is
 	 */
-	private void setLighting(boolean shadowed, float lightMod, float transparency)
+	private void setLighting(boolean shadowed, float lightMod, TimeOfDay tod, float transparency)
 	{
 		float r, g, b;
 		switch (tod)
@@ -1435,19 +1434,6 @@ public class Map
 		displayCenter[1] = center.y;
 	}
 	
-	public void cycleTimeOfDay()
-	{
-		switch (tod)
-		{
-		case Sunrise: tod = Morning; break;
-		case Morning: tod = Midday; break;
-		case Midday: tod = Afternoon; break;
-		case Afternoon: tod = Sunset; break;
-		case Sunset: tod = Night; break;
-		case Night: tod = Sunrise; break;
-		}
-	}
-	
 	/**
 	 * Getter for the display x
 	 * 
@@ -1683,32 +1669,6 @@ public class Map
 		}
 	}
 		
-	/**
-	 * Getter for the player-controlled agent
-	 * @return the current player-controlled agent, null if there isn't one
-	 */
-	public Hero getPlayer()
-	{
-		return player;
-	}
-	
-	/**
-	 * Setter for the player-controlled agent
-	 * @param agent the new player-controlled agent
-	 */
-	public void setPlayer(Hero hero)
-	{
-		player = hero;
-	}
-
-	public void setTod(TimeOfDay tod) {
-		this.tod = tod;
-	}
-
-	public TimeOfDay getTod() {
-		return tod;
-	}
-
 	public void setCameraLockV(boolean cameraLockV) {
 		this.cameraLockV = cameraLockV;
 	}
@@ -1757,7 +1717,7 @@ public class Map
 		this.cs = cs;
 	}
 
-	public ArrayList<String> save() 
+	public ArrayList<String> save(GameState gameState) 
 	{
 		ArrayList<String> data = new ArrayList<String>();
 
@@ -1799,7 +1759,7 @@ public class Map
 		for (int i = 0; i < agentGrid.getGrid().length; i ++)
 		{
 			Agent agent = (Agent)agentGrid.getGrid()[i];
-			if (agent != null && !agent.isAssociated() && agent != getPlayer())
+			if (agent != null && !agent.isAssociated() && agent != gameState.getPlayer())
 			{
 				data.add(agent.save());
 				data.add("-\n");

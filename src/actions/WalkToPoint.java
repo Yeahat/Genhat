@@ -2,6 +2,7 @@ package actions;
 
 import utils.planners.AStar;
 import utils.planners.PathPlannerUtils.MovementClass;
+import world.GameState;
 import world.Position;
 import world.Map;
 import entities.Agent;
@@ -39,7 +40,7 @@ public class WalkToPoint implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{
 		if (finished)
 			return;
@@ -72,7 +73,7 @@ public class WalkToPoint implements Action {
 		}
 		else
 		{
-			followPath.execute(agent, world);
+			followPath.execute(agent, world, gameState);
 			if (followPath.isFinished())
 			{
 				finished = true;

@@ -11,6 +11,7 @@ import actions.FollowPath;
 import actions.Say;
 import actions.Turn;
 import actions.WalkToPoint;
+import world.GameState;
 import world.Position;
 import world.Map;
 import static entities.Agent.Direction.*;
@@ -70,11 +71,11 @@ public class Innkeeper extends Agent
 	}
 	
 	@Override
-	public void interact(Agent agent, Map world)
+	public void interact(Agent agent, Map world, GameState gameState)
 	{
 		if (currentAction.isInterruptable())
 		{
-			if (agent == world.getPlayer())
+			if (agent == gameState.getPlayer())
 			{
 				setInteractingWithHero(true);
 				world.setCs(talking);
@@ -85,7 +86,7 @@ public class Innkeeper extends Agent
 				setInterrupted(true);
 				//queue current action and commence with interaction
 				heldActionStack.push(currentAction);
-				beginInteraction(agent, world);
+				beginInteraction(agent, world, gameState);
 			}
 			else
 			{
@@ -99,9 +100,9 @@ public class Innkeeper extends Agent
 		}
 	}
 	
-	private void beginInteraction(Agent agent, Map world)
+	private void beginInteraction(Agent agent, Map world, GameState gameState)
 	{
-		if (agent == world.getPlayer())
+		if (agent == gameState.getPlayer())
 		{
 			if (conversationNumber == 0)
 			{
@@ -201,7 +202,7 @@ public class Innkeeper extends Agent
 	}
 	
 	@Override
-	public void decideNextAction(Map world)
+	public void decideNextAction(Map world, GameState gameState)
 	{
 		if (isInteractingWithHero())
 		{
@@ -212,7 +213,7 @@ public class Innkeeper extends Agent
 					setInterrupted(true);
 					//queue current action and commence with interaction
 					heldActionStack.push(currentAction);
-					beginInteraction(waitingInteractee, world);
+					beginInteraction(waitingInteractee, world, gameState);
 					setInterruptRequested(false);
 				}
 			}
@@ -239,7 +240,7 @@ public class Innkeeper extends Agent
 				setInterrupted(true);
 				//queue current action and commence with interaction
 				heldActionStack.push(currentAction);
-				beginInteraction(waitingInteractee, world);
+				beginInteraction(waitingInteractee, world, gameState);
 				setInterruptRequested(false);
 			}
 		}

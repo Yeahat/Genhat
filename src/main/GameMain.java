@@ -10,6 +10,7 @@ import java.util.Random;
 
 
 
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -43,6 +44,7 @@ import things.Table;
 import things.WallCandle;
 import utils.data.MapSaver;
 import utils.display.DisplayText;
+import world.GameState;
 import world.Grid;
 import world.Position;
 import world.Terrain;
@@ -59,6 +61,7 @@ import static things.Stairs.StairsType.*;
 public class GameMain {
 	
 	Map world;
+	GameState gameState;
 	
 	int arrowKeyInputCount = 0;
 	
@@ -85,10 +88,11 @@ public class GameMain {
 		while(!Display.isCloseRequested())	//exits when window is closed
 		{
 			//update everything
+			gameState.update();
 			world.updateThings();
-			world.updateAgents();
-			world.updateCameraScrollLock();
-			world.updateCamera();
+			world.updateAgents(gameState);
+			world.updateCameraScrollLock(gameState);
+			world.updateCamera(gameState);
 			//render everything
 			renderGL();
 			
@@ -125,13 +129,13 @@ public class GameMain {
 				//Debugging stuff
 				if (Keyboard.getEventKey() == Keyboard.KEY_T)
 				{
-					world.cycleTimeOfDay();
+					gameState.cycleTimeOfDay();
 				}
 				
 				if (Keyboard.getEventKey() == Keyboard.KEY_S)
 				{
 					System.out.println("Saving map...");
-					MapSaver.saveMap(world);
+					MapSaver.saveMap(world, gameState);
 					System.out.println("Map saved.");
 				}
 				
@@ -147,7 +151,7 @@ public class GameMain {
 					//Pressed Action Keys
 					if (Keyboard.getEventKey() == Keyboard.KEY_Z)
 					{
-						Hero player = world.getPlayer();
+						Hero player = gameState.getPlayer();
 						if (player != null)
 						{
 							Direction d = player.getDir();
@@ -163,9 +167,9 @@ public class GameMain {
 							case Right: x++; break;
 							}
 							if (world.getAgentAt(x, y, z) != null)
-								world.getAgentAt(x, y, z).interact(player, world);
+								world.getAgentAt(x, y, z).interact(player, world, gameState);
 							else if (world.hasThing(x, y, z))
-								world.getThingsAt(x, y, z).interact(player, world);
+								world.getThingsAt(x, y, z).interact(player, world, gameState);
 							else
 							{
 								if (player.isIdle())
@@ -199,7 +203,7 @@ public class GameMain {
 		case walking:
 			if (Keyboard.isKeyDown(Keyboard.KEY_X))
 			{
-				Hero player = world.getPlayer();
+				Hero player = gameState.getPlayer();
 				if (player != null && !player.isJumping())
 				{
 					if (player.getSpeed() != 4)
@@ -208,7 +212,7 @@ public class GameMain {
 			}
 			else
 			{
-				Hero player = world.getPlayer();
+				Hero player = gameState.getPlayer();
 				if (player != null && !player.isJumping())
 				{
 					if (player.getSpeed() != 2)
@@ -219,7 +223,7 @@ public class GameMain {
 			//Arrow Keys
 			if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 			{
-				Hero player = world.getPlayer();
+				Hero player = gameState.getPlayer();
 				if (player != null)
 				{
 					arrowKeyInputCount ++;
@@ -240,7 +244,7 @@ public class GameMain {
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_UP))
 			{
-				Hero player = world.getPlayer();
+				Hero player = gameState.getPlayer();
 				if (player != null)
 				{
 					arrowKeyInputCount ++;
@@ -261,7 +265,7 @@ public class GameMain {
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 			{
-				Hero player = world.getPlayer();
+				Hero player = gameState.getPlayer();
 				if (player != null)
 				{
 					arrowKeyInputCount ++;
@@ -282,7 +286,7 @@ public class GameMain {
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 			{
-				Hero player = world.getPlayer();
+				Hero player = gameState.getPlayer();
 				if (player != null)
 				{
 					arrowKeyInputCount ++;
@@ -363,8 +367,8 @@ public class GameMain {
 	 */
 	public void initWorld()
 	{
-		//genInnTest();
-		loadInnTest();
+		genInnTest();
+		//loadInnTest();
 	}
 	
 	/**
@@ -383,7 +387,7 @@ public class GameMain {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		
 		GL11.glPushMatrix();
-			world.renderWorld();
+			world.renderWorld(gameState);
 		GL11.glPopMatrix();
 		GL11.glPushMatrix();
 			world.renderOverlay();
@@ -842,10 +846,11 @@ public class GameMain {
 		innkeeper.setPos(new Position(31, 36, 1));
 		agents.add(innkeeper);
 		
-		world.setTod(Sunrise);
-		
 		world.addAgents(agents);
-		world.setPlayer(hero);
+		
+		gameState = new GameState();
+		gameState.setPlayer(hero);
+		gameState.setTimeOfDay(Morning);
 	}
 	
 	private void loadInnTest()
@@ -859,6 +864,7 @@ public class GameMain {
 		agents.add(hero);
 		
 		world.addAgents(agents);
-		world.setPlayer(hero);
+		gameState.setPlayer(hero);
+		gameState.setTimeOfDay(Morning);
 	}
 }

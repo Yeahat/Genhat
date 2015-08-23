@@ -11,6 +11,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import actions.Wander;
+import world.GameState;
 import world.Position;
 import world.Map;
 
@@ -55,7 +56,7 @@ public class Wanderer extends Agent {
 	}
 	
 	@Override
-	public void decideNextAction(Map world) 
+	public void decideNextAction(Map world, GameState gameState) 
 	{
 		if (currentAction != wander)
 			currentAction = wander;

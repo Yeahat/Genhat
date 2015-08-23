@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.opengl.Texture;
 
+import world.GameState;
 import world.Position;
 import world.Map;
 import entities.Agent;
@@ -75,7 +76,7 @@ public abstract class Thing {
 	 * @param world the world in which the thing exists
 	 * @return true when interaction is complete, false if interaction was skipped.
 	 */
-	public boolean interact(Agent agent, Map world)
+	public boolean interact(Agent agent, Map world, GameState gameState)
 	{
 		return true;
 	}

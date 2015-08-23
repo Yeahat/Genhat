@@ -2,6 +2,7 @@ package actions;
 
 import java.util.ArrayList;
 
+import world.GameState;
 import world.Map;
 import entities.Agent;
 
@@ -28,7 +29,7 @@ public class Converse implements Action
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{
 		if (texts.isEmpty() && say.isFinished())
 			return;
@@ -36,7 +37,7 @@ public class Converse implements Action
 		//start a new conversation
 		if (!initialized)
 		{
-			if (interactee == world.getPlayer())
+			if (interactee == gameState.getPlayer())
 				talkingToHero = true;
 			
 			wait = new Wait(waitTimes.get(0));
@@ -55,7 +56,7 @@ public class Converse implements Action
 				names.remove(0);
 				texts.remove(0);
 			}
-			say.execute(agent, world);
+			say.execute(agent, world, gameState);
 			if (say.isFinished())
 			{
 				//set up the next wait time, if there are any left
@@ -68,7 +69,7 @@ public class Converse implements Action
 		}
 		else
 		{
-			wait.execute(agent, world);
+			wait.execute(agent, world, gameState);
 		}
 	}
 

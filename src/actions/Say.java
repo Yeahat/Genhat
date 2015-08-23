@@ -1,10 +1,10 @@
 package actions;
 
 import utils.display.DisplayText;
+import world.GameState;
 import world.Position;
 import world.Map;
 import entities.Agent;
-
 import static entities.Agent.Direction.*;
 
 public class Say implements Action 
@@ -44,11 +44,11 @@ public class Say implements Action
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{
 		if (!initialized)
 		{
-			if (interactee == world.getPlayer())
+			if (interactee == gameState.getPlayer())
 				talkingToHero = true;
 			
 			//turn to face hero
@@ -74,7 +74,7 @@ public class Say implements Action
 				}
 				
 				
-				turn.execute(agent, world);
+				turn.execute(agent, world, gameState);
 			}
 			
 			//fill in the world text box

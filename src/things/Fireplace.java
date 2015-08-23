@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import world.GameState;
 import world.Map;
 import world.Position;
 import entities.Agent;
@@ -175,7 +176,7 @@ public class Fireplace extends Thing {
 	}
 
 	@Override
-	public boolean interact(Agent agent, Map world)
+	public boolean interact(Agent agent, Map world, GameState gameState)
 	{
 		if (!lit)
 			lit = true;

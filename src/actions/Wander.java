@@ -3,6 +3,7 @@ package actions;
 import java.util.Random;
 
 import utils.planners.Distance;
+import world.GameState;
 import world.Position;
 import world.Map;
 import entities.Agent;
@@ -33,7 +34,7 @@ public class Wander implements Action {
 	}
 	
 	@Override
-	public void execute(Agent agent, Map world)
+	public void execute(Agent agent, Map world, GameState gameState)
 	{
 		Random rand = new Random();
 		if (step == null || step.isFinished())
@@ -43,20 +44,20 @@ public class Wander implements Action {
 				if (rand.nextFloat() < turnChance)
 				{
 					turn = new Turn(setTurnDirection());
-					turn.execute(agent, world);
+					turn.execute(agent, world, gameState);
 				}
 				else
 				{
 					if (setStepDirection(agent))
 					{
-						step.execute(agent, world);
+						step.execute(agent, world, gameState);
 					}
 				}
 			}
 		}
 		else
 		{
-			step.execute(agent, world);
+			step.execute(agent, world, gameState);
 		}
 	}
 
